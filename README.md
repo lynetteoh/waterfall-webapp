@@ -11,3 +11,8 @@ Update/install virtualenv using pip: pip install virtualenv
 2. source venv/bin/activate
 
 3. pip install -r requirements.txt
+
+
+## Everytime you add a python dependancy to the project, run:
+
+pip freeze > requirements.txt
