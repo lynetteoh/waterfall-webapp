@@ -1,0 +1,138 @@
+{% load static %}
+
+@font-face {
+    font-family: Fashion;
+    src: url('/static/fonts/Fashion-Fetish-Bold.ttf') format('truetype');
+}
+
+.index_back {
+    background: url('/static/images/splash.jpg');
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
+}
+
+.register_back {
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 8px;
+}
+
+.register_form {
+    padding: 35px;
+}
+
+.bottom_line_motto{
+    padding-left: 7em;
+}
+
+.top_line_motto{
+    padding-left: 3em;
+}
+
+.intro_text {
+    position: absolute;
+    top: 23%;
+    font-family: Fashion, serif;
+    color: #77b59f;
+    text-shadow:
+    -3px -3px 0 #fff,
+    3px -3px 0 #fff,
+    -3px 3px 0 #fff,
+    3px 3px 0 #fff;
+
+}
+
+.navbar-fixed-top {
+    background-color: rgba(158,204,188, 0.96) !important;
+}
+
+
+.padding_top {
+    padding-top: 3em;
+}
+
+.display-5 {
+    font-size: 2.2em !important;
+}
+
+.icon {
+    padding-left: 10px;
+}
+
+.icon:hover {
+    color: grey;
+}
+
+.social_icons {
+    float: right;
+    position: relative;
+    font-size: 27px;
+}
+
+.copyright {
+    float: left;
+    position: relative;
+}
+
+.main_landing {
+    position:  relative;
+    z-index: 1;
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: black !important;
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: black;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+    color: black;
+}
+
+input, textarea {
+    background-color: rgba(255,255,255,0.6) !important;
+    color: black !important;
+}
+
+.display-6 {
+    font-size: 1.7em;
+    color: white;
+}
+
+.footer {
+    min-height: 200px;
+    background-color: white;
+    color: #5b5b5b;
+}
+
+.landing {
+    min-height: 380px;
+}
+
+.nav_text {
+    color: white !important; 
+    padding-left: 4em !important;
+    font-size: 1.2em;
+}
+
+@media screen and (max-width: 992px) {
+    /* For mobile phones: */
+    .nav_text  {
+        padding-left: 0.1em !important;
+    }
+}
+
+.nav_text:hover {
+    color: grey !important; 
+    transition: color 300ms linear;
+
+}
+
+.navbar-default .navbar-nav > li.dropdown:hover > a, 
+.navbar-default .navbar-nav > li.dropdown:hover > a:hover,
+.navbar-default .navbar-nav > li.dropdown:hover > a:focus {
+    background-color: rgb(231, 231, 231);
+    color: rgb(85, 85, 85);
+}
