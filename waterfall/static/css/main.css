@@ -5,6 +5,10 @@
     src: url('/static/fonts/Fashion-Fetish-Bold.ttf') format('truetype');
 }
 
+.container {
+  max-width: 100%;
+}
+
 .index_back {
     background: url('/static/images/splash.jpg');
     background-attachment: fixed;
@@ -112,7 +116,7 @@ input, textarea {
 }
 
 .nav_text {
-    color: white !important; 
+    color: white !important;
     padding-left: 4em !important;
     font-size: 1.2em;
 }
@@ -125,12 +129,12 @@ input, textarea {
 }
 
 .nav_text:hover {
-    color: grey !important; 
+    color: grey !important;
     transition: color 300ms linear;
 
 }
 
-.navbar-default .navbar-nav > li.dropdown:hover > a, 
+.navbar-default .navbar-nav > li.dropdown:hover > a,
 .navbar-default .navbar-nav > li.dropdown:hover > a:hover,
 .navbar-default .navbar-nav > li.dropdown:hover > a:focus {
     background-color: rgb(231, 231, 231);
