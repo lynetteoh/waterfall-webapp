@@ -26,7 +26,6 @@
     <!-- Load our React component. -->
     <body class="">
         <nav class="navbar fixed-top navbar-expand-lg navbar-light navbar-fixed-top">
-
             <a href="/"><img src="{% static "images/waterfall-logo.png" %}" style="padding-left: 35%; padding-top: 5px;padding-bottom: 5px; height: 120px;"/></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -49,12 +48,11 @@
                         </a>
                     </li>
                 </div>
-            </div>
 
         </nav><button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup"></div>
         {% block content %} {% endblock %}
         <div class="footer">
                 <div class="container desktopView">
