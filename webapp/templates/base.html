@@ -24,38 +24,65 @@
     </head>
 
     <!-- Load our React component. -->
-    <body class="">
-        <nav class="navbar fixed-top navbar-expand-lg navbar-light navbar-fixed-top">
-
-            <a href="/"><img src="{% static "images/waterfall-logo.png" %}" style="padding-left: 35%; padding-top: 5px;padding-bottom: 5px; height: 120px;"/></a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
-                <div class="navbar-nav" style="padding-right: 35px; font-size:18px;">
-                    <li class="nav-item">
-                        <a id="about_nav" class="nav_text nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Product
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="services_nav" class="nav_text nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Team
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="contact_nav" class="nav_text nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Login
-                        </a>
-                    </li>
-                </div>
+    <body>
+        <!-- Top Navbar -->
+        <div class="navbar fixed-top navbar-light navbar-fixed-top">
+            <div class="navbar-header">
+              <a href="/"><img src="{% static "images/waterfall-logo.png" %}"  style="padding-left: 35%; padding-top: 5px;padding-bottom: 5px; height: 120px;"/></a>
             </div>
 
-        </nav><button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
-        {% block content %} {% endblock %}
+            <ul class="nav navbar-nav navbar-right" style="max-height:120px; padding-right:10%">
+                <li style="padding-top:20px; text-align:right; color:white; font-size:18px; padding-right:35px;">BALANCE
+                  <p style="font-size: 25px;">$380.50</p>
+                </li>
+                <li>
+                  <a href="/"><img src="{% static "images/anon-user.svg" %}" style="padding-top: 5px;padding-bottom: 5px; height: 95px;"/></a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="container-fluid" style="padding-top:135px">
+            <div class="row row-offcanvas row-offcanvas-left">
+                <!-- Sidebar -->
+                <div class="col-xs-5 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation" style="background-color:#666666; padding-top: 5vh; min-width: 300px; height: 100vh; padding-left:-50px;">
+                    <ul class="nav" style="display:block;">
+                        <li>
+                          <a id="about_nav" class="active nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">Dashboard
+                          </a>
+                        </li>
+                        <li>
+                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">TricklePay
+                          </a>
+                        </li>
+                        <li style="padding-left:1em;">
+                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" style="font-size:16px;" href="#">Pay
+                          </a>
+                        </li>
+                        <li style="padding-left:1em;">
+                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" style="font-size:16px;" href="#">Request
+                          </a>
+                        </li>
+                        <li style="padding-left:1em;">
+                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" style="font-size:16px;" href="#">Split
+                          </a>
+                        </li>
+                        <li>
+                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">Groups
+                          </a>
+                        </li>
+                        <li style="padding-left:1em;">
+                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" style="font-size:16px;" href="#">Create Group
+                          </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-xs-12 col-sm-9">
+                    <!-- Rendered Body -->
+                    {% block content %} {% endblock %}
+                </div>
+            </div>
+        </div>
         <div class="footer">
                 <div class="container desktopView">
                     <br/>
