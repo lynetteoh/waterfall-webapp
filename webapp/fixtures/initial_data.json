@@ -1,0 +1,31 @@
+[
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$120000$qAlxdTYvaUzn$XnyeascHUHt6LH/fbZ8iPc9aVZ5lTAC74qQUfQcEMyA=",
+            "last_login": "2018-09-15T10:58:23.335Z",
+            "is_superuser": true,
+            "username": "admin",
+            "first_name": "",
+            "last_name": "",
+            "email": "admin@admin.com",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2018-09-15T10:58:05.971Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+
+    {
+        "model": "webapp.profile",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "avatar": "",
+            "timezone": "Australia/Sydney"
+        }
+    }
+    ]
+    
