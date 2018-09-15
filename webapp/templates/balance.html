@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Waterfall</title>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<style type="text/css">
+  input[type="text"] {
+    font-size: 16px;
+  }
+  input[type="text"][readonly] {
+    border: 2px solid rgba(0,0,0,0);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container bootstrap snippet">
+  <div class="row">
+      <div class="col-sm-10">
+        <h1>Balance Management &nbsp;&nbsp;</h1>
+        <h3 style="padding-top:15px; font-size:20px;">Current Balance </h3>
+        <p style="padding-left:10%; color:grey; font-size: 40px; text-align:center;">$380.50</p>
+      </div>
+        <!-- Balance Edit Buttons -->
+      <div class="col-sm-10" style="min-width:150px; padding-left:10%;">
+        <div class="row">
+          <div style="min-width:50%; display:inline;">
+            <input type="text" class="text-center form-control" name="add_amount" id="add_amount" placeholder="0.00" style="width:80px;">
+            <p style="font-size:0.1px;"><br></p>
+            <div style="padding-left:5%;">
+              <button class="btn btn-lg btn-success text-center" type="submit" value="Add" onclick="popup(0.00, false)" style="font-size:17px; border-radius:50%; float:left;">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <div style="display:inline; min-width:50%; padding-left:36%; float:right;">
+            <input type="text" class="text-center form-control" name="minus_amount" id="minus_amount" placeholder="0.00" style="width: 80px;">
+            <p style="font-size:0.1px;"><br></p>
+            <div style="padding-right:25%">
+              <button class="btn btn-lg btn-danger" type="submit" value="Withdraw" onclick="popup(0.00, true)" style="font-size:17px; border-radius:50%; float:right;">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div><!-- end of buttons -->
+    </div>
+
+    <br> <br>
+    <!-- Payment Options -->
+    <div class="row">
+      <div class="col-sm-10">
+        <h3 style="font-size:20px;">Edit Card Payment Options &nbsp;&nbsp;
+          <!-- <button class="btn" type="button" value="Edit" onclick="editCard()" style="font-size:15px;">
+            <i class="fas fa-edit"></i>&nbsp;Edit
+          </button> -->
+        </h3>
+        <!-- Credit Card Account Details -->
+        <div class="panel panel-default credit-card-box">
+            <div class="panel-body">
+                <form role="form" id="card-form" method="POST">
+                    <div class="row">
+                        <div class="col-xs-7 col-md-7">
+                            <div class="form-group">
+                                <label for="cardNumber">Card Number</label>
+                                <div class="input-group">
+                                    <input type="tel" class="form-control" name="cardNumber" placeholder="Card Number" autocomplete="cc-number" required autofocus
+                                    />
+                                </div>
+                              </div>
+                        </div>
+                        <div class="col-xs-5 col-md-5 pull-right" style="padding-top:4%;">
+                          <img class="img-responsive pull-right" style="float:right;" src="http://i76.imgup.net/accepted_c22e0.png">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-7 col-md-7">
+                            <div class="form-group">
+                                <label for="cardExpiry">
+                                  <span class="hidden-xs">Expiry Date</span>
+                                </label>
+                                <input type="tel" class="form-control" name="cardExpiry" placeholder="MM / YY" autocomplete="cc-exp" required
+                                />
+                            </div>
+                        </div>
+                        <div class="col-xs-5 col-md-5 pull-right">
+                            <div class="form-group">
+                                <label for="cardCVC">CV Code</label>
+                                <input type="tel" class="form-control" name="cardCVC" placeholder="CVC" autocomplete="cc-csc" required
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                       <div class="col-xs-12 text-left">
+                          	<button class="btn btn-lg btn-success" type="submit"><i class="fas fa-check"></i> &nbsp;Save Card</button>
+                            <!-- &nbsp; &nbsp;
+                           	<button class="btn btn-lg btn-danger" type="reset" onclick="disableForm()"><i class="fas fa-ban" ></i>&nbsp;Cancel</button> -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div> <!-- end of card payments row -->
+
+  </div> <!-- end of container -->
+</div>
+
+  <script type="text/javascript">
+  function popup(amount, isWithdraw){
+    var text = "";
+    if (isWithdraw && onlyNumbers(amount)) {
+      text = "Withdrawing $" + amount + "?";
+    } else {
+      text = "Depositing $" + amount + "?";
+    }
+    swal({
+      title: text,
+      text:  "Once processed, this action cannot be undone.",
+      icon:  "warning",
+      buttons: true,
+    }).then((confirmed) => {
+      if (confirmed) {
+        swal({
+          title: "Success!",
+          text:  "The transaction has been processed.",
+          icon:  "success",
+        });
+      }
+    });
+  }
+
+  function onlyNumbers(txt) {
+    if (isNaN(txt) || parseFloat(txt) < 0) {
+      swal({
+        title: "Invalid Amount",
+        text:  "Please only input positive numeric amounts.",
+        icon:  "warning",
+      });
+      return false;
+    }
+    return true;
+  }
+
+  function editCard() {
+    if (document.getElementById("card-form").style.display == "none") {
+      document.getElementById("card-form").style.display = "block"
+    } else {
+      document.getElementById("card-form").style.display = "none"
+    }
+  }
+</script>
+{% endblock %}

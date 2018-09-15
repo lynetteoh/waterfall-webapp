@@ -10,3 +10,6 @@ def dashboard(request):
 
 def profile(request):
     return render(request, 'profile.html')
+
+def balance(request):
+    return render(request, 'balance.html')
