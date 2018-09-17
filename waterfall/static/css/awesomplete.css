@@ -20,6 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 Taken from : https://leaverou.github.io/awesomplete/ */
 
+{% load static %}
+
 .awesomplete [hidden] {
     display: none;
 }
