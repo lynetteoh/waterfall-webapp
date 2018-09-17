@@ -25,4 +25,7 @@ urlpatterns = [
     path('dashboard', views.dashboard, name='dashboard'),
     path('profile', views.profile, name='profile'),
     path('balance', views.balance, name='balance'),
+    path('pay', views.pay, name='pay'),
+    path('request', views.request_payment, name='request_payment'),
+    path('split', views.split, name='split'),
 ]
