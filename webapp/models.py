@@ -38,7 +38,7 @@ class Account(models.Model):
 
     @property
     def balance(self):
-        return self.transaction_set.aggregate(Sum('value'))['value__sum']
+        return self.user.transaction_set.aggregate(Sum('value'))['value__sum']
 
     def __str__(self):
         return '@{}'.format(self.user.username)
