@@ -28,4 +28,5 @@ urlpatterns = [
     path('pay', views.pay, name='pay'),
     path('request', views.request_payment, name='request_payment'),
     path('split', views.split, name='split'),
+    path('team', views.team, name='team'),
 ]
