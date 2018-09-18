@@ -22,6 +22,66 @@
         <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
         <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+        <style>
+          #header-logo {
+            padding-left: 35%;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            height: 120px;
+          }
+
+        #balance-name {
+          padding-top:20px;
+          text-align:right;
+          color:white;
+          font-size:18px;
+          padding-right:35px;
+        }
+
+        #navbar {
+          max-height:120px;
+          padding-right:10%;
+        }
+
+        #user-icon {
+          padding-top: 5px;
+          padding-bottom: 5px;
+          height: 95px;
+        }
+
+        #footer {
+           max-width:200px;
+           margin-right: 10px !important;
+        }
+
+        #sidebar-wrapper {
+          padding-top:135px;
+          width: 1500px;
+        }
+
+        #sidebar {
+          background-color:#666666;
+          padding-top: 5vh;
+          width: 400x;
+          min-height: 100vh;
+        }
+
+        #rendered-body {
+          padding-top: 5vh;
+          min-width: 300px;
+          max-height: 100vh;
+          padding-left:70px;
+        }
+
+        .subnav {
+          font-size: 16px;
+        }
+
+        .subnav-list {
+          padding-left: 15%;
+        }
+        </style>
     </head>
 
     <!-- Load our React component. -->
@@ -29,64 +89,68 @@
         <!-- Top Navbar -->
         <div class="navbar fixed-top navbar-light navbar-fixed-top">
             <div class="navbar-header">
-              <a href="/"><img src="{% static "images/waterfall-logo.png" %}"  style="padding-left: 35%; padding-top: 5px;padding-bottom: 5px; height: 120px;"/></a>
+              <a href="/"><img src="{% static "images/waterfall-logo.png" %}"  id="header-logo"/></a>
             </div>
 
-            <ul class="nav navbar-nav navbar-right" style="max-height:120px; padding-right:10%">
-                <li style="padding-top:20px; text-align:right; color:white; font-size:18px; padding-right:35px;">BALANCE
+            <ul class="nav navbar-nav navbar-right" id="navbar">
+                <li id="balance-name">BALANCE
                   <p style="font-size: 25px;">${{ user.account.balance | floatformat:"2" }}</p>
                 </li>
                 <li>
-                  <a href="/"><img src="{% static "images/anon-user.svg" %}" style="padding-top: 5px;padding-bottom: 5px; height: 95px;"/></a>
+                  <a href="/"><img src="{% static "images/anon-user.svg" %}" id="user-icon"/></a>
                 </li>
             </ul>
         </div>
 
-        <div class="container-fluid" style="padding-top:135px;">
-            <div class="row row-offcanvas row-offcanvas-left">
+        <div id="sidebar-wrapper">
+            <div class="row">
                 <!-- Sidebar -->
-                <div class="col-xs-5 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation" style="background-color:#666666; padding-top: 5vh; min-width: 300px; min-height: 100vh; padding-left:-50px;">
-                    <ul class="nav" style="display:block;">
+                <div class="col-sm-3" id="sidebar" role="navigation">
+                    <ul class="nav" style="display:block; position:fixed;">
                         <li>
-                          <a id="about_nav" class="active nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">Dashboard
+                          <a href="{% url 'webapp:dashboard'%}" id="about_nav" class="active nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" >Dashboard
                           </a>
                         </li>
-                        <li style="padding-left:1em;">
-                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" style="font-size:16px;" href="#">Account
+                        <li class="subnav-list">
+                          <a id="about_nav" class="nav_text nav-link subnav" if="navbarDropdown" role="button" data-toggle="dropdown" href="profile">Profile Settings
                           </a>
                         </li>
-                        <li style="padding-left:1em;">
-                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" style="font-size:16px;" href="#">Balance Management
+                        <li class="subnav-list">
+                          <a id="about_nav" class="nav_text nav-link subnav" if="navbarDropdown" role="button" data-toggle="dropdown" href="balance">Balance Management
+                          </a>
+                        </li>
+                        <li class="subnav-list">
+                          <a id="about_nav" class="nav_text nav-link subnav" if="navbarDropdown" role="button" data-toggle="dropdown" href="logout">Logout
                           </a>
                         </li>
                         <li>
-                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">TricklePay
+                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" href="pay">TricklePay
                           </a>
                         </li>
-                        <li style="padding-left:1em;">
-                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" style="font-size:16px;" href="#">Pay
+                        <li class="subnav-list">
+                          <a id="about_nav" class="nav_text nav-link subnav" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">Pay
                           </a>
                         </li>
-                        <li style="padding-left:1em;">
-                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" style="font-size:16px;" href="#">Request
+                        <li class="subnav-list">
+                          <a id="about_nav" class="nav_text nav-link subnav" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">Request
                           </a>
                         </li>
-                        <li style="padding-left:1em;">
-                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" style="font-size:16px;" href="#">Split
+                        <li class="subnav-list">
+                          <a id="about_nav" class="nav_text nav-link subnav" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">Split
                           </a>
                         </li>
                         <li>
                           <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">Groups
                           </a>
                         </li>
-                        <li style="padding-left:1em;">
-                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" style="font-size:16px;" href="#">Create Group
+                        <li class="subnav-list">
+                          <a id="about_nav" class="nav_text nav-link subnav" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">Create Group
                           </a>
                         </li>
                     </ul>
                 </div>
 
-                <div class="col-xs-12 col-sm-9" style="padding-top: 5vh; min-width: 300px; max-height: 100vh; padding-left:70px;">
+                <div class="col-xs-12 col-sm-9" id="rendered-body">
                     <!-- Rendered Body -->
                     {% block content %} {% endblock %}
                 </div>
@@ -97,7 +161,7 @@
                     <br/>
                     <br/>
                     <div class="copyright">
-                        <p style="max-width:200px; margin-right: 10px !important;" class="bottomText"> Project Waterfall &copy; 2018</p>
+                        <p id="footer" class="bottomText"> Project Waterfall &copy; 2018</p>
                     </div>
                     <div class="social_icons">
                         <i class="fab fa-facebook-square icon"></i>

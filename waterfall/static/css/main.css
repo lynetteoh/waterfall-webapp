@@ -47,7 +47,8 @@
 }
 
 .navbar-fixed-top {
-    background-color: rgba(158,204,188, 0.96) !important;
+    background-color: #88cebc !important;
+    /* rgba(158,204,188, 0.96) !important; */
 }
 
 .padding_top {
@@ -123,7 +124,7 @@ input, textarea {
 @media screen and (max-width: 992px) {
     /* For mobile phones: */
     .nav_text  {
-        padding-left: 0.1em !important;
+        padding-left: 5% !important;
     }
 }
 
