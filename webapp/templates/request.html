@@ -28,8 +28,7 @@
                             <button class="col-sm-2 btn btn-primary" id="add" onclick="add()">Add <i class="fa fa-plus"></i></button>
                         </div>
                     </div>
-                    <form role="form" id="req-form" onsubmit="event.preventDefault();popup('req-form','amount')"
-                        method="POST">
+                    <form role="form" id="req-form" onsubmit="event.preventDefault();popup('req-form','amount')" method="POST">
                         {% csrf_token %}
                         <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
                             <ul class="pt-2 form-inline" id='req_users'>
@@ -97,9 +96,8 @@
         return btn;
     }
 
-    function popup(form, amount) {
-        var text = document.getElementById(amount).value;
-        var form = document.getElementById(form)
+    function popup(f, amountId) {
+        var text = document.getElementById(amountId).value;
         swal({
             title: text,
             text: "Once processed, this action cannot be undone.",
@@ -113,7 +111,7 @@
                     text: "The transaction has been processed.",
                     icon: "success",
                 }).then((submit) => {
-                    form.submit();
+                    document.getElementById(f).submit();
                 });
             } else {
                 swal("Your transaction has been cancelled!");

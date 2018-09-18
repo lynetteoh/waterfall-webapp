@@ -218,9 +218,8 @@
 </div>
 
 <script class="text/javascript">
-    function popup(form, amountId) {
-        var text = document.getElementById(amountId).value;
-        var form = document.getElementById(form)
+    function popup(form, amount) {
+        var text = document.getElementById(amount).value;
         swal({
             title: text,
             text: "Once processed, this action cannot be undone.",
@@ -234,7 +233,7 @@
                     text: "The transaction has been processed.",
                     icon: "success",
                 }).then((submit) => {
-                    form.submit();
+                    document.getElementById(form).submit();
                 });
             } else {
                 swal("Your transaction has been cancelled!");
