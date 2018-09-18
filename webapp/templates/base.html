@@ -5,6 +5,7 @@
         {% block title %} {% endblock %}
         {% block css %} {% endblock %}
         <link href="{% static "css/main.css" %}" rel="stylesheet" type="text/css">
+        <link href="{% static "css/base.css" %}" rel="stylesheet" type="text/css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
         <link rel="icon"
@@ -12,76 +13,13 @@
           href="{% static 'images/waterfall-logo.png' %}">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <script src="https://storage.googleapis.com/vrview/2.0/build/vrview.min.js"></script>
-
         <script src="{% static 'js/jquery-3.1.0.js' %}"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <link href="https://fonts.googleapis.com/css?family=Hind:300|Nanum+Gothic" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Assistant|IBM+Plex+Sans" rel="stylesheet">
-        <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-        <style>
-          #header-logo {
-            padding-left: 35%;
-            padding-top: 5px;
-            padding-bottom: 5px;
-            height: 120px;
-          }
-
-        #balance-name {
-          padding-top:20px;
-          text-align:right;
-          color:white;
-          font-size:18px;
-          padding-right:35px;
-        }
-
-        #navbar {
-          max-height:120px;
-          padding-right:10%;
-        }
-
-        #user-icon {
-          padding-top: 5px;
-          padding-bottom: 5px;
-          height: 95px;
-        }
-
-        #footer {
-           max-width:200px;
-           margin-right: 10px !important;
-        }
-
-        #sidebar-wrapper {
-          padding-top:135px;
-          width: 1500px;
-        }
-
-        #sidebar {
-          background-color:#666666;
-          padding-top: 5vh;
-          width: 400x;
-          min-height: 100vh;
-        }
-
-        #rendered-body {
-          padding-top: 5vh;
-          min-width: 300px;
-          max-height: 100vh;
-          padding-left:70px;
-        }
-
-        .subnav {
-          font-size: 16px;
-        }
-
-        .subnav-list {
-          padding-left: 15%;
-        }
-        </style>
     </head>
 
     <!-- Load our React component. -->
@@ -94,7 +32,7 @@
 
             <ul class="nav navbar-nav navbar-right" id="navbar">
                 <li id="balance-name">BALANCE
-                  <p style="font-size: 25px;">${{ user.account.balance | floatformat:"2" }}</p>
+                  <p id="balance-text">${{ user.account.balance | floatformat:"2" }}</p>
                 </li>
                 <li>
                   <a href="/"><img src="{% static "images/anon-user.svg" %}" id="user-icon"/></a>
@@ -106,45 +44,45 @@
             <div class="row">
                 <!-- Sidebar -->
                 <div class="col-sm-3" id="sidebar" role="navigation">
-                    <ul class="nav" style="display:block; position:fixed;">
+                    <ul class="nav" id="nav-list">
                         <li>
-                          <a href="{% url 'webapp:dashboard'%}" id="about_nav" class="active nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" >Dashboard
+                          <a href="{% url 'dashboard'%}" id="about_nav" class="active nav_text nav-link" role="button">Dashboard
                           </a>
                         </li>
                         <li class="subnav-list">
-                          <a id="about_nav" class="nav_text nav-link subnav" if="navbarDropdown" role="button" data-toggle="dropdown" href="profile">Profile Settings
+                          <a id="about_nav" class="nav_text nav-link subnav" href={% url 'profile'%}>Profile Settings
                           </a>
                         </li>
                         <li class="subnav-list">
-                          <a id="about_nav" class="nav_text nav-link subnav" if="navbarDropdown" role="button" data-toggle="dropdown" href="balance">Balance Management
+                          <a id="about_nav" class="nav_text nav-link subnav" role="button" href={% url 'balance'%}>Balance Management
                           </a>
                         </li>
                         <li class="subnav-list">
-                          <a id="about_nav" class="nav_text nav-link subnav" if="navbarDropdown" role="button" data-toggle="dropdown" href="logout">Logout
-                          </a>
-                        </li>
-                        <li>
-                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" href="pay">TricklePay
-                          </a>
-                        </li>
-                        <li class="subnav-list">
-                          <a id="about_nav" class="nav_text nav-link subnav" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">Pay
-                          </a>
-                        </li>
-                        <li class="subnav-list">
-                          <a id="about_nav" class="nav_text nav-link subnav" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">Request
-                          </a>
-                        </li>
-                        <li class="subnav-list">
-                          <a id="about_nav" class="nav_text nav-link subnav" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">Split
+                          <a id="about_nav" class="nav_text nav-link subnav"  role="button" href="#">Logout
                           </a>
                         </li>
                         <li>
-                          <a id="about_nav" class="nav_text nav-link" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">Groups
+                          <a id="about_nav" class="nav_text nav-link" role="button" href="#">TricklePay
                           </a>
                         </li>
                         <li class="subnav-list">
-                          <a id="about_nav" class="nav_text nav-link subnav" if="navbarDropdown" role="button" data-toggle="dropdown" href="#">Create Group
+                          <a id="about_nav" class="nav_text nav-link subnav" role="button" href="#">Pay
+                          </a>
+                        </li>
+                        <li class="subnav-list">
+                          <a id="about_nav" class="nav_text nav-link subnav" role="button" href="#">Request
+                          </a>
+                        </li>
+                        <li class="subnav-list">
+                          <a id="about_nav" class="nav_text nav-link subnav" role="button"href="#">Split
+                          </a>
+                        </li>
+                        <li>
+                          <a id="about_nav" class="nav_text nav-link" role="button" href="#">Groups
+                          </a>
+                        </li>
+                        <li class="subnav-list">
+                          <a id="about_nav" class="nav_text nav-link subnav" role="button" href="#">Create Group
                           </a>
                         </li>
                     </ul>
