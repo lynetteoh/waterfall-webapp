@@ -1,3 +1,5 @@
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -6,6 +8,8 @@ __pycache__/
 # VS Code
 .vscode/
 
+# Mac OSX
+.DS_Store
 
 # C extensions
 *.so
@@ -106,3 +110,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+webapp/templates/.DS_Store
+waterfall/static/css/.DS_Store
+webapp/migrations/.DS_Store

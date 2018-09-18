@@ -34,7 +34,7 @@
 
             <ul class="nav navbar-nav navbar-right" style="max-height:120px; padding-right:10%">
                 <li style="padding-top:20px; text-align:right; color:white; font-size:18px; padding-right:35px;">BALANCE
-                  <p style="font-size: 25px;">$380.50</p>
+                  <p style="font-size: 25px;">${{ user.account.balance | floatformat:"2" }}</p>
                 </li>
                 <li>
                   <a href="/"><img src="{% static "images/anon-user.svg" %}" style="padding-top: 5px;padding-bottom: 5px; height: 95px;"/></a>
