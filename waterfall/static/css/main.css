@@ -47,7 +47,7 @@
 }
 
 .navbar-fixed-top {
-    background-color: #81d1bc !important;
+    background-color: #88cebc !important;
     /* rgba(158,204,188, 0.96) !important; */
 }
 
@@ -124,7 +124,7 @@ input, textarea {
 @media screen and (max-width: 992px) {
     /* For mobile phones: */
     .nav_text  {
-        padding-left: 0.1em !important;
+        padding-left: 5% !important;
     }
 }
 
