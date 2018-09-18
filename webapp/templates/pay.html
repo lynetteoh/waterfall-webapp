@@ -48,7 +48,7 @@
                                         <i class="fa fa-plus"></i></button>
                                 </div>
                             </div>
-                            <form role="form" id="pay-form" onsubmit="event.preventDefault();popup('pay-form','pay_amount')"
+                            <form role="form" id="pay-form" onsubmit="event.preventDefault();popup('pay_users','pay-form','pay_amount')"
                                 method="POST">
                                 {% csrf_token %}
                                 <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
@@ -69,12 +69,13 @@
                                         <input type=date class="form-control col-sm-4" role="input" id="date" required>
                                         <div class="text-center col-sm-5">
                                             <div class="btn-group  pl-5">
-                                                <input type="radio" id="once" name="selector"><label for="once" class="btn">Once</label>
-                                                <input type="radio" id="weekly" name="selector"><label for="weekly"
+                                                <input type="radio" name="pay_freq" id="once" value="once"required><label for="once"
+                                                    class="btn">Once</label>
+                                                <input type="radio" name="pay_freq" id="weekly"value="weekly"><label for="weekly"
                                                     class="btn">Weekly</label>
-                                                <input type="radio" id="monthly" name="selector"><label for="monthly"
+                                                <input type="radio" name="pay_freq" id="monthly"value="monthly"><label for="monthly"
                                                     class="btn ">Monthly</label>
-                                                <input type="radio" id="yearly" name="selector"><label for="yearly"
+                                                <input type="radio" name="pay_freq" id="yearly"value="yearly"><label for="yearly"
                                                     class="btn ">Yearly</label>
                                             </div>
                                         </div>
@@ -87,7 +88,7 @@
                                     </div>
                                 </div>
                                 <div class="text-center p-4">
-                                    <button class="btn btn-lg btn-primary" onclick="popup('pay_amount')" type="submit">TricklePay
+                                    <button class="btn btn-lg btn-primary" type="submit">TricklePay
                                         <i class="fa fa-credit-card px-2"></i></button>
                                 </div>
                             </form>
@@ -107,7 +108,7 @@
                                         <i class="fa fa-plus"></i></button>
                                 </div>
                             </div>
-                            <form role="form" id="req-form" onsubmit="event.preventDefault();popup('req-form','req_amount')"
+                            <form role="form" id="req-form" onsubmit="event.preventDefault();popup('req_users','req-form','req_amount')"
                                 method="POST">
                                 {% csrf_token %}
                                 <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
@@ -128,12 +129,13 @@
                                         <input type=date class="form-control col-sm-4" role="input" id="date" required>
                                         <div class="text-center col-sm-5">
                                             <div class="btn-group  pl-5">
-                                                <input type="radio" id="once" name="selector"><label for="once" class="btn">Once</label>
-                                                <input type="radio" id="weekly" name="selector"><label for="weekly"
+                                                <input type="radio" name="req_freq" id="once" value="once" required><label for="once"
+                                                    class="btn">Once</label>
+                                                <input type="radio" name="req_freq" id="weekly" value="weekly"><label for="weekly"
                                                     class="btn">Weekly</label>
-                                                <input type="radio" id="monthly" name="selector"><label for="monthly"
+                                                <input type="radio" name="req_freq" id="monthly" value="monthly"><label for="monthly"
                                                     class="btn ">Monthly</label>
-                                                <input type="radio" id="yearly" name="selector"><label for="yearly"
+                                                <input type="radio" name="req_freq" id="yearly" value="yearly"><label for="yearly"
                                                     class="btn ">Yearly</label>
                                             </div>
                                         </div>
@@ -146,7 +148,7 @@
                                     </div>
                                 </div>
                                 <div class="text-center p-4">
-                                    <button class="btn btn-lg btn-primary" type="submit" onclick="popup('req_amount')">Request
+                                    <button class="btn btn-lg btn-primary" type="submit">Request
                                         <i class="fa fa-paper-plane px-2"></i></button>
                                 </div>
                             </form>
@@ -166,7 +168,7 @@
                                         <i class="fa fa-plus"></i></button>
                                 </div>
                             </div>
-                            <form role="form" id="split-form" onsubmit="event.preventDefault();popup('split-form','split_amount')"
+                            <form role="form" id="split-form" onsubmit="event.preventDefault();popup('split_users','split-form','split_amount')"
                                 method="POST">
                                 {% csrf_token %}
                                 <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
@@ -187,12 +189,13 @@
                                         <input type=date class="form-control col-sm-4" role="input" id="date" required>
                                         <div class="text-center col-sm-5">
                                             <div class="btn-group  pl-5">
-                                                <input type="radio" id="once" name="selector"><label for="once" class="btn">Once</label>
-                                                <input type="radio" id="weekly" name="selector"><label for="weekly"
+                                                <input type="radio" name="split_freq" id="once" value="once" required><label for="once"
+                                                    class="btn">Once</label>
+                                                <input type="radio" name="split_freq" id="weekly" value="weekly"><label for="weekly"
                                                     class="btn">Weekly</label>
-                                                <input type="radio" id="monthly" name="selector"><label for="monthly"
+                                                <input type="radio" name="split_freq" id="monthly" value="monthly"><label for="monthly"
                                                     class="btn ">Monthly</label>
-                                                <input type="radio" id="yearly" name="selector"><label for="yearly"
+                                                <input type="radio" name="split_freq" id="yearly" value="yearly"><label for="yearly"
                                                     class="btn ">Yearly</label>
                                             </div>
                                         </div>
@@ -218,27 +221,33 @@
 </div>
 
 <script class="text/javascript">
-    function popup(form, amount) {
+    function popup(ul, form, amount) {
         var text = document.getElementById(amount).value;
-        swal({
-            title: text,
-            text: "Once processed, this action cannot be undone.",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((confirmed) => {
-            if (confirmed) {
-                swal({
-                    title: "Success!",
-                    text: "The transaction has been processed.",
-                    icon: "success",
-                }).then((submit) => {
-                    document.getElementById(form).submit();
-                });
-            } else {
-                swal("Your transaction has been cancelled!");
-            }
-        });
+        if (document.getElementById(ul).getElementsByTagName('li').length == 1) {
+            swal({
+                title: '$ ' + text,
+                text: "Once processed, this action cannot be undone.",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((confirmed) => {
+                if (confirmed) {
+                    swal({
+                        title: "Success!",
+                        text: "The transaction has been processed.",
+                        icon: "success",
+                    }).then((submit) => {
+                        document.getElementById(form).submit();
+                    });
+                } else {
+                    swal("Your transaction has been cancelled!");
+                }
+            });
+        }else if(document.getElementById(ul).getElementsByTagName('li').length >= 1){
+            swal ( "Oops" ,  "Please choose only 1 user !");
+        }else {
+            swal ( "Oops" ,  "Please choose a user !");
+        }
     }
 
     function add(search, user) {
