@@ -1,9 +1,11 @@
+
+/* Enables and disables profile editing on clicks. */
 function editProfile() {
-    if (document.getElementById("change-settings").style.display === "none") {
-      enableProfileForm()
-    } else {
-      disableProfileForm()
-    }
+  if (document.getElementById("change-settings").style.display === "none") {
+    enableProfileForm()
+  } else {
+    disableProfileForm()
+  }
 }
 
 function disableProfileForm() {

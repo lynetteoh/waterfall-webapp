@@ -94,7 +94,7 @@
 
             <ul class="nav navbar-nav navbar-right" id="navbar">
                 <li id="balance-name">BALANCE
-                  <p style="font-size: 25px;">$380.50</p>
+                  <p style="font-size: 25px;">${{ user.account.balance | floatformat:"2" }}</p>
                 </li>
                 <li>
                   <a href="/"><img src="{% static "images/anon-user.svg" %}" id="user-icon"/></a>
