@@ -42,17 +42,11 @@ def balance(request):
     return render_to_response('balance.html', context)
 
 def pay(request):
-    return render(request, 'pay1.html')
-
-# def pay(request):
-#     context = {"pay_page": "active"} 
-#     return render(request, 'pay.html', context)
-
-
-def request_payment(request):
-    context = {"request_page": "active"}
-    return render(request, 'request.html', context)
-
-def split(request):
-    context = {"split_page": "active"}
-    return render(request, 'split.html', context)
+    all_users = User.objects.all().exclude(username='admin')
+    users = all_users.exclude(username='admin')
+    for user in users: 
+        print (user)
+    context ={
+        "users": users
+    }
+    return render(request, 'pay.html', context)
