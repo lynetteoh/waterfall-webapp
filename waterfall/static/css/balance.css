@@ -1,0 +1,46 @@
+{% load static %}
+
+#balance-value {
+  padding-left:10%;
+  color:grey;
+  font-size: 40px;
+  text-align:center;
+}
+
+#balance-buttons {
+  min-width:150px;
+  padding-left:10%;
+}
+
+#plus-button {
+  font-size:17px;
+  border-radius:50%;
+  float:left;
+}
+
+#minus-button {
+  font-size:17px;
+  border-radius:50%;
+  float:right;
+}
+
+#minus-amount{
+  width: 80px;
+}
+
+#add-amount{
+  width: 80px;
+}
+
+.button-row {
+  min-width:50%;
+  display:inline;
+}
+
+.input-amount {
+  width: 80px;
+}
+
+.subheader {
+  font-size:20px;
+}

@@ -26,4 +26,5 @@ urlpatterns = [
     path('profile', views.profile, name='profile'),
     path('balance', views.balance, name='balance'),
     path('pay', views.pay, name='pay'),
+    path('team', views.team, name='team'),
 ]

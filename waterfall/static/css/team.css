@@ -1,0 +1,28 @@
+.member_image {
+    max-width: 150px;
+    max-height: 150px;
+    padding: 15px;
+    border-radius: 50% !important;
+}
+
+.about_product {
+    background-color: #f2f2f2;
+}
+
+.card {
+    background-color: #f2f2f2 !important;
+    border: none !important;
+}
+
+.profile_card {
+    padding-right: 30px;
+    
+}
+
+.padding_top {
+    padding-top: 150px !important;
+}
+
+.card-text {
+    font-size: 15px !important;
+}

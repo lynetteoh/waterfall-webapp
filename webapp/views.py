@@ -23,6 +23,17 @@ def dashboard(request):
         }
     return render_to_response('dashboard.html', context)
 
+
+def team(request):
+    # Temporary fixed user login
+    user = User.objects.filter(username='admin').distinct()[0]
+
+    context = {
+        "user": user
+        }
+    
+    return render_to_response('team.html', context)
+
 def profile(request):
         # Temporary fixed user login
     user = User.objects.filter(username='admin').distinct()[0]
