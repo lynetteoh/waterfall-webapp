@@ -1,0 +1,59 @@
+{% load static %}
+
+.panel .panel-heading {
+    background-color: rgb(136, 206, 188);
+    padding-top: 1%;
+    padding-left: 0.7%;
+}
+
+.nav-tabs>li>a {
+    color: black;
+    width: 150px;
+    text-align: center;
+}
+
+.nav-tabs>li>a:hover,
+.nav-tabs>li>a:focus {
+    background-color: rgb(79, 196, 166);
+}
+
+.btn-primary {
+    background-color: rgb(136, 206, 188) !important;
+    border-color: rgb(136, 206, 188) !important;
+    color: black;
+
+}
+
+input[type=radio] {
+    display: none;
+}
+
+input[type=radio]+label {
+    border: 1px, solid, rgb(136, 206, 188);
+}
+
+input[type=radio]:checked+label {
+    background: rgb(136, 206, 188);
+}
+
+.no-resize {
+    resize: none;
+}
+
+ul {
+    list-style-type: none;
+}
+
+.btn:hover,
+.btn:focus {
+    background-color: rgb(96, 204, 177) !important;
+    border-color: rgb(96, 204, 177) !important;
+}
+
+.fa-trash {
+    color: rgb(136, 206, 188);
+}
+
+.fa-trash:hover {
+    color:rgb(83, 190, 164);
+}

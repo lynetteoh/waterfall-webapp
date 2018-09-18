@@ -13,3 +13,16 @@ def profile(request):
 
 def balance(request):
     return render(request, 'balance.html')
+
+def pay(request):
+    context = {"pay_page": "active"} 
+    return render(request, 'pay.html', context)
+
+def request_payment(request):
+    context = {"request_page": "active"} 
+    return render(request, 'request.html', context)
+
+def split(request):
+    context = {"split_page": "active"} 
+    return render(request, 'split.html', context)
+    
