@@ -6,6 +6,8 @@ __pycache__/
 # VS Code
 .vscode/
 
+# Mac OSX
+.DS_Store
 
 # C extensions
 *.so

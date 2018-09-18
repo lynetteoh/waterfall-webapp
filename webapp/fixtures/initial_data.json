@@ -1,0 +1,103 @@
+[
+{
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$120000$qAlxdTYvaUzn$XnyeascHUHt6LH/fbZ8iPc9aVZ5lTAC74qQUfQcEMyA=",
+        "last_login": "2018-09-15T10:58:23.335Z",
+        "is_superuser": true,
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
+        "email": "admin@admin.com",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2018-09-15T10:58:05.971Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+        "password": "pbkdf2_sha256$120000$fxInUpiDlOqb$WVh74IoUgfvOA4XH2ps0Xqm+yIXB1ILhDcncLF4rqkU=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "johnbarricade",
+        "first_name": "John",
+        "last_name": "Barricade",
+        "email": "johnbarricade@gmail.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2018-09-17T19:17:16Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "webapp.account",
+    "pk": 1,
+    "fields": {
+        "user": 1
+    }
+},
+{
+    "model": "webapp.account",
+    "pk": 2,
+    "fields": {
+        "user": 2
+    }
+},
+{
+    "model": "webapp.transaction",
+    "pk": 1,
+    "fields": {
+        "title": "Deposit of AUD $100.00",
+        "user": 1,
+        "transaction_type": "d",
+        "value": "100.0000",
+        "is_pending": false,
+        "created_at": "2018-09-17T19:21:49.591Z",
+        "modified_at": "2018-09-17T19:21:49.591Z",
+        "confirmed_at": null
+    }
+},
+{
+    "model": "webapp.transaction",
+    "pk": 2,
+    "fields": {
+        "title": "For Pizza",
+        "user": 1,
+        "transaction_type": "w",
+        "value": "13.3700",
+        "is_pending": false,
+        "created_at": "2018-09-17T19:22:18.027Z",
+        "modified_at": "2018-09-17T19:22:18.027Z",
+        "confirmed_at": null
+    }
+},
+{
+    "model": "webapp.transaction",
+    "pk": 3,
+    "fields": {
+        "title": "For Pizza",
+        "user": 2,
+        "transaction_type": "d",
+        "value": "13.3700",
+        "is_pending": false,
+        "created_at": "2018-09-17T19:22:31.244Z",
+        "modified_at": "2018-09-17T19:22:31.244Z",
+        "confirmed_at": null
+    }
+},
+{
+    "model": "webapp.onetoonepayment",
+    "pk": 1,
+    "fields": {
+        "tx_from": 2,
+        "tx_to": 3
+    }
+}
+]
+    
