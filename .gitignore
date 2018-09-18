@@ -110,3 +110,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+webapp/templates/.DS_Store
+waterfall/static/css/.DS_Store
+webapp/migrations/.DS_Store
+waterfall/static/.DS_Store
+waterfall/static/.DS_Store

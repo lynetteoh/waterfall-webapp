@@ -15,53 +15,62 @@
         {% include 'navtabs.html' %}
         <div class="panel-body">
             <div class="tab-content">
-                <div class="tab-pane container active" id="request">
-                    <div class="row form-group mt-5">
-                        <label class="col-sm-2 col-form-label" for="search">TricklePay ID</label>
-                        <div class="col-sm-10 mb-3 form-inline">
-                            <input class="col-sm-10 form-control autocomplete" type="search" placeholder="Search" id="search"
-                                list="userList" required>
-                            <datalist id="userList">
-                                <option>...</option>
-                            </datalist>
-                            <button class="col-sm-2 btn btn-primary" id="add" onclick="add()">Add <i class="fa fa-plus"></i></button>
-                            <ul class="pt-2 form-inline" id='users'></ul>
-                        </div>
-                    </div>
+                <div class="tab-pane container active" id="split">
                     <form role="form" id="split-form" method="POST">
-                        <div class="row form-group mb-5">
-                            <label for="amount" class="col-sm-2 col-form-label">Amount</label>
-                            <div class="input-group col-sm-10">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">$</span>
-                                </div>
-                                <input type="number" class="form-control" id="amount" required>
+                        <div class="row form-group mt-5">
+                            <label class="col-sm-2 col-form-label" for="search">TricklePay ID</label>
+                            <div class="col-sm-10 mb-3 form-inline">
+                                <input class="col-sm-10 form-control autocomplete" type="search" placeholder="Search"
+                                    id="search" list="userList" required>
+                                <datalist id="userList">
+                                    {% for user in users %}
+                                    <option>{{user}}</option>
+                                    {% endfor %}
+                                </datalist>
+                                <button class="col-sm-2 btn btn-primary" id="add" onclick="add()">Add <i class="fa fa-plus"></i></button>
+                                <ul class="pt-2 form-inline" id='users'></ul>
                             </div>
                         </div>
-                        <div class="row form-group mb-5">
-                            <label class="col-sm-2 col-form-label" for="date">Date</label>
-                            <div class="form-inline col-sm-10">
-                                <input type=date class="form-control col-sm-4" role="input" id="date" required>
-                                <div class="text-center col-sm-5">
-                                    <div class="btn-group  pl-5">
-                                        <input type="radio" id="once" name="selector"><label for="once" class="btn">Once</label>
-                                        <input type="radio" id="weekly" name="selector"><label for="weekly" class="btn">Weekly</label>
-                                        <input type="radio" id="monthly" name="selector"><label for="monthly" class="btn ">Monthly</label>
-                                        <input type="radio" id="yearly" name="selector"><label for="yearly" class="btn ">Yearly</label>
+                        <form role="form" id="req-form" onsubmit="event.preventDefault();popup('req-form','amount')"
+                            method="POST">
+                            {% csrf_token %}
+                            <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
+                                <ul class="pt-2 form-inline" id='req_users'>
+                                </ul>
+                            </div>
+                            <div class="row form-group mb-5">
+                                <label for="amount" class="col-sm-2 col-form-label">Amount</label>
+                                <div class="input-group col-sm-10">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">$</span>
+                                    </div>
+                                    <input type="number" class="form-control" id="amount" required>
+                                </div>
+                            </div>
+                            <div class="row form-group mb-5">
+                                <label class="col-sm-2 col-form-label" for="date">Date</label>
+                                <div class="form-inline col-sm-10">
+                                    <input type=date class="form-control col-sm-4" role="input" id="date" required>
+                                    <div class="text-center col-sm-5">
+                                        <div class="btn-group  pl-5">
+                                            <input type="radio" id="once" name="selector"><label for="once" class="btn">Once</label>
+                                            <input type="radio" id="weekly" name="selector"><label for="weekly" class="btn">Weekly</label>
+                                            <input type="radio" id="monthly" name="selector"><label for="monthly" class="btn ">Monthly</label>
+                                            <input type="radio" id="yearly" name="selector"><label for="yearly" class="btn ">Yearly</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row form-group mb-5">
-                            <label class="col-sm-2 col-form-label" for="description">Description</label>
-                            <div class="col-sm-10 mb-3">
-                                <textarea class="no-resize form-control" row="3" id="description">Type something...</textarea>
+                            <div class="row form-group mb-5">
+                                <label class="col-sm-2 col-form-label" for="description">Description</label>
+                                <div class="col-sm-10 mb-3">
+                                    <textarea class="no-resize form-control" row="3" id="description">Type something...</textarea>
+                                </div>
                             </div>
-                        </div>
-                        <div class="text-center p-4">
-                            <button class="btn btn-lg btn-primary" type="submit">Split <i class="fa fa-paper-plane px-2"></i></button>
-                        </div>
-                    </form>
+                            <div class="text-center p-4">
+                                <button class="btn btn-lg btn-primary" type="submit">Split <i class="fa fa-paper-plane px-2"></i></button>
+                            </div>
+                        </form>
                 </div>
             </div>
         </div>
@@ -69,6 +78,28 @@
 </div>
 
 <script type="text/javascript">
+    function popup(f, amountId) {
+        var text = document.getElementById(amountId).value;
+        swal({
+            title: text,
+            text: "Once processed, this action cannot be undone.",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((confirmed) => {
+            if (confirmed) {
+                swal({
+                    title: "Success!",
+                    text: "The transaction has been processed.",
+                    icon: "success",
+                }).then((submit) => {
+                    document.getElementById(f).submit();
+                });
+            } else {
+                swal("Your transaction has been cancelled!");
+            }
+        });
+    }
 
     function add() {
         var list = document.createElement("li");
