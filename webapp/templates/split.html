@@ -16,19 +16,19 @@
         <div class="panel-body">
             <div class="tab-content">
                 <div class="tab-pane container active" id="request">
-                    <div class="row form-group mt-5">
-                        <label class="col-sm-2 col-form-label" for="search">TricklePay ID</label>
-                        <div class="col-sm-10 mb-3 form-inline">
-                            <input class="col-sm-10 form-control autocomplete" type="search" placeholder="Search" id="search"
-                                list="userList" required>
-                            <datalist id="userList">
-                                <option>...</option>
-                            </datalist>
-                            <button class="col-sm-2 btn btn-primary" id="add" onclick="add()">Add <i class="fa fa-plus"></i></button>
-                            <ul class="pt-2 form-inline" id='users'></ul>
-                        </div>
-                    </div>
                     <form role="form" id="split-form" method="POST">
+                        <div class="row form-group mt-5">
+                            <label class="col-sm-2 col-form-label" for="search">TricklePay ID</label>
+                            <div class="col-sm-10 mb-3 form-inline">
+                                <input class="col-sm-10 form-control autocomplete" type="search" placeholder="Search"
+                                    id="search" list="userList" required>
+                                <datalist id="userList">
+                                    <option>...</option>
+                                </datalist>
+                                <button class="col-sm-2 btn btn-primary" id="add" onclick="add()">Add <i class="fa fa-plus"></i></button>
+                                <ul class="pt-2 form-inline" id='users'></ul>
+                            </div>
+                        </div>
                         <div class="row form-group mb-5">
                             <label for="amount" class="col-sm-2 col-form-label">Amount</label>
                             <div class="input-group col-sm-10">

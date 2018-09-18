@@ -15,8 +15,11 @@ def balance(request):
     return render(request, 'balance.html')
 
 def pay(request):
-    context = {"pay_page": "active"} 
-    return render(request, 'pay.html', context)
+    return render(request, 'pay1.html')
+
+# def pay(request):
+#     context = {"pay_page": "active"} 
+#     return render(request, 'pay.html', context)
 
 def request_payment(request):
     context = {"request_page": "active"} 
