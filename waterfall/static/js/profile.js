@@ -22,8 +22,7 @@ function validateForm() {
   var regex = new RegExp("[^A-Za-z0-9' ]+");
   var fname = document.getElementById("first_name").value;
   var lname = document.getElementById("last_name").value;
-  if (!fname.isBlank() || regex.test(fname)
-      || !lname.isBlank() || regex.test(lname)) {
+  if (!fname || regex.test(fname) || !lname || regex.test(lname)) {
     return "Please ensure names contain only alphabets."
   }
 
