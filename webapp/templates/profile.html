@@ -2,7 +2,8 @@
 {% load static %}
 
 {% block title %}
-<title>Waterfall</title>
+<title>Waterfall - Profile</title>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="{% static "js/profile.js" %}" type="text/javascript"></script>
 <style type="text/css">
 
@@ -36,7 +37,7 @@ input[type="text"][readonly] {
       <div class="text-center">
         <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar">
       </br></br>
-        <h4>@username$</h4>
+        <h4>@TricklePayID$</h4>
         </br>
         <div id="upload-pic" style="display:none;">
           <h6>Upload New Profile Picture</h6>
@@ -47,51 +48,54 @@ input[type="text"][readonly] {
 
       <ul class="list-group">
         <li class="list-group-item"><strong>Activity</strong><i class="fa fa-dashboard fa-1x"></i></li>
-        <li class="list-group-item text-right text-muted" style="text-align:left;"><span style="float:left;">Payments$</span> 125</li>
-        <li class="list-group-item text-right text-muted"><span style="float:left;">Requests$</span> 13</li>
-        <li class="list-group-item text-right text-muted"><span style="float:left;">Groups$</span> 37</li>
+        <li class="list-group-item text-right text-muted" style="text-align:left;"><span style="float:left;">Payments</span>$$ 125</li>
+        <li class="list-group-item text-right text-muted"><span style="float:left;">Requests</span> $$13</li>
+        <li class="list-group-item text-right text-muted"><span style="float:left;">Groups</span> $$37</li>
       </ul>
 
 
       </div><!--/col-3-->
     	<div class="col-sm-9" style="padding-left:40px;">
-          <form class="form" id="edit-form" action="##" method="post" id="editProfile">
+          <form id="edit-form" role="form" onsubmit="event.preventDefault(); checkForm()">
+             <!-- " method="post"  -->
               <div class="form-group">
                   <div class="col-xs-6">
                       <label for="first_name">
                         <h5>First name</h5></label>
-                      <input type="text" class="form-control" name="first_name" id="first_name" readonly value="name$read" placeholder="NAME$">
+                      <input type="text" class="form-control" name="first_name" id="first_name" readonly value="name$read" placeholder="John">
                   </div>
               </div>
               <div class="form-group">
                   <div class="col-xs-6">
                     <label for="last_name"><h4>Last name</h4></label>
-                      <input type="text" class="form-control" name="last_name" id="last_name" readonly value="lname$read" placeholder="SURNAME$">
+                      <input type="text" class="form-control" name="last_name" id="last_name" readonly value="lname$read" placeholder="Doe">
                   </div>
               </div>
               <div class="form-group">
                   <div class="col-xs-6">
                     <label for="email"><h5>Email</h5></label>
-                      <input type="text" class="form-control" name="email" id="email" readonly value="email$read" placeholder="EMAIL$">
+                      <input type="text" class="form-control" name="email" id="email" readonly value="email$read" placeholder="john.doe@example.com">
                   </div>
               </div>
               <div id="change-settings" style="display:none;"> <!-- start of change settings -->
                 <div class="form-group">
                     <div class="col-xs-6">
                       <label for="password"><h5>Change Password</h5></label>
-                        <input type="new-password" class="form-control" name="password" id="password" placeholder="New Password">
+                        <input type="password" class="form-control" name="password" id="password" placeholder="New Password">
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-xs-6">
                       <label for="password2"><h5>Verify New Password</h5></label>
-                        <input type="new-password" class="form-control" name="password2" id="password2" placeholder="Confirm New Password" title="enter your password2.">
+                        <input type="password" class="form-control" name="password2" id="password2" placeholder="Confirm New Password" title="enter your password2.">
                     </div>
                 </div>
                 <div class="form-group">
                      <div class="col-xs-12 text-left">
                           <br>
-                        	<button class="btn btn-lg btn-success" type="submit"><i class="fas fa-check"></i> &nbsp;Save</button>
+                        	<button class="btn btn-lg btn-success"  type="submit">
+                            <i class="fas fa-check"></i> &nbsp;Save
+                          </button>
                           &nbsp; &nbsp;
                          	<button class="btn btn-lg btn-danger" type="reset" onclick="disableProfileForm()"><i class="fas fa-ban" ></i>&nbsp;Cancel</button>
                       </div>
