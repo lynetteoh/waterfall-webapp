@@ -1,4 +1,41 @@
-function validateForm() {}
+/* Confirms profile change and gives relevant error alerts. */
+function checkForm() {
+console.log("here");
+  var error = validateForm();
+  if (!error) {
+    swal({
+      title: "Success!",
+      text:  "Your profile details have been updated.",
+      icon:  "success",
+    })
+    return;
+  }
+  swal({
+    title: "Error",
+    text:  error,
+    icon:  "warning",
+  });
+}
+
+/* Validates profile form entries, returning error messages. */
+function validateForm() {
+  var regex = new RegExp("[^A-Za-z0-9' ]+");
+  var fname = document.getElementById("first_name").value;
+  var lname = document.getElementById("last_name").value;
+  if (!fname.isBlank() || regex.test(fname)
+      || !lname.isBlank() || regex.test(lname)) {
+    return "Please ensure names contain only alphabets."
+  }
+
+  // Validate password.
+  var pw = document.getElementById("password").value;
+  var pw2 = document.getElementById("password2").value;
+  if (pw != pw2) {
+    return "Please ensure you verify the right password."
+  }
+  // TODO if pw field is empty, send back old pw
+  return "";
+}
 
 /* Enables and disables profile editing on clicks. */
 function editProfile() {
