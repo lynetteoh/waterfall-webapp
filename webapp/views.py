@@ -23,6 +23,17 @@ def dashboard(request):
         }
     return render_to_response('dashboard.html', context)
 
+
+def team(request):
+    # Temporary fixed user login
+    user = User.objects.filter(username='admin').distinct()[0]
+
+    context = {
+        "user": user
+        }
+    
+    return render_to_response('team.html', context)
+
 def profile(request):
         # Temporary fixed user login
     user = User.objects.filter(username='admin').distinct()[0]
@@ -42,13 +53,11 @@ def balance(request):
     return render_to_response('balance.html', context)
 
 def pay(request):
-    context = {"pay_page": "active"}
+    all_users = User.objects.all().exclude(username='admin')
+    users = all_users.exclude(username='admin')
+    for user in users: 
+        print (user)
+    context ={
+        "users": users
+    }
     return render(request, 'pay.html', context)
-
-def request_payment(request):
-    context = {"request_page": "active"}
-    return render(request, 'request.html', context)
-
-def split(request):
-    context = {"split_page": "active"}
-    return render(request, 'split.html', context)

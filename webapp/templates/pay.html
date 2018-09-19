@@ -1,88 +1,277 @@
-{% extends "base.html" %}
-
+{% extends 'base.html' %}
 {% load static %}
 
 {% block title %}
 <title>Trickle Pay</title>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <link rel="stylesheet" href="{% static 'css/awesomplete.css' %}" type="text/css">
 <script src="{% static 'js/awesomplete.js' %}" async></script>
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <link rel="stylesheet" href="{% static 'css/tricklepay.css' %}" type="text/css">
+
 {% endblock %}
 
 {% block content %}
-<div class="container bootstrap snippet pt-3 pl-5 ml-5">
+<div class="container bootstrap snipplet">
+    <div class="page-header">
+        <h1 style="padding-bottom:20px; padding-bottom:15px;">TricklePay</h1>
+    </div>
     <div class="row">
-        {% include 'navtabs.html' %}
-        <div class="panel-body">
-            <div class="tab-content">
-                <div class="tab-pane container active" id="pay">
-                    <div class="row form-group mt-5">
-                        <label class="col-sm-2 col-form-label" for="search">TricklePay ID</label>
-                        <div class="col-sm-10 mb-3 form-inline">
-                            <input class="col-sm-10 form-control autocomplete" type="search" placeholder="Search" id="search"
-                                list="userList" required>
-                            <datalist id="userList">
-                                <option>...</option>
-                            </datalist>
-                            <button class="col-sm-2 btn btn-primary" id="add" onclick="add()">Add <i class="fa fa-plus"></i></button>
-                            <ul class="pt-2 form-inline" id='users'></ul>
-                        </div>
-                    </div>
-                    <form role="form" id="pay-form" method="POST">
-                        <div class="row form-group mb-5">
-                            <label for="amount" class="col-sm-2 col-form-label">Amount</label>
-                            <div class="input-group col-sm-10">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">$</span>
+        <div class="col-sm-10">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#pay" data-toggle="tab">Pay</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#request" data-toggle="tab">Request</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#split" data-toggle="tab">Split</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="panel-body">
+                    <div class="tab-content">
+                        <div class="tab-pane container active" id="pay">
+                            <div class="row form-group mt-5">
+                                <label class="col-sm-2 col-form-label" for="pay_search">TricklePay ID</label>
+                                <div class="col-sm-10 mb-3 form-inline">
+                                    <input class="col-sm-10 form-control autocomplete" type="search" placeholder="Search"
+                                        id="pay_search" list="userList" required>
+                                    <datalist id="pay_userList">
+                                        {% for user in users %}
+                                        <option>{{user}}</option>
+                                        {% endfor %}
+                                    </datalist>
+                                    <button class="col-sm-2 btn btn-primary" id="add" onclick="add('pay_search', 'pay_users')">Add
+                                        <i class="fa fa-plus"></i></button>
                                 </div>
-                                <input type="number" class="form-control" id="amount" required>
                             </div>
-                        </div>
-                        <div class="row form-group mb-5">
-                            <label class="col-sm-2 col-form-label" for="date">Date</label>
-                            <div class="form-inline col-sm-10">
-                                <input type=date class="form-control col-sm-4" role="input" id="date" required>
-                                <div class="text-center col-sm-5">
-                                    <div class="btn-group  pl-5">
-                                        <input type="radio" id="once" name="selector"><label for="once" class="btn">Once</label>
-                                        <input type="radio" id="weekly" name="selector"><label for="weekly" class="btn">Weekly</label>
-                                        <input type="radio" id="monthly" name="selector"><label for="monthly" class="btn ">Monthly</label>
-                                        <input type="radio" id="yearly" name="selector"><label for="yearly" class="btn ">Yearly</label>
+                            <form role="form" id="pay-form" onsubmit="event.preventDefault();popup('pay_users','pay-form','pay_amount')"
+                                method="POST">
+                                {% csrf_token %}
+                                <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
+                                    <ul class="ml-4 form-inline" id='pay_users'></ul>
+                                </div>
+                                <div class="row form-group mb-5">
+                                    <label for="pay_amount" class="col-sm-2 col-form-label">Amount</label>
+                                    <div class="input-group col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input name="pay_amount" type="number" class="form-control" id="pay_amount"
+                                            name="pay_amount" required>
                                     </div>
                                 </div>
+                                <div class="row form-group mb-5">
+                                    <label class="col-sm-2 col-form-label" for="date">Date</label>
+                                    <div class="form-inline col-sm-10">
+                                        <input type=date class="form-control col-sm-4" role="input" id="date" name="pay_date"
+                                            required>
+                                        <div class="text-center col-sm-5">
+                                            <div class="btn-group  pl-5" id="pay_freq">
+                                                <input type="radio" name="pay_freq" id="pay_once" value="once" required><label
+                                                    for="pay_once" class="btn">Once</label>
+                                                <input type="radio" name="pay_freq" id="pay_weekly" value="weekly"><label
+                                                    for="pay_weekly" class="btn">Weekly</label>
+                                                <input type="radio" name="pay_freq" id="pay_monthly" value="monthly"><label
+                                                    for="pay_monthly" class="btn ">Monthly</label>
+                                                <input type="radio" name="pay_freq" id="pay_yearly" value="yearly"><label
+                                                    for="pay_yearly" class="btn ">Yearly</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row form-group mb-5">
+                                    <label class="col-sm-2 col-form-label" for="description">Description</label>
+                                    <div class="col-sm-10 mb-3">
+                                        <textarea class="no-resize form-control" name="pay_description" row="3" id="description" placeholder="Type Something..." required></textarea>
+                                    </div>
+                                </div>
+                                <div class="text-center p-4">
+                                    <button class="btn btn-lg btn-primary" type="submit">TricklePay
+                                        <i class="fa fa-credit-card px-2"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="tab-pane container" id="request">
+                            <div class="row form-group mt-5">
+                                <label class="col-sm-2 col-form-label" for="search">TricklePay ID</label>
+                                <div class="col-sm-10 mb-3 form-inline">
+                                    <input class="col-sm-10 form-control autocomplete" type="req_search" placeholder="Search"
+                                        id="req_search" list="req_userList" required>
+                                    <datalist id="req_userList">
+                                        {% for user in users %}
+                                        <option>{{user}}</option>
+                                        {% endfor %}
+                                    </datalist>
+                                    <button class="col-sm-2 btn btn-primary" id="req_add" onclick="add('req_search', 'req_users')">Add
+                                        <i class="fa fa-plus"></i></button>
+                                </div>
                             </div>
+                            <form role="form" id="req-form" onsubmit="event.preventDefault();popup('req_users','req-form','req_amount')"
+                                method="POST">
+                                {% csrf_token %}
+                                <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
+                                    <ul class="pt-2 form-inline" id="req_users"></ul>
+                                </div>
+                                <div class="row form-group mb-5">
+                                    <label for="req_amount" class="col-sm-2 col-form-label">Amount</label>
+                                    <div class="input-group col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input type="number" class="form-control" id="req_amount" name="req_amount"
+                                            required>
+                                    </div>
+                                </div>
+                                <div class="row form-group mb-5">
+                                    <label class="col-sm-2 col-form-label" for="date">Date</label>
+                                    <div class="form-inline col-sm-10">
+                                        <input type=date class="form-control col-sm-4" role="input" id="date" name="req_date"
+                                            required>
+                                        <div class="text-center col-sm-5">
+                                            <div class="btn-group  pl-5" id="req_freq">
+                                                <input type="radio" name="req_freq" id="req_once" value="once" required><label
+                                                    for="req_once" class="btn">Once</label>
+                                                <input type="radio" name="req_freq" id="req_weekly" value="weekly"><label
+                                                    for="req_weekly" class="btn">Weekly</label>
+                                                <input type="radio" name="req_freq" id="req_monthly" value="monthly"><label
+                                                    for="req_monthly" class="btn ">Monthly</label>
+                                                <input type="radio" name="req_freq" id="req_yearly" value="yearly"><label
+                                                    for="req_yearly" class="btn ">Yearly</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row form-group mb-5">
+                                    <label class="col-sm-2 col-form-label" for="description">Description</label>
+                                    <div class="col-sm-10 mb-3">
+                                        <textarea name="req_description" class="no-resize form-control" row="3" id="description" placeholder="Type Something..." required></textarea>
+                                    </div>
+                                </div>
+                                <div class="text-center p-4">
+                                    <button class="btn btn-lg btn-primary" type="submit">Request
+                                        <i class="fa fa-paper-plane px-2"></i></button>
+                                </div>
+                            </form>
                         </div>
-                        <div class="row form-group mb-5">
-                            <label class="col-sm-2 col-form-label" for="description">Description</label>
-                            <div class="col-sm-10 mb-3">
-                                <textarea class="no-resize form-control" row="3" id="description">Type something...</textarea>
+                        <div class="tab-pane container" id="split">
+                            <div class="row form-group mt-5">
+                                <label class="col-sm-2 col-form-label" for="split_search">TricklePay ID</label>
+                                <div class="col-sm-10 mb-3 form-inline">
+                                    <input class="col-sm-10 form-control autocomplete" type="search" placeholder="Search"
+                                        id="split_search" list="userList" required>
+                                    <datalist id="userList">
+                                        {% for user in users %}
+                                        <option>{{user}}</option>
+                                        {% endfor %}
+                                    </datalist>
+                                    <button class="col-sm-2 btn btn-primary" id="split_add" onclick="add('split_search', 'split_users')">Add
+                                        <i class="fa fa-plus"></i></button>
+                                </div>
                             </div>
+                            <form role="form" id="split-form" onsubmit="event.preventDefault();popup('split_users','split-form','split_amount')"
+                                method="POST">
+                                {% csrf_token %}
+                                <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
+                                    <ul class="pt-2 form-inline" id='split_users'></ul>
+                                </div>
+                                <div class="row form-group mb-5">
+                                    <label for="amount" class="col-sm-2 col-form-label">Amount</label>
+                                    <div class="input-group col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input name="split_amount" type="number" class="form-control" id="split_amount"
+                                            required>
+                                    </div>
+                                </div>
+                                <div class="row form-group mb-5">
+                                    <label class="col-sm-2 col-form-label" for="date">Date</label>
+                                    <div class="form-inline col-sm-10">
+                                        <input name="split_date" type=date class="form-control col-sm-4" role="input"
+                                            id="date" required>
+                                        <div class="text-center col-sm-5">
+                                            <div class="btn-group  pl-5" id="split_freq">
+                                                <input type="radio" name="split_freq" id="split_once" value="once"
+                                                    required><label for="split_once" class="btn">Once</label>
+                                                <input type="radio" name="split_freq" id="split_weekly" value="weekly"><label
+                                                    for="split_weekly" class="btn">Weekly</label>
+                                                <input type="radio" name="split_freq" id="split_monthly" value="monthly"><label
+                                                    for="split_monthly" class="btn ">Monthly</label>
+                                                <input type="radio" name="split_freq" id="split_yearly" value="yearly"><label
+                                                    for="split_yearly" class="btn ">Yearly</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row form-group mb-5">
+                                    <label class="col-sm-2 col-form-label" for="description">Description</label>
+                                    <div class="col-sm-10 mb-3">
+                                        <textarea class="no-resize form-control" name="split_description" row="3" id="description" placeholder="Type Something..." required></textarea>
+                                    </div>
+                                </div>
+                                <div class="text-center p-4">
+                                    <button class="btn btn-lg btn-primary" type="submit">Split
+                                        <i class="fa fa-paper-plane px-2"></i></button>
+                                </div>
+                            </form>
                         </div>
-                        <div class="text-center p-4">
-                            <button class="btn btn-lg btn-primary" type="submit">TricklePay <i class="fa fa-credit-card px-2"></i></button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<script class="text/javascript">
+    function popup(ul, form, amount) {
+        var text = document.getElementById(amount).value;
+        if (document.getElementById(ul).getElementsByTagName('li').length == 1) {
+            swal({
+                title: '$ ' + text,
+                text: "Once processed, this action cannot be undone.",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((confirmed) => {
+                if (confirmed) {
+                    swal({
+                        title: "Success!",
+                        text: "The transaction has been processed.",
+                        icon: "success",
+                    }).then((post) => {
+                        document.getElementById(form).submit();
+                    });
+                } else {
+                    swal("Your transaction has been cancelled!");
+                }
+            });
+        } else if (document.getElementById(ul).getElementsByTagName('li').length >= 1) {
+            swal("Oops", "Please choose only 1 payee !");
+        } else {
+            swal("Oops", "Please choose a payee !");
+        }
+    }
 
-<script type="text/javascript">
-
-    function add() {
+    function add(search, user) {
+        var text = document.getElementById(search).value;
         var list = document.createElement("li");
-        var text = document.getElementById("search").value;
         var textnode = document.createTextNode(text);
+        var input = document.createElement("input");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("name", user);
+        input.setAttribute("value", text);
+        list.appendChild(input);
         list.appendChild(textnode);
         list.setAttribute('class', 'pr-5');
-        document.getElementById("users").appendChild(list);
+        document.getElementById(user).appendChild(list);
         remove = removeBtn();
         list.appendChild(remove);
         remove.onclick = function () {
-            document.getElementById("users").removeChild(list);
+            document.getElementById(user).removeChild(list);
         }
     }
 
@@ -92,5 +281,12 @@
         btn.setAttribute('class', 'ml-2');
         return btn;
     }
+
 </script>
+
+
+
+
+
+
 {% endblock %}
