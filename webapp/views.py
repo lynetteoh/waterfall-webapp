@@ -34,6 +34,10 @@ def team(request):
     
     return render_to_response('team.html', context)
 
+def login(request):
+
+    return render_to_response('login.html')
+
 def profile(request):
         # Temporary fixed user login
     user = User.objects.filter(username='admin').distinct()[0]
