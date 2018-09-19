@@ -53,11 +53,12 @@ def balance(request):
     return render_to_response('balance.html', context)
 
 def pay(request):
+    # Temporary fixed user login
+    user = User.objects.filter(username='admin').distinct()[0]
+
     all_users = User.objects.all().exclude(username='admin')
-    users = all_users.exclude(username='admin')
-    for user in users:
-        print (user)
     context ={
-        "users": users
+        "user" : user,
+        "users": all_users,
     }
     return render(request, 'tricklepay.html', context)
