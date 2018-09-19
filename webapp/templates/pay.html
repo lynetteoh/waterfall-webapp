@@ -39,7 +39,7 @@
                                 <div class="col-sm-10 mb-3 form-inline">
                                     <input class="col-sm-10 form-control autocomplete" type="search" placeholder="Search"
                                         id="pay_search" list="userList" required>
-                                    <datalist id="userList">
+                                    <datalist id="pay_userList">
                                         {% for user in users %}
                                         <option>{{user}}</option>
                                         {% endfor %}
@@ -60,23 +60,25 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">$</span>
                                         </div>
-                                        <input type="number" class="form-control" id="pay_amount" required>
+                                        <input name="pay_amount" type="number" class="form-control" id="pay_amount"
+                                            name="pay_amount" required>
                                     </div>
                                 </div>
                                 <div class="row form-group mb-5">
                                     <label class="col-sm-2 col-form-label" for="date">Date</label>
                                     <div class="form-inline col-sm-10">
-                                        <input type=date class="form-control col-sm-4" role="input" id="date" required>
+                                        <input type=date class="form-control col-sm-4" role="input" id="date" name="pay_date"
+                                            required>
                                         <div class="text-center col-sm-5">
-                                            <div class="btn-group  pl-5">
-                                                <input type="radio" name="pay_freq" id="once" value="once"required><label for="once"
-                                                    class="btn">Once</label>
-                                                <input type="radio" name="pay_freq" id="weekly"value="weekly"><label for="weekly"
-                                                    class="btn">Weekly</label>
-                                                <input type="radio" name="pay_freq" id="monthly"value="monthly"><label for="monthly"
-                                                    class="btn ">Monthly</label>
-                                                <input type="radio" name="pay_freq" id="yearly"value="yearly"><label for="yearly"
-                                                    class="btn ">Yearly</label>
+                                            <div class="btn-group  pl-5" id="pay_freq">
+                                                <input type="radio" name="pay_freq" id="pay_once" value="once" required><label
+                                                    for="pay_once" class="btn">Once</label>
+                                                <input type="radio" name="pay_freq" id="pay_weekly" value="weekly"><label
+                                                    for="pay_weekly" class="btn">Weekly</label>
+                                                <input type="radio" name="pay_freq" id="pay_monthly" value="monthly"><label
+                                                    for="pay_monthly" class="btn ">Monthly</label>
+                                                <input type="radio" name="pay_freq" id="pay_yearly" value="yearly"><label
+                                                    for="pay_yearly" class="btn ">Yearly</label>
                                             </div>
                                         </div>
                                     </div>
@@ -84,7 +86,7 @@
                                 <div class="row form-group mb-5">
                                     <label class="col-sm-2 col-form-label" for="description">Description</label>
                                     <div class="col-sm-10 mb-3">
-                                        <textarea class="no-resize form-control" row="3" id="description">Type something...</textarea>
+                                        <textarea class="no-resize form-control" name="pay_description" row="3" id="description" placeholder="Type Something..." required></textarea>
                                     </div>
                                 </div>
                                 <div class="text-center p-4">
@@ -98,13 +100,13 @@
                                 <label class="col-sm-2 col-form-label" for="search">TricklePay ID</label>
                                 <div class="col-sm-10 mb-3 form-inline">
                                     <input class="col-sm-10 form-control autocomplete" type="req_search" placeholder="Search"
-                                        id="search" list="req_userList" required>
+                                        id="req_search" list="req_userList" required>
                                     <datalist id="req_userList">
                                         {% for user in users %}
                                         <option>{{user}}</option>
                                         {% endfor %}
                                     </datalist>
-                                    <button class="col-sm-2 btn btn-primary" id="add" onclick="add('req_search', 'req_users')">Add
+                                    <button class="col-sm-2 btn btn-primary" id="req_add" onclick="add('req_search', 'req_users')">Add
                                         <i class="fa fa-plus"></i></button>
                                 </div>
                             </div>
@@ -112,7 +114,7 @@
                                 method="POST">
                                 {% csrf_token %}
                                 <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
-                                    <ul class="pt-2 form-inline" id='req_users'></ul>
+                                    <ul class="pt-2 form-inline" id="req_users"></ul>
                                 </div>
                                 <div class="row form-group mb-5">
                                     <label for="req_amount" class="col-sm-2 col-form-label">Amount</label>
@@ -120,23 +122,23 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">$</span>
                                         </div>
-                                        <input type="number" class="form-control" id="req_amount" required>
+                                        <input type="number" class="form-control" id="req_amount" name="req_amount" required>
                                     </div>
                                 </div>
                                 <div class="row form-group mb-5">
                                     <label class="col-sm-2 col-form-label" for="date">Date</label>
                                     <div class="form-inline col-sm-10">
-                                        <input type=date class="form-control col-sm-4" role="input" id="date" required>
+                                        <input type=date class="form-control col-sm-4" role="input" id="date" name="req_date" required>
                                         <div class="text-center col-sm-5">
-                                            <div class="btn-group  pl-5">
-                                                <input type="radio" name="req_freq" id="once" value="once" required><label for="once"
-                                                    class="btn">Once</label>
-                                                <input type="radio" name="req_freq" id="weekly" value="weekly"><label for="weekly"
-                                                    class="btn">Weekly</label>
-                                                <input type="radio" name="req_freq" id="monthly" value="monthly"><label for="monthly"
-                                                    class="btn ">Monthly</label>
-                                                <input type="radio" name="req_freq" id="yearly" value="yearly"><label for="yearly"
-                                                    class="btn ">Yearly</label>
+                                            <div class="btn-group  pl-5" id="req_freq">
+                                                <input type="radio" name="req_freq" id="req_once" value="once" required><label
+                                                    for="req_once" class="btn">Once</label>
+                                                <input type="radio" name="req_freq" id="req_weekly" value="weekly"><label
+                                                    for="req_weekly" class="btn">Weekly</label>
+                                                <input type="radio" name="req_freq" id="req_monthly" value="monthly"><label
+                                                    for="req_monthly" class="btn ">Monthly</label>
+                                                <input type="radio" name="req_freq" id="req_yearly" value="yearly"><label
+                                                    for="req_yearly" class="btn ">Yearly</label>
                                             </div>
                                         </div>
                                     </div>
@@ -144,7 +146,7 @@
                                 <div class="row form-group mb-5">
                                     <label class="col-sm-2 col-form-label" for="description">Description</label>
                                     <div class="col-sm-10 mb-3">
-                                        <textarea class="no-resize form-control" row="3" id="description">Type something...</textarea>
+                                        <textarea name="req_description" class="no-resize form-control" row="3" id="description" placeholder="Type Something..." required></textarea>
                                     </div>
                                 </div>
                                 <div class="text-center p-4">
@@ -164,7 +166,7 @@
                                         <option>{{user}}</option>
                                         {% endfor %}
                                     </datalist>
-                                    <button class="col-sm-2 btn btn-primary" id="add" onclick="add('split_search', 'split_users')">Add
+                                    <button class="col-sm-2 btn btn-primary" id="split_add" onclick="add('split_search', 'split_users')">Add
                                         <i class="fa fa-plus"></i></button>
                                 </div>
                             </div>
@@ -180,23 +182,23 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">$</span>
                                         </div>
-                                        <input type="number" class="form-control" id="split_amount" required>
+                                        <input name="split_amount" type="number" class="form-control" id="split_amount" required>
                                     </div>
                                 </div>
                                 <div class="row form-group mb-5">
                                     <label class="col-sm-2 col-form-label" for="date">Date</label>
                                     <div class="form-inline col-sm-10">
-                                        <input type=date class="form-control col-sm-4" role="input" id="date" required>
+                                        <input name="split_date" type=date class="form-control col-sm-4" role="input" id="date" required>
                                         <div class="text-center col-sm-5">
-                                            <div class="btn-group  pl-5">
-                                                <input type="radio" name="split_freq" id="once" value="once" required><label for="once"
-                                                    class="btn">Once</label>
-                                                <input type="radio" name="split_freq" id="weekly" value="weekly"><label for="weekly"
-                                                    class="btn">Weekly</label>
-                                                <input type="radio" name="split_freq" id="monthly" value="monthly"><label for="monthly"
-                                                    class="btn ">Monthly</label>
-                                                <input type="radio" name="split_freq" id="yearly" value="yearly"><label for="yearly"
-                                                    class="btn ">Yearly</label>
+                                            <div class="btn-group  pl-5" id="split_freq">
+                                                <input type="radio" name="split_freq" id="split_once" value="once" required><label
+                                                    for="split_once" class="btn">Once</label>
+                                                <input type="radio" name="split_freq" id="split_weekly" value="weekly"><label
+                                                    for="split_weekly" class="btn">Weekly</label>
+                                                <input type="radio" name="split_freq" id="split_monthly" value="monthly"><label
+                                                    for="split_monthly" class="btn ">Monthly</label>
+                                                <input type="radio" name="split_freq" id="split_yearly" value="yearly"><label
+                                                    for="split_yearly" class="btn ">Yearly</label>
                                             </div>
                                         </div>
                                     </div>
@@ -204,7 +206,7 @@
                                 <div class="row form-group mb-5">
                                     <label class="col-sm-2 col-form-label" for="description">Description</label>
                                     <div class="col-sm-10 mb-3">
-                                        <textarea class="no-resize form-control" row="3" id="description">Type something...</textarea>
+                                        <textarea class="no-resize form-control" name="split_description" row="3" id="description" placeholder="Type Something..." required></textarea>
                                     </div>
                                 </div>
                                 <div class="text-center p-4">
@@ -236,17 +238,17 @@
                         title: "Success!",
                         text: "The transaction has been processed.",
                         icon: "success",
-                    }).then((submit) => {
+                    }).then((post) => {
                         document.getElementById(form).submit();
                     });
                 } else {
                     swal("Your transaction has been cancelled!");
                 }
             });
-        }else if(document.getElementById(ul).getElementsByTagName('li').length >= 1){
-            swal ( "Oops" ,  "Please choose only 1 user !");
-        }else {
-            swal ( "Oops" ,  "Please choose a user !");
+        } else if (document.getElementById(ul).getElementsByTagName('li').length >= 1) {
+            swal("Oops", "Please choose only 1 payee !");
+        } else {
+            swal("Oops", "Please choose a payee !");
         }
     }
 
@@ -254,6 +256,11 @@
         var text = document.getElementById(search).value;
         var list = document.createElement("li");
         var textnode = document.createTextNode(text);
+        var input = document.createElement("input");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("name", user);
+        input.setAttribute("value", text);
+        list.appendChild(input);
         list.appendChild(textnode);
         list.setAttribute('class', 'pr-5');
         document.getElementById(user).appendChild(list);
