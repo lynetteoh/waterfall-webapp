@@ -17,19 +17,25 @@
         <div class="panel-body">
             <div class="tab-content">
                 <div class="tab-pane container active" id="pay">
+
                     <div class="row form-group mt-5">
                         <label class="col-sm-2 col-form-label" for="search">TricklePay ID</label>
                         <div class="col-sm-10 mb-3 form-inline">
                             <input class="col-sm-10 form-control autocomplete" type="search" placeholder="Search" id="search"
                                 list="userList" required>
                             <datalist id="userList">
-                                <option>...</option>
+                                {% for user in users %}
+                                <option>{{user}}</option>
+                                {% endfor %}
                             </datalist>
                             <button class="col-sm-2 btn btn-primary" id="add" onclick="add()">Add <i class="fa fa-plus"></i></button>
-                            <ul class="pt-2 form-inline" id='users'></ul>
                         </div>
                     </div>
-                    <form role="form" id="pay-form" method="POST">
+                    <form role="form" id="pay-form" onsubmit="event.preventDefault();popup('pay-form','amount')" method="POST">
+                        {% csrf_token %}
+                        <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
+                            <ul class="ml-4 form-inline" id='pay_users'></ul>
+                        </div>
                         <div class="row form-group mb-5">
                             <label for="amount" class="col-sm-2 col-form-label">Amount</label>
                             <div class="input-group col-sm-10">
@@ -71,6 +77,28 @@
 
 
 <script type="text/javascript">
+    function popup(f, amountId) {
+        var text = document.getElementById(amountId).value;
+        swal({
+            title: text,
+            text: "Once processed, this action cannot be undone.",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((confirmed) => {
+            if (confirmed) {
+                swal({
+                    title: "Success!",
+                    text: "The transaction has been processed.",
+                    icon: "success",
+                }).then((submit) => {
+                    document.getElementById(f).submit();
+                });
+            } else {
+                swal("Your transaction has been cancelled!");
+            }
+        });
+    }
 
     function add() {
         var list = document.createElement("li");

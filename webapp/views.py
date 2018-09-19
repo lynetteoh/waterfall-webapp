@@ -31,7 +31,7 @@ def team(request):
     context = {
         "user": user
         }
-    
+
     return render_to_response('team.html', context)
 
 def login(request):
@@ -57,13 +57,12 @@ def balance(request):
     return render_to_response('balance.html', context)
 
 def pay(request):
-    context = {"pay_page": "active"}
-    return render(request, 'pay.html', context)
+    # Temporary fixed user login
+    user = User.objects.filter(username='admin').distinct()[0]
 
-def request_payment(request):
-    context = {"request_page": "active"}
-    return render(request, 'request.html', context)
-
-def split(request):
-    context = {"split_page": "active"}
-    return render(request, 'split.html', context)
+    all_users = User.objects.all().exclude(username='admin')
+    context ={
+        "user" : user,
+        "users": all_users,
+    }
+    return render(request, 'tricklepay.html', context)

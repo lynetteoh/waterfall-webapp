@@ -10,9 +10,9 @@
 var _ = function (input, o) {
 	var me = this;
 
-    // Keep track of number of instances for unique IDs
-    _.count = (_.count || 0) + 1;
-    this.count = _.count;
+  // Keep track of number of instances for unique IDs
+  _.count = (_.count || 0) + 1;
+  this.count = _.count;
 
 	// Setup
 
