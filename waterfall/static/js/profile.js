@@ -1,3 +1,4 @@
+function validateForm() {}
 
 /* Enables and disables profile editing on clicks. */
 function editProfile() {

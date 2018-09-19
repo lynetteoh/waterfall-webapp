@@ -6,6 +6,7 @@
 <link href="{% static "css/balance.css" %}" rel="stylesheet" type="text/css">
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="{% static "js/balance.js" %}" type="text/javascript"></script>
+
 {% endblock %}
 
 {% block content %}
@@ -23,7 +24,7 @@
             <input type="text" class="text-center form-control" name="add_amount" placeholder="0.00" value="0.00" id="add-amount">
             <p style="font-size:0.1px;"><br></p>
             <div style="padding-left:5%;">
-              <button class="btn btn-lg btn-success text-center" type="submit" value="Add" onclick="popup(false)" id="plus-button">
+              <button class="btn btn-lg btn-success text-center" type="submit" value="Add" onclick="balancePopup(false)" id="plus-button">
                 <i class="fas fa-plus"></i>
               </button>
             </div>
@@ -33,7 +34,7 @@
             <input type="text" class="text-center form-control" name="minus_amount" id="minus-amount" value="0.00" placeholder="0.00">
             <p style="font-size:0.1px;"><br></p>
             <div style="padding-right:25%">
-              <button class="btn btn-lg btn-danger" type="submit" value="Withdraw" onclick="popup(true)" id="minus-button">
+              <button class="btn btn-lg btn-danger" type="submit" value="Withdraw" onclick="balancePopup(true)" id="minus-button">
                 <i class="fas fa-minus"></i>
               </button>
             </div>
@@ -48,56 +49,47 @@
       <div class="col-sm-10">
         <h3 class="subheader">Edit Card Payment Options &nbsp;&nbsp;</h3>
         <!-- Credit Card Account Details -->
-        <div class="panel panel-default credit-card-box">
-            <div class="panel-body">
-                <form role="form" id="card-form" method="POST">
-                    <div class="row">
-                        <div class="col-xs-7 col-md-7">
-                            <div class="form-group">
-                                <label for="cardNumber">Card Number</label>
-                                <div class="input-group">
-                                    <input type="tel" class="form-control" name="cardNumber" placeholder="Card Number" autocomplete="cc-number" required autofocus
-                                    />
-                                </div>
-                              </div>
-                        </div>
-                        <div class="col-xs-5 col-md-5 pull-right" style="padding-top:4%;">
-                          <img class="img-responsive pull-right" style="float:right;" src="http://i76.imgup.net/accepted_c22e0.png">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-7 col-md-7">
-                            <div class="form-group">
-                                <label for="cardExpiry">
-                                  <span class="hidden-xs">Expiry Date</span>
-                                </label>
-                                <input type="tel" class="form-control" name="cardExpiry" placeholder="MM / YY" autocomplete="cc-exp" required
-                                />
-                            </div>
-                        </div>
-                        <div class="col-xs-5 col-md-5 pull-right">
-                            <div class="form-group">
-                                <label for="cardCVC">CV Code</label>
-                                <input type="tel" class="form-control" name="cardCVC" placeholder="CVC" autocomplete="cc-csc" required
-                                />
-                            </div>
-                        </div>
-                    </div>
+
+        <!-- <form role="form" method="POST"> -->
+            <div class="row" id="card-form">
+                <div class="col-xs-7 col-md-7">
                     <div class="form-group">
-                       <div class="col-xs-12 text-left">
-                          	<button class="btn btn-lg btn-success" type="submit"><i class="fas fa-check"></i> &nbsp;Save Card</button>
-                        </div>
-                    </div>
-                </form>
+                        <label for="cardNumber">Card Number</label>
+                          <input type="tel" id="cardnum" class="form-control" name="cardNumber" placeholder="Card Number" autocomplete="cc-number" required autofocus
+                          />
+                      </div>
+                </div>
+                <div class="col-xs-5 col-md-5 pull-right" style="padding-top:4%;">
+                  <img class="img-responsive pull-right" style="float:right;" src="http://i76.imgup.net/accepted_c22e0.png">
+                </div>
             </div>
-        </div>
+            <div class="row">
+                <div class="col-xs-7 col-md-7">
+                    <div class="form-group">
+                        <label for="cardExpiry">
+                          <span class="hidden-xs">Expiry Date</span>
+                        </label>
+                        <input type="tel" class="form-control" name="cardExpiry" placeholder="MM / YYYY" autocomplete="cc-exp" id="expiry" required
+                        />
+                    </div>
+                </div>
+                <div class="col-xs-5 col-md-5 pull-right">
+                    <div class="form-group">
+                        <label for="cardCVC">CCV Code</label>
+                        <input type="tel" class="form-control" name="cardCVC" placeholder="CVC" id="ccv" autocomplete="cc-csc" required
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+               <div class="col-xs-12 text-left">
+                  	<button class="btn btn-lg btn-success" type="submit" onclick="checkCard()" ><i class="fas fa-check"></i> &nbsp;Save Card</button>
+                </div>
+            </div>
+        <!-- </form> -->
       </div>
     </div> <!-- end of card payments row -->
 
   </div> <!-- end of container -->
 </div>
-
-  <script type="text/javascript">
-
-</script>
 {% endblock %}
