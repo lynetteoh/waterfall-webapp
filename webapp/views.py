@@ -31,7 +31,7 @@ def team(request):
     context = {
         "user": user
         }
-    
+
     return render_to_response('team.html', context)
 
 def profile(request):
@@ -55,9 +55,9 @@ def balance(request):
 def pay(request):
     all_users = User.objects.all().exclude(username='admin')
     users = all_users.exclude(username='admin')
-    for user in users: 
+    for user in users:
         print (user)
     context ={
         "users": users
     }
-    return render(request, 'pay.html', context)
+    return render(request, 'tricklepay.html', context)
