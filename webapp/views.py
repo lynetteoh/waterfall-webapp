@@ -38,7 +38,6 @@ def team(request):
     return render_to_response('team.html', context)
 
 def login(request):
-
     return render_to_response('login.html')
 
 def profile(request):
@@ -66,12 +65,12 @@ def pay(request):
 
     if request.method == "POST":
         # Requires more extensive form validation
-        
+
         tx_sender = user.account._create_transaction(-10,'hi','w')
 
         receiver_acc = User.objects.get(username=request.POST.get('pay_users')).account
         tx_receiver = receiver_acc._create_transaction(10,'hi','d')
-        
+
         link_tx = OneToOnePayment.objects.create(
             tx_from = tx_sender,
             tx_to = tx_receiver
