@@ -38,7 +38,7 @@ class Account(models.Model):
 
     @property
     def balance(self):
-        return self.user.transaction_set.aggregate(Sum('value'))['value__sum']
+        return self.transaction_set.aggregate(Sum('value'))['value__sum']
 
     def __str__(self):
         return '@{}'.format(self.user.username)
@@ -55,7 +55,7 @@ class Transaction(models.Model):
     ]
 
     title = models.CharField(max_length=255)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
 
     transaction_type = models.CharField(
         max_length=1,
@@ -71,8 +71,11 @@ class Transaction(models.Model):
     confirmed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return '{} | @{} | ${}'.format(self.created_at, self.user.username, self.value)
+        return '{} | @{} | ${}'.format(self.created_at, self.account.user.username, self.value)
 
 class OneToOnePayment(models.Model):
     tx_from = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='tx_from')
     tx_to = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='tx_to')
+
+    def __str__(self):
+        return '{}-- ${} -->{}'.format(self.tx_from.account.user.username, self.tx_to.value, self.tx_to.account.user.username)
