@@ -4,6 +4,7 @@
 {% block title %}
 <title>Waterfall - TricklePay</title>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="{% static 'js/pay.js' %}"></script>
 <link rel="stylesheet" href="{% static 'css/awesomplete.css' %}" type="text/css">
 <script src="{% static 'js/awesomplete.js' %}" async></script>
 <link rel="stylesheet" href="{% static 'css/tricklepay.css' %}" type="text/css">
@@ -225,68 +226,6 @@
         </div>
     </div>
 </div>
-
-<script class="text/javascript">
-    function popup(ul, form, amount) {
-        var text = document.getElementById(amount).value;
-        if (document.getElementById(ul).getElementsByTagName('li').length == 1) {
-            swal({
-                title: '$ ' + text,
-                text: "Once processed, this action cannot be undone.",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            }).then((confirmed) => {
-                if (confirmed) {
-                    swal({
-                        title: "Success!",
-                        text: "The transaction has been processed.",
-                        icon: "success",
-                    }).then((post) => {
-                        document.getElementById(form).submit();
-                    });
-                } else {
-                    swal("Your transaction has been cancelled!");
-                }
-            });
-        } else if (document.getElementById(ul).getElementsByTagName('li').length >= 1) {
-            swal("Oops", "Please choose only 1 payee !");
-        } else {
-            swal("Oops", "Please choose a payee !");
-        }
-    }
-
-    function add(search, user) {
-        var text = document.getElementById(search).value;
-        var list = document.createElement("li");
-        var textnode = document.createTextNode(text);
-        var input = document.createElement("input");
-        input.setAttribute("type", "hidden");
-        input.setAttribute("name", user);
-        input.setAttribute("value", text);
-        list.appendChild(input);
-        list.appendChild(textnode);
-        list.setAttribute('class', 'pr-5');
-        document.getElementById(user).appendChild(list);
-        remove = removeBtn();
-        list.appendChild(remove);
-        remove.onclick = function () {
-            document.getElementById(user).removeChild(list);
-        }
-    }
-
-    function removeBtn() {
-        var btn = document.createElement("a");
-        btn.innerHTML = '<i class="fa fa-trash" aria-hidden="true"></i>';
-        btn.setAttribute('class', 'ml-2');
-        return btn;
-    }
-
-</script>
-
-
-
-
 
 
 {% endblock %}
