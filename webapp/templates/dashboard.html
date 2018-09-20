@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-{% for tx in user.transaction_set.all.reverse %}
+{% for tx in user.account.transaction_set.all.reverse %}
     <div class="card" style="width: 18rem;">
         <div class="card-body">
             <h5 class="card-title">{{ tx.title }}</h5>

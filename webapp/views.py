@@ -4,6 +4,9 @@ from django.shortcuts import render, render_to_response, redirect, get_object_or
 from django.contrib.auth.models import User
 from .models import Profile, Account, Transaction, OneToOnePayment
 
+# TODO:
+# * Handle User sessions instead of hard code
+# * User session authentication
 
 def index(request):
     # Temporary fixed user login
@@ -59,10 +62,31 @@ def balance(request):
 def pay(request):
     # Temporary fixed user login
     user = User.objects.filter(username='admin').distinct()[0]
-
     all_users = User.objects.all().exclude(username='admin')
-    context ={
-        "user" : user,
-        "users": all_users,
-    }
-    return render(request, 'tricklepay.html', context)
+
+    if request.method == "POST":
+        # Requires more extensive form validation
+        
+        tx_sender = user.account._create_transaction(-10,'hi','w')
+
+        receiver_acc = User.objects.get(username=request.POST.get('pay_users')).account
+        tx_receiver = receiver_acc._create_transaction(10,'hi','d')
+        
+        link_tx = OneToOnePayment.objects.create(
+            tx_from = tx_sender,
+            tx_to = tx_receiver
+        )
+
+        tx_sender.save()
+        tx_receiver.save()
+        link_tx.save()
+
+        return redirect('/dashboard')
+
+    else:
+        pass
+        context ={
+            "user" : user,
+            "users": all_users,
+        }
+        return render(request, 'tricklepay.html', context)
