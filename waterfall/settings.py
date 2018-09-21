@@ -119,7 +119,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "waterfall/static/"),
 ]
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
