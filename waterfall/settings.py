@@ -124,3 +124,7 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+LOGIN_REDIRECT_URL = '/dashboard'
+
+LOGOUT_REDIRECT_URL = '/'

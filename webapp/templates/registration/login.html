@@ -10,17 +10,33 @@
 {% endblock %}
 
 {% block content %}
+
+{% if form.errors %}
+<p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+
+
 <div class="login_back">
     <div class="padding_top1 container main_landing">
         
         <center>
             <div class="col-md-5 login_back1">
-                <form class="register_form">
+                <form method="post" action="{% url 'login' %}" class="register_form">
+                        
+                        {% csrf_token %}
                     <div class="form-group row">
                         <div class="col-sm-12">
                           <p class="display-6 form-control-static login_title">LOGIN</p>
                         </div>
                     </div>
+                    {% if next %}
+                        {% if user.is_authenticated %}
+                        <p>Your account doesn't have access to this page. To proceed,
+                        please login with an account that has access.</p>
+                        {% else %}
+                        <p>Please login to see this page.</p>
+                        {% endif %}
+                    {% endif %}
                     <div class="form-group row">
                         <div class="col-sm-12">
                             <button type="submit" class="g_button btn btn-default"><img class="g_icon_login" src="{% static 'images/google_icon.png' %}">Sign in with Google</button>
@@ -31,30 +47,30 @@
                             <button type="submit" class="g_button btn btn-default"><img class="g_icon_login" src="{% static 'images/fb_icon.png' %}">Sign in with Facebook</button>
                         </div>
                     </div>-->
-                    <div class='hr'></div>
-
-                    <div class='hr-or'></div>
-
+                    
                     <div class='hr'>
                         <span class='hr-title'>or</span>
                     </div>
                     <hr style="colour:white; background-color:white;"/>
+
                     <div class="form-group row">
                         <div class="col-12">
-                            <input class="form-control" type="text" placeholder="Username" id="input_username">
+                            <input class="form-control" type="text" placeholder="Username" id="id_username" value="admin" required="" name="username" autofocus="">
                         </div>
                     </div>
                     
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input type="password" class="form-control" id="input_password" placeholder="Password">
+                            <input type="password" class="form-control" placeholder="Password" name="password" required="" id="id_password">    
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <button type="submit" id="login_btn" style="width: 100%;" class="btn btn-outline-success">Sign In</button>
+                            <button type="submit" value="login" id="login_btn" style="width: 100%;" class="btn btn-outline-success">Sign In</button>
                         </div>
                     </div>
+                    <input type="hidden" name="next" value="{{ next }}">
+
                 </form>
             </div>
         </center>
