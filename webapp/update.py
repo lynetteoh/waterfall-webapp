@@ -10,19 +10,26 @@ from .models import Profile, Account, Transaction, OneToOnePayment
 def update():
     # Traverse through the database and look for pending transfers.
     pending_transfers = Transfer.objects.select_for_update()
-                                        .filter(request=False,
+                                        .filter(is_request=False,
+                                                is_deleted=False,
                                                 confirmed_at__isnull=False)
     to_delete = []
     for t in pending_transfers:
         today = datetime.today()
-        # Check execdate, see if transfer can be executed or should be deleted.
-        if (t.execution_date < now):
+        # See if transfer can be executed or should be deleted.
+        if (t.deadline < now):
+            if (t.deadline + timedelta(days=3)):
+                notify(t, True)
             continue
-        if (t.execution_date > now):
-            to_delete.append(t)
+        if (t.deadline > now):
+            t.tx_from.is_deleted = True
+            t.tx_to.is_deleted = True
+            t.is_deleted = True
+            notify(t, False)
+            continue
 
-        tx_from = Transaction.objects.filter(id=t.from_tx.id).select_for_update()
-        tx_to = Transaction.objects.filter(id=t.to_tx.id).select_for_update()
+        tx_from = Transaction.objects.filter(id=t.tx_from.id).select_for_update()
+        tx_to = Transaction.objects.filter(id=t.tx_to.id).select_for_update()
 
         # Check balances.
         w_tx = tx_from.transaction_type is 'w' ? tx_from : tx_to
@@ -30,7 +37,7 @@ def update():
             continue
 
         # Update transfer.
-        t.confirmation_date  = today
+        t.confirmed_at  = today
         t.save()
         tx_from.confirmed_at = today
         tx_from.is_pending   = False
@@ -40,19 +47,15 @@ def update():
         tx_to.save()
 
         # Make a copy of this transaction if it is a recurring one.
-        if (t.recurrence > 0):
-            new_exec_date = today + timedelta(days=t.recurrence)
+        if (t.recurrence_days > 0):
+            new_exec_date = today + timedelta(days=t.recurrence_days)
             Transfer.objects.create(
                 tx_from=tx_from.deepcopy(),
                 tx_to=tx_to.deepcopy(),
-                execution_date=new_exec_date,
-                recurrence=t.recurrence,
+                deadline=new_exec_date,
+                recurrence_days=t.recurrence_days,
                 is_request=False,
             )
-    for t in to_delete:
-        Transaction.objects.remove(t.tx_from)
-        Transaction.objects.remove(t.tx_to)
-        Transfer.objects.remove(t)
     return
 
 # Sends email notification.
@@ -70,7 +73,6 @@ def notify(transfer, is_reminder):
         subj, body = reminder_template()
     else:
         subj, body = delete_template()
-        notify_delete(acc_to, acc_from, transfer.amount)
     body_from = body.format(amount, "to " + acc_to.username, acc_from.balance)
     body_to   = body.format(amount, "from " + acc_from.username, acc_to.balance)
     EmailMessage(subj, body_from, acc_from.email).send()
