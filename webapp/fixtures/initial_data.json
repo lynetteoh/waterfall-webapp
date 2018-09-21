@@ -60,7 +60,7 @@
         "is_pending": false,
         "created_at": "2018-09-17T19:21:49.591Z",
         "modified_at": "2018-09-17T19:21:49.591Z",
-        "confirmed_at": null
+        "confirmed_at": "2018-09-17T19:21:49.591Z"
     }
 },
 {
@@ -74,7 +74,7 @@
         "is_pending": false,
         "created_at": "2018-09-17T19:22:18.027Z",
         "modified_at": "2018-09-17T19:22:18.027Z",
-        "confirmed_at": null
+        "confirmed_at": "2018-09-17T19:21:49.591Z"
     }
 },
 {
@@ -88,15 +88,7 @@
         "is_pending": false,
         "created_at": "2018-09-17T19:22:31.244Z",
         "modified_at": "2018-09-17T19:22:31.244Z",
-        "confirmed_at": null
-    }
-},
-{
-    "model": "webapp.onetoonepayment",
-    "pk": 1,
-    "fields": {
-        "tx_from": 2,
-        "tx_to": 3
+        "confirmed_at": "2018-09-17T19:21:49.591Z"
     }
 }
 ]
