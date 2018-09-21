@@ -90,6 +90,18 @@
         "modified_at": "2018-09-17T19:22:31.244Z",
         "confirmed_at": "2018-09-17T19:21:49.591Z"
     }
-}
+},
+{
+    "model": "webapp.transfer",
+    "pk": 1,
+    "fields": {
+        "tx_from": 2,
+        "tx_to": 3,
+        "recurrence_days": null,
+        "is_request": false,
+        "deadline": null,
+        "confirmed_at": "2018-09-17T19:22:31.244Z"
+        }
+    }
 ]
     
