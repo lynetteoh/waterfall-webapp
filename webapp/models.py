@@ -36,6 +36,7 @@ class Account(models.Model):
             print('Account funds are insufficient.')
             return None
 
+    # TODO: Change to utilize filter for confirmed_at field.
     @property
     def balance(self):
         return self.transaction_set.aggregate(Sum('value'))['value__sum']
@@ -70,12 +71,20 @@ class Transaction(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
     confirmed_at = models.DateTimeField(null=True, blank=True)
 
+
+
     def __str__(self):
         return '{} | @{} | ${}'.format(self.created_at, self.account.user.username, self.value)
 
-class OneToOnePayment(models.Model):
+class Transfer(models.Model):
     tx_from = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='tx_from')
     tx_to = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='tx_to')
+
+    recurrence_days = models.IntegerField(blank=True, null=True)
+    is_request = models.BooleanField(default=False)
+    
+    deadline = models.DateTimeField(null=True, blank=True)
+    confirmed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return '{}-- ${} -->{}'.format(self.tx_from.account.user.username, self.tx_to.value, self.tx_to.account.user.username)

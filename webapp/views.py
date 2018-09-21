@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
 
 from django.contrib.auth.models import User
-from .models import Profile, Account, Transaction, OneToOnePayment
+from .models import Profile, Account, Transaction, Transfer
 
 # TODO:
 # * Handle User sessions instead of hard code
