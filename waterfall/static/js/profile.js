@@ -1,13 +1,14 @@
 /* Confirms profile change and gives relevant error alerts. */
 function checkForm() {
-console.log("here");
   var error = validateForm();
   if (!error) {
     swal({
       title: "Success!",
       text:  "Your profile details have been updated.",
       icon:  "success",
-    })
+    }).then((post) => {
+      document.getElementById("edit-form").submit();
+    });
     return;
   }
   swal({

@@ -54,7 +54,7 @@
     "pk": 1,
     "fields": {
         "title": "Deposit of AUD $100.00",
-        "user": 1,
+        "account": 1,
         "transaction_type": "d",
         "value": "100.0000",
         "is_pending": false,
@@ -68,9 +68,9 @@
     "pk": 2,
     "fields": {
         "title": "For Pizza",
-        "user": 1,
+        "account": 1,
         "transaction_type": "w",
-        "value": "13.3700",
+        "value": "-13.3700",
         "is_pending": false,
         "created_at": "2018-09-17T19:22:18.027Z",
         "modified_at": "2018-09-17T19:22:18.027Z",
@@ -82,7 +82,7 @@
     "pk": 3,
     "fields": {
         "title": "For Pizza",
-        "user": 2,
+        "account": 2,
         "transaction_type": "d",
         "value": "13.3700",
         "is_pending": false,

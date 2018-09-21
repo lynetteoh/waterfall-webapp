@@ -16,3 +16,18 @@ Update/install virtualenv using pip: pip install virtualenv
 ## Everytime you add a python dependancy to the project, run:
 
 pip freeze > requirements.txt
+
+
+## Wiping the DB clean and loading dummy dev data
+
+1. Delete all files BUT __init__.py files in migration folders for each app.
+2. Drop the current database, or delete the db.sqlite3 if it is your case.
+3. Create the initial migrations and generate the database schema:
+
+python manage.py makemigrations
+
+python manage.py migrate
+
+4. Load dummy data
+
+python manage.py loaddata webapp/fixtures/initial_data.json
