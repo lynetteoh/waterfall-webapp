@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'webapp',
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +68,11 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+# Cron Jobs tasked periodically; added by Steph.
+CRONJOBS = [
+    ('* * * * *', 'webapp.cron.update'),
 ]
 
 WSGI_APPLICATION = 'waterfall.wsgi.application'

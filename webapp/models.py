@@ -11,7 +11,7 @@ class Profile(models.Model):
     avatar = models.ImageField()
     timezone = models.CharField(max_length=32, choices=TIMEZONES, default='UTC')
     # balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
-    
+
     def __str__(self):
         return '@{}'.format(self.user.username)
 
@@ -31,7 +31,7 @@ class Account(models.Model):
 
     def register_withdrawal(self, title, value):
         if self.balance >= value:
-            return self._create_transaction(value, title, 'w')
+            return self._create_transaction(0-value, title, 'w')
         else:
             print('Account funds are insufficient.')
             return None
@@ -65,13 +65,11 @@ class Transaction(models.Model):
     )
 
     value = models.DecimalField(max_digits=10, decimal_places=4)
-
+    # is_deleted = models.BooleanField(default=False)
     is_pending = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     confirmed_at = models.DateTimeField(null=True, blank=True)
-
-
 
     def __str__(self):
         return '{} | @{} | ${}'.format(self.created_at, self.account.user.username, self.value)
@@ -82,7 +80,8 @@ class Transfer(models.Model):
 
     recurrence_days = models.IntegerField(blank=True, null=True)
     is_request = models.BooleanField(default=False)
-    
+    # is_deleted = models.BooleanField(default=False)
+
     deadline = models.DateTimeField(null=True, blank=True)
     confirmed_at = models.DateTimeField(null=True, blank=True)
 
