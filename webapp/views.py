@@ -3,6 +3,9 @@ from django.shortcuts import render, render_to_response, redirect, get_object_or
 
 from django.contrib.auth.models import User
 from .models import Profile, Account, Transaction, Transfer
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.template import RequestContext
+
 
 # TODO:
 # * Handle User sessions instead of hard code
@@ -15,7 +18,7 @@ def index(request):
     context = {
         "user": user
         }
-    return render_to_response('index.html', context)
+    return render(request, 'index.html', context)
 
 def dashboard(request):
     # Temporary fixed user login
@@ -57,6 +60,22 @@ def balance(request):
         "user": user
         }
     return render_to_response('balance.html', context)
+
+@ensure_csrf_cookie
+def register_new(request):
+    if request.POST:
+        #DO VALIDATION HERE, AND IF USER IS ADDED TO DB GO TO SUCCESS PAGE
+        username = request.POST['username']
+        #pw = request.POST['password'] #PROBS NEED TO HASH THIS and STORE in DB
+        email = request.POST['email']
+        print("The username is:", username)
+
+        return render(request, "register_success.html")
+
+        #CAN DO AN IF STATEMENT TO REDIRECT TO HOME PAGE IF FAILED
+        #return redirect('/')
+        
+    return render(request, "register_success.html.html")
 
 def pay(request):
     # Temporary fixed user login

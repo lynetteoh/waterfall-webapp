@@ -28,4 +28,5 @@ urlpatterns = [
     path('pay', views.pay, name='pay'),
     path('team', views.team, name='team'),
     path('login', views.login, name='login'),
+    path('register-new', views.register_new, name='register_new'),
 ]
