@@ -59,7 +59,27 @@ def balance(request):
     context = {
         "user": user
         }
-    return render_to_response('balance.html', context)
+
+    if request.method == "POST":
+        # TODO Requires more extensive form validation and error checking.
+        add_amount = request.POST.get('add_amount')
+        minus_amount = request.POST.get('minus_amount')
+        if add_amount and float(add_amount) > 0:
+            tx = user.account.register_deposit("Deposit", float(add_amount))
+            tx.save()
+            context['error'] = "Success"
+        elif minus_amount and float(minus_amount) > 0:
+            print("Withdraw")
+            tx = user.account.register_withdrawal("Withdrawal", float(minus_amount))
+            if not tx:
+                context['error'] = "Insufficient Funds"
+                print(context)
+            else:
+                tx.save()
+                context['error'] = "Success"
+        return render(request, 'balance.html', context)
+
+    return render(request, 'balance.html', context)
 
 @ensure_csrf_cookie
 def register_new(request):
