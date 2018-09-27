@@ -58,23 +58,25 @@ def balance(request):
         }
 
     if request.method == "POST":
-        # TODO Requires more extensive form validation and error checking.
         add_amount = request.POST.get('add_amount')
         minus_amount = request.POST.get('minus_amount')
-        if add_amount and float(add_amount) > 0:
-            tx = user.account.register_deposit("Deposit", float(add_amount))
-            tx.save()
-            context['error'] = "Success"
-        elif minus_amount and float(minus_amount) > 0:
-            print("Withdraw")
-            tx = user.account.register_withdrawal("Withdrawal", float(minus_amount))
-            if not tx:
-                context['error'] = "Insufficient Funds"
-                print(context)
-            else:
+
+        try:
+            if add_amount and float(add_amount) > 0:
+                tx = user.account.register_deposit("Deposit", float(add_amount))
                 tx.save()
                 context['error'] = "Success"
-        return render(request, 'balance.html', context)
+            elif minus_amount and float(minus_amount) > 0:
+                tx = user.account.register_withdrawal("Withdrawal", float(minus_amount))
+                if not tx:
+                    context['error'] = "Insufficient Funds"
+                else:
+                    tx.save()
+                    context['error'] = "Success"
+        except:
+            context['error'] = "Invalid Value"
+        finally:
+            return render(request, 'balance.html', context)
 
     return render(request, 'balance.html', context)
 

@@ -35,7 +35,7 @@
                   <p id="balance-text">${{ user.account.balance | floatformat:"2" }}</p>
                 </li>
                 <li>
-                  <a href="/"><img src="{% static "images/anon-user.svg" %}" id="user-icon"/></a>
+                  <a href="{% url 'profile' %}"><img src="{% static "images/anon-user.svg" %}" id="user-icon"/></a>
                 </li>
             </ul>
         </div>
