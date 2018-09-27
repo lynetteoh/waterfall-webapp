@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Sum
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
@@ -111,6 +111,7 @@ class Transfer(models.Model):
     def __str__(self):
         return '{}-- ${} -->{}'.format(self.tx_from.account.user.username, self.tx_to.value, self.tx_to.account.user.username)
 
+    @transaction.atomic
     def delete(self):
         # TODO check this works in multithreading models
         self.tx_from.is_deleted = True
@@ -120,6 +121,7 @@ class Transfer(models.Model):
         self.tx_to.save()
         self.save()
 
+    @transaction.atomic
     def confirm(self, today):
         self.confirmed_at  = today
         self.save()
@@ -153,4 +155,4 @@ class Transfer(models.Model):
                 recurrence_days=self.recurrence_days,
                 is_request=False,
             )
-            print("Created transfer copy.")
+            print("Created recurring transfer copy.")

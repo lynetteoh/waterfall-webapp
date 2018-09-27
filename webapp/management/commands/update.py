@@ -12,7 +12,7 @@ import pytz
 class Command(BaseCommand):
     help = "Script updates any pending recurring transactions."
 
-    # @transaction.atomic
+    @transaction.atomic
     def handle(self, *args, **options):
         pending_transfers = Transfer.objects.select_for_update()\
                                             .filter(is_request=False,\
@@ -32,17 +32,23 @@ class Command(BaseCommand):
                 t.delete()
                 self.notify(t, False)
                 continue
-            elif t.deadline and (t.deadline.date() > today):
+            if t.deadline and (t.deadline.date() > today):
                 continue
 
             self.stdout.write("...Updating pending transfer %d." % t.id)
             tx_from = Transaction.objects.filter(id=t.tx_from.id).select_for_update().first()
             tx_to = Transaction.objects.filter(id=t.tx_to.id).select_for_update().first()
-            # Check balances.
+
+            # Check balances and delete recurring payments with insufficent funds.
             w_tx = tx_from if (tx_from.transaction_type is 'w') else tx_to
             if (w_tx.account.balance < w_tx.value):
+                #TODO notify error
+                self.stdout.write("...Deleting insufficient funds withdrawal %d." % t.id)
+                t.delete()
+                self.notify(t, False)
                 continue
 
+            # Confirm recurring payment.
             t.confirm(timezone.localize(datetime.now()))
         return
 
