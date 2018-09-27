@@ -155,7 +155,7 @@
         "tx_to": 3,
         "recurrence_days": null,
         "is_request": false,
-        "deadline": null,
+        "deadline": "2018-09-17T19:22:31.244Z",
         "confirmed_at": "2018-09-17T19:22:31.244Z"
     }
   },

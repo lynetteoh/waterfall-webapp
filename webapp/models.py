@@ -119,8 +119,9 @@ class Transfer(models.Model):
         self.tx_from.save()
         self.tx_to.save()
         self.save()
+        print("Transfer %d is deleted." % self.id)
 
-    def confirm_recurring(self, today):
+    def confirm(self, today):
         self.confirmed_at  = today
         self.save()
         self.tx_from.confirmed_at = today
@@ -129,9 +130,10 @@ class Transfer(models.Model):
         self.tx_to.confirmed_at   = today
         self.tx_to.is_pending     = False
         self.tx_to.save()
+        print("Transfer %d is confirmed." % self.id)
 
-        # Make a copy of this transaction if it is a recurring one.
-        if (self.recurrence_days > 0):
+        # Create recurring copy of transfer.
+        if (self.recurrence_days and self.recurrence_days > 0):
             new_exec_date = today + timedelta(days=t.recurrence_days)
             tx_from_copy = self.tx_from._copy()
             tx_from_copy.created_at = today

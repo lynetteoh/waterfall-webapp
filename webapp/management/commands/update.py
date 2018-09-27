@@ -5,6 +5,8 @@ from django.db import models, transaction
 from django.contrib.auth.models import User
 from webapp.models import Profile, Account, Transaction, Transfer
 
+import pytz
+
 # Updates various transactions in the database.
 # Will be called by the Scheduler running in the background periodically.
 class Command(BaseCommand):
@@ -12,36 +14,44 @@ class Command(BaseCommand):
 
     # @transaction.atomic
     def handle(self, *args, **options):
-        self.stdout.write("Updating pending transfers")
         pending_transfers = Transfer.objects.select_for_update()\
                                             .filter(is_request=False,\
                                                     is_deleted=False,\
-                                                    confirmed_at__isnull=False)
-        to_delete = []
+                                                    confirmed_at__isnull=True)
         for t in pending_transfers:
             # See if transfer can be executed or should be deleted.
-            today = datetime.today()
-            if t.deadline and (t.deadline is timedelta(days=3) + today):
+            timezone = pytz.UTC     # TODO get user timezone
+            today = timezone.localize(datetime.today()).date()
+            print("TODAY " + str(today))
+            print("DEADLINE " + str(t.deadline.date()))
+            print(today == t.deadline.date())
+
+            if t.deadline and t.deadline.date() == (timedelta(days=3) + today):
+                self.stdout.write("...Reminding pending transfer %d." % t.id)
                 notify(t, True)
-            elif t.deadline and (t.deadline > today):
+            elif t.deadline and (t.deadline.date() > today):
+                self.stdout.write("...Deleting pending transfer %d." % t.id)
+                print("deleting")
                 t.delete()
                 notify(t, False)
-            elif t.deadline and (t.deadline is not today):
+            elif t.deadline and not (t.deadline.date() == today):
                 continue
 
-            tx_from = Transaction.objects.filter(id=t.tx_from.id).select_for_update()
-            tx_to = Transaction.objects.filter(id=t.tx_to.id).select_for_update()
-            print (tx_from)
+            self.stdout.write("...Updating pending transfer %d." % t.id)
+            tx_from = Transaction.objects.filter(id=t.tx_from.id).select_for_update().first()
+            tx_to = Transaction.objects.filter(id=t.tx_to.id).select_for_update().first()
             # Check balances.
             w_tx = tx_from if (tx_from.transaction_type is 'w') else tx_to
             if (w_tx.account.balance < w_tx.value):
                 continue
 
-            t.confirm_recurring(today)
+            t.confirm(today)
         return
 
     # Sends email notification.
-    def notify(transfer, is_reminder):
+    def notify(self, transfer, is_reminder):
+        print("notification")
+        return
         # Ensure that tx_from is the payer and tx_to the payee.
         tx_from = transfer.tx_from
         tx_to   = transfer.tx_to
