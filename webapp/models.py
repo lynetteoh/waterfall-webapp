@@ -80,7 +80,7 @@ class Transaction(models.Model):
     is_pending = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
-    confirmed_at = models.DateTimeField(null=True, blank=True)
+    confirmed_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return '{} | @{} | ${}'.format(self.created_at, self.account.user.username, self.value)
@@ -96,7 +96,7 @@ class Transaction(models.Model):
             modified_at=self.modified_at,
             confirmed_at=self.confirmed_at,
         )
-        
+
 class Transfer(models.Model):
     tx_from = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='tx_from')
     tx_to = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='tx_to')
@@ -106,7 +106,7 @@ class Transfer(models.Model):
     is_deleted = models.BooleanField(default=False)
 
     deadline = models.DateTimeField(null=True, blank=True)
-    confirmed_at = models.DateTimeField(null=True, blank=True)
+    confirmed_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return '{}-- ${} -->{}'.format(self.tx_from.account.user.username, self.tx_to.value, self.tx_to.account.user.username)

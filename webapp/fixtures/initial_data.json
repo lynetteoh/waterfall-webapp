@@ -1,5 +1,5 @@
 [
-{
+  {
     "model": "auth.user",
     "pk": 1,
     "fields": {
@@ -16,8 +16,8 @@
         "groups": [],
         "user_permissions": []
     }
-},
-{
+  },
+  {
     "model": "auth.user",
     "pk": 2,
     "fields": {
@@ -34,22 +34,22 @@
         "groups": [],
         "user_permissions": []
     }
-},
-{
+  },
+  {
     "model": "webapp.account",
     "pk": 1,
     "fields": {
         "user": 1
     }
-},
-{
+  },
+  {
     "model": "webapp.account",
     "pk": 2,
     "fields": {
         "user": 2
     }
-},
-{
+  },
+  {
     "model": "webapp.transaction",
     "pk": 1,
     "fields": {
@@ -62,8 +62,8 @@
         "modified_at": "2018-09-17T19:21:49.591Z",
         "confirmed_at": "2018-09-17T19:21:49.591Z"
     }
-},
-{
+  },
+  {
     "model": "webapp.transaction",
     "pk": 2,
     "fields": {
@@ -76,8 +76,8 @@
         "modified_at": "2018-09-17T19:22:18.027Z",
         "confirmed_at": "2018-09-17T19:21:49.591Z"
     }
-},
-{
+  },
+  {
     "model": "webapp.transaction",
     "pk": 3,
     "fields": {
@@ -90,8 +90,8 @@
         "modified_at": "2018-09-17T19:22:31.244Z",
         "confirmed_at": "2018-09-17T19:21:49.591Z"
     }
-},
-{
+  },
+  {
     "model": "webapp.transfer",
     "pk": 1,
     "fields": {
@@ -101,7 +101,6 @@
         "is_request": false,
         "deadline": null,
         "confirmed_at": "2018-09-17T19:22:31.244Z"
-        }
     }
+  }
 ]
-    
