@@ -113,7 +113,6 @@ class Transfer(models.Model):
 
     @transaction.atomic
     def delete(self):
-        # TODO check this works in multithreading models
         self.tx_from.is_deleted = True
         self.tx_to.is_deleted = True
         self.is_deleted = True
