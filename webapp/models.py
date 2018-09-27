@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import Sum
 from django.contrib.auth.models import User
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class Profile(models.Model):
     import pytz
@@ -90,7 +90,7 @@ class Transaction(models.Model):
             account=self.account,
             title=self.title,
             value=self.value,
-            transaction_type=self.type,
+            transaction_type=self.transaction_type,
             is_pending=self.is_pending,
             created_at=self.created_at,
             modified_at=self.modified_at,
@@ -119,7 +119,6 @@ class Transfer(models.Model):
         self.tx_from.save()
         self.tx_to.save()
         self.save()
-        print("Transfer %d is deleted." % self.id)
 
     def confirm(self, today):
         self.confirmed_at  = today
@@ -134,16 +133,18 @@ class Transfer(models.Model):
 
         # Create recurring copy of transfer.
         if (self.recurrence_days and self.recurrence_days > 0):
-            new_exec_date = today + timedelta(days=t.recurrence_days)
+            new_exec_date = today + timedelta(days=self.recurrence_days)
             tx_from_copy = self.tx_from._copy()
             tx_from_copy.created_at = today
             tx_from_copy.modified_at = today
-            tx_from_copy.confirmed_at.null = True
+            tx_from_copy.confirmed_at = None
+            tx_from_copy.save()
 
             tx_to_copy = self.tx_to._copy()
             tx_to_copy.created_at = today
             tx_to_copy.modified_at = today
-            tx_to_copy.confirmed_at.null = True
+            tx_to_copy.confirmed_at = None
+            tx_to_copy.save()
 
             Transfer.objects.create(
                 tx_from=tx_from_copy,
@@ -152,3 +153,4 @@ class Transfer(models.Model):
                 recurrence_days=self.recurrence_days,
                 is_request=False,
             )
+            print("Created transfer copy.")

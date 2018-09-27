@@ -5,7 +5,7 @@ from django.db import models, transaction
 from django.contrib.auth.models import User
 from webapp.models import Profile, Account, Transaction, Transfer
 
-import pytz
+import pytz, warnings
 
 # Updates various transactions in the database.
 # Will be called by the Scheduler running in the background periodically.
@@ -22,19 +22,17 @@ class Command(BaseCommand):
             # See if transfer can be executed or should be deleted.
             timezone = pytz.UTC     # TODO get user timezone
             today = timezone.localize(datetime.today()).date()
-            print("TODAY " + str(today))
-            print("DEADLINE " + str(t.deadline.date()))
-            print(today == t.deadline.date())
 
             if t.deadline and t.deadline.date() == (timedelta(days=3) + today):
                 self.stdout.write("...Reminding pending transfer %d." % t.id)
-                notify(t, True)
-            elif t.deadline and (t.deadline.date() > today):
+                self.notify(t, True)
+                continue
+            elif t.deadline and (t.deadline.date() < today):
                 self.stdout.write("...Deleting pending transfer %d." % t.id)
-                print("deleting")
                 t.delete()
-                notify(t, False)
-            elif t.deadline and not (t.deadline.date() == today):
+                self.notify(t, False)
+                continue
+            elif t.deadline and (t.deadline.date() > today):
                 continue
 
             self.stdout.write("...Updating pending transfer %d." % t.id)
@@ -45,12 +43,12 @@ class Command(BaseCommand):
             if (w_tx.account.balance < w_tx.value):
                 continue
 
-            t.confirm(today)
+            t.confirm(timezone.localize(datetime.now()))
         return
 
     # Sends email notification.
     def notify(self, transfer, is_reminder):
-        print("notification")
+        print("TODO: Notification")
         return
         # Ensure that tx_from is the payer and tx_to the payee.
         tx_from = transfer.tx_from
