@@ -1,11 +1,11 @@
 from django.core.management.base import BaseCommand, CommandError
-from datetime import datetime, timedelta
 from django.core.mail import EmailMessage
 from django.db import models, transaction
 from django.contrib.auth.models import User
 from webapp.models import Profile, Account, Transaction, Transfer
 
-import pytz, warnings
+from datetime import datetime, timedelta
+import pytz
 
 # Updates various transactions in the database.
 # Will be called by the Scheduler running in the background periodically.
