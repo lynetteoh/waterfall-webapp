@@ -15,17 +15,14 @@ def update():
                                                 confirmed_at__isnull=False)
     to_delete = []
     for t in pending_transfers:
-        today = datetime.today()
         # See if transfer can be executed or should be deleted.
-        if (t.deadline < now):
-            if (t.deadline + timedelta(days=3)):
-                notify(t, True)
-            continue
-        if (t.deadline > now):
-            t.tx_from.is_deleted = True
-            t.tx_to.is_deleted = True
-            t.is_deleted = True
+        today = datetime.today()
+        if (t.deadline is timedelta(days=3) + now):
+            notify(t, True)
+        elif (t.deadline > now):
+            t.delete()
             notify(t, False)
+        elif (t is not now):
             continue
 
         tx_from = Transaction.objects.filter(id=t.tx_from.id).select_for_update()
@@ -36,26 +33,7 @@ def update():
         if (w_tx.account.balance < w_tx.value):
             continue
 
-        # Update transfer.
-        t.confirmed_at  = today
-        t.save()
-        tx_from.confirmed_at = today
-        tx_from.is_pending   = False
-        tx_from.save()
-        tx_to.confirmed_at   = today
-        tx_to.is_pending     = False
-        tx_to.save()
-
-        # Make a copy of this transaction if it is a recurring one.
-        if (t.recurrence_days > 0):
-            new_exec_date = today + timedelta(days=t.recurrence_days)
-            Transfer.objects.create(
-                tx_from=tx_from.deepcopy(),
-                tx_to=tx_to.deepcopy(),
-                deadline=new_exec_date,
-                recurrence_days=t.recurrence_days,
-                is_request=False,
-            )
+        t.confirm_recurring(today)
     return
 
 # Sends email notification.

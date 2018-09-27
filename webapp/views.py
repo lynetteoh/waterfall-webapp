@@ -11,7 +11,6 @@ from .models import Profile, Account, Transaction, Transfer
 def index(request):
     # Temporary fixed user login
     user = User.objects.filter(username='admin').distinct()[0]
-
     context = {
         "user": user
         }
@@ -20,21 +19,18 @@ def index(request):
 def dashboard(request):
     # Temporary fixed user login
     user = User.objects.filter(username='admin').distinct()[0]
-
     context = {
         "user": user
-        }
+    }
     return render_to_response('dashboard.html', context)
 
 
 def team(request):
     # Temporary fixed user login
     user = User.objects.filter(username='admin').distinct()[0]
-
     context = {
         "user": user
-        }
-
+    }
     return render_to_response('team.html', context)
 
 def login(request):
@@ -43,20 +39,17 @@ def login(request):
 def profile(request):
         # Temporary fixed user login
     user = User.objects.filter(username='admin').distinct()[0]
-
     context = {
-        "user": user
-        }
+        "user": user,
+    }
     return render_to_response('profile.html', context)
 
 def balance(request):
     # Temporary fixed user login
     user = User.objects.filter(username='admin').distinct()[0]
-
     context = {
         "user": user
-        }
-
+    }
     if request.method == "POST":
         add_amount = request.POST.get('add_amount')
         minus_amount = request.POST.get('minus_amount')
@@ -93,7 +86,7 @@ def pay(request):
         receiver_acc = User.objects.get(username=request.POST.get('pay_users')).account
         tx_receiver = receiver_acc._create_transaction(10,'hi','d')
 
-        link_tx = OneToOnePayment.objects.create(
+        link_tx = Transfer.objects.create(
             tx_from = tx_sender,
             tx_to = tx_receiver
         )
