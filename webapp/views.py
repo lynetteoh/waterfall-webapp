@@ -3,10 +3,9 @@ from django.shortcuts import render, render_to_response, redirect, get_object_or
 
 from django.contrib.auth.models import User
 from .models import Profile, Account, Transaction, Transfer
-
-# TODO:
-# * Handle User sessions instead of hard code
-# * User session authentication
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
+from .forms import SignUpForm
 
 def index(request):
     # Temporary fixed user login
@@ -15,38 +14,44 @@ def index(request):
         "user": user
         }
     return render_to_response('index.html', context)
+    # if request.method == 'POST':
+    #     username = request.POST.get('username')
+    #     email = request.POST.get('email')
+    #     password = request.POST.get('password')
+    #     user = User.objects.create_user(username=username, email=email, password=password)
+    #     user.save()
+    #     login(request, user)
+    #     return redirect('/dashboard')
 
-def dashboard(request):
-    # Temporary fixed user login
-    user = User.objects.filter(username='admin').distinct()[0]
-    context = {
-        "user": user
-    }
-    return render_to_response('dashboard.html', context)
-
+    # return render(request, 'index.html')
 
 def team(request):
-    # Temporary fixed user login
-    user = User.objects.filter(username='admin').distinct()[0]
-    context = {
-        "user": user
-    }
-    return render_to_response('team.html', context)
+    return render(request, 'team.html')
 
-def login(request):
-    return render_to_response('login.html')
 
+@login_required
+def dashboard(request):
+    return render(request, 'dashboard.html')
+
+@login_required
 def profile(request):
-        # Temporary fixed user login
-    user = User.objects.filter(username='admin').distinct()[0]
-    context = {
-        "user": user,
-    }
-    return render_to_response('profile.html', context)
+    if request.method == "POST":
+        user = request.user
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.email = request.POST.get('email')
+        user.save()
 
+        new_pass = request.POST.get('password')
+        if new_pass:
+            user.set_password(new_pass)
+            user.save()
+    return render(request, 'profile.html')
+
+@login_required
 def balance(request):
-    # Temporary fixed user login
-    user = User.objects.filter(username='admin').distinct()[0]
+    user = request.user
+
     context = {
         "user": user
     }
@@ -73,9 +78,9 @@ def balance(request):
 
     return render(request, 'balance.html', context)
 
+@login_required
 def pay(request):
-    # Temporary fixed user login
-    user = User.objects.filter(username='admin').distinct()[0]
+    user = request.user
     all_users = User.objects.all().exclude(username='admin')
 
     if request.method == "POST":
