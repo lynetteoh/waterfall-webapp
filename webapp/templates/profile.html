@@ -57,6 +57,7 @@ input[type="text"][readonly] {
       </div><!--/col-3-->
     	<div class="col-sm-9" style="padding-left:40px;">
           <form id="edit-form" role="form" method="POST" onsubmit="event.preventDefault(); checkForm()">
+          {% csrf_token %}
               <div class="form-group">
                   <div class="col-xs-6">
                       <label for="first_name">
