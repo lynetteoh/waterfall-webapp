@@ -19,6 +19,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from webapp import views
 from django.urls import include
+from django.contrib.auth import views as auth_views
+# from django.conf.urls import url, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,6 +30,7 @@ urlpatterns = [
     path('balance', views.balance, name='balance'),
     path('pay', views.pay, name='pay'),
     path('team', views.team, name='team'),
-    path('login', views.login, name='login'),
+    path('login', auth_views.LoginView, name='login'),
+    path('logout', auth_views.LogoutView, name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
