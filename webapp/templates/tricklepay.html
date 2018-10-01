@@ -14,7 +14,7 @@
 {% block content %}
 <div class="container bootstrap snipplet">
     <div class="page-header">
-        <h1 style="padding-bottom:20px; padding-bottom:15px;">TricklePay</h1>
+        <h1 class="py-3">TricklePay</h1>
     </div>
     <div class="row">
         <div class="col-sm-10">
@@ -26,9 +26,6 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#request" data-toggle="tab">Request</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#split" data-toggle="tab">Split</a>
                         </li>
                     </ul>
                 </div>
@@ -87,7 +84,8 @@
                                 <div class="row form-group mb-5">
                                     <label class="col-sm-2 col-form-label" for="description">Description</label>
                                     <div class="col-sm-10 mb-3">
-                                        <textarea class="no-resize form-control" name="pay_description" row="3" id="description" placeholder="Type Something..." required></textarea>
+                                        <textarea class="no-resize form-control" name="pay_description" row="3" id="description"
+                                            placeholder="Type Something..." required></textarea>
                                     </div>
                                 </div>
                                 <div class="text-center p-4">
@@ -107,14 +105,14 @@
                                         <option>{{user}}</option>
                                         {% endfor %}
                                     </datalist>
-                                    <button class="col-sm-2 btn btn-primary" id="req_add" onclick="add('req_search', 'req_users')">Add
+                                    <button class="col-sm-2 btn btn-primary" id="req_add" onclick="add('req_search', 'req_users', 'req_amount'); update_value('req_users','req_amount')">Add
                                         <i class="fa fa-plus"></i></button>
                                 </div>
                             </div>
                             <form role="form" id="req-form" onsubmit="event.preventDefault();popup('req_users','req-form','req_amount', 'req_date')"
                                 method="POST">
                                 {% csrf_token %}
-                                <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
+                                <div class="col-sm-10  ml-5 pl-5 mb-3">
                                     <ul class="pt-2 form-inline" id="req_users"></ul>
                                 </div>
                                 <div class="row form-group mb-5">
@@ -124,6 +122,7 @@
                                             <span class="input-group-text">$</span>
                                         </div>
                                         <input type="number" class="form-control" id="req_amount" name="req_amount"
+                                            onchange="update_total('req_amount', 'summary_total'); update_value('req_users','req_amount')"
                                             required>
                                     </div>
                                 </div>
@@ -149,7 +148,28 @@
                                 <div class="row form-group mb-5">
                                     <label class="col-sm-2 col-form-label" for="description">Description</label>
                                     <div class="col-sm-10 mb-3">
-                                        <textarea name="req_description" class="no-resize form-control" row="3" id="description" placeholder="Type Something..." required></textarea>
+                                        <textarea name="req_description" class="no-resize form-control" row="3" id="description"
+                                            placeholder="Type Something..." required></textarea>
+                                    </div>
+                                </div>
+                                <div class="row form-group mb-5 border-top" style="display:none" id="summary">
+                                    <p class="py-4">Request Summary</p>
+                                    <div class="form-group col-sm-10  ml-5 pl-5 mb-3 table-responsive-sm">
+                                        <!-- <ul class="ml-4 form-inline" id='summary'></ul> -->
+                                        <table class="ml-5 table" id="summary_table">
+                                            <thead>
+                                                <tr>
+                                                    <td class="w-50">Payee</td>
+                                                    <td class="w-50">Amount</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><label for="summary_total" class="col-sm-2 ml-5 col-form-label">Total</label></td>
+                                                    <td><input id="summary_total" class="form-control col-sm-7" value="0"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                                 <div class="text-center p-4">
@@ -164,6 +184,5 @@
         </div>
     </div>
 </div>
-
 
 {% endblock %}
