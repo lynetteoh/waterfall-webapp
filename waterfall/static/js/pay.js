@@ -204,9 +204,11 @@ function check_split(amount, users_list) {
             var text = input.attributes[3].value;
             var input = document.getElementById(text);
             var val = input.value;
-            sum += parseInt(val, 10);
+            val = parseFloat(val, 10)
+            sum += val;
         }
     }
+
     if (sum != amount) {
         return 1
     } else {
