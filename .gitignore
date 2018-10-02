@@ -116,3 +116,5 @@ waterfall/static/css/.DS_Store
 webapp/migrations/.DS_Store
 waterfall/static/.DS_Store
 waterfall/static/.DS_Store
+webapp/migrations/0001_initial.py
+webapp/migrations/0001_initial.py
