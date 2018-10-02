@@ -98,7 +98,7 @@
         "title": "Dinner request",
         "account": 1,
         "transaction_type": "w",
-        "value": "20.0000",
+        "value": "-20.0000",
         "is_pending": false,
         "created_at": "2018-09-17T19:22:31.244Z",
         "modified_at": "2018-09-17T19:22:31.244Z",
