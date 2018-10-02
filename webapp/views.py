@@ -11,24 +11,7 @@ from django.contrib.auth import authenticate, login
 from .forms import SignUpForm
 
 def index(request):
-    # Temporary fixed user login
-    user = User.objects.filter(username='admin').distinct()[0]
-    context = {
-        "user": user
-        }
-    return render(request, 'index.html', context)
-
-    # if request.method == 'POST':
-    #     username = request.POST.get('username')
-    #     email = request.POST.get('email')
-    #     password = request.POST.get('password')
-    #     user = User.objects.create_user(username=username, email=email, password=password)
-    #     user.save()
-    #     login(request, user)
-    #     return redirect('/dashboard')
-
-
-    # return render(request, 'index.html')
+    return render(request, 'index.html')
 
 def team(request):
     return render(request, 'team.html')
@@ -92,19 +75,17 @@ def balance(request):
 @ensure_csrf_cookie
 def register_new(request):
     if request.POST:
-        #DO VALIDATION HERE, AND IF USER IS ADDED TO DB GO TO SUCCESS PAGE
         username = request.POST['username']
-        #pw = request.POST['password'] #PROBS NEED TO HASH THIS and STORE in DB
         email = request.POST['email']
-        print("The username is:", username)
-
-        return render(request, "register_success.html")
-
-        #CAN DO AN IF STATEMENT TO REDIRECT TO HOME PAGE IF FAILED
-        #return redirect('/')
-
-    return render(request, "register_success.html.html")
-
+        password = request.POST['password']
+        user = User.objects.create_user(username=username, email=email, password=password)
+        if user:
+            user.save()
+            login(request, user)
+            return redirect('/dashboard')
+        else:
+            return render(request, 'index.html')
+          
 @login_required
 def pay(request):
     user = request.user
