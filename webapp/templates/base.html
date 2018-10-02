@@ -32,7 +32,7 @@
 
             <ul class="nav navbar-nav navbar-right" id="navbar">
                 <li id="balance-name">BALANCE
-                  <p id="balance-text">${{ user.account.balance | floatformat:"2" }}</p>
+                  <p id="balance-text">${{ user.balance | floatformat:"2" }}</p>
                 </li>
                 <li>
                   <a href="{% url 'profile' %}"><img src="{% static "images/anon-user.svg" %}" id="user-icon"/></a>

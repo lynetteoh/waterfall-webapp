@@ -14,7 +14,7 @@
 {% block content %}
 <div class="container bootstrap snipplet">
     <div class="page-header">
-        <h1 style="padding-bottom:20px; padding-bottom:15px;">TricklePay</h1>
+        <h1 class="py-3">TricklePay</h1>
     </div>
     <div class="row">
         <div class="col-sm-10">
@@ -26,9 +26,6 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#request" data-toggle="tab">Request</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#split" data-toggle="tab">Split</a>
                         </li>
                     </ul>
                 </div>
@@ -49,7 +46,7 @@
                                         <i class="fa fa-plus"></i></button>
                                 </div>
                             </div>
-                            <form role="form" id="pay-form" onsubmit="event.preventDefault();popup('pay_users','pay-form','pay_amount')"
+                            <form role="form" id="pay-form" onsubmit="event.preventDefault();popup('pay_users','pay-form','pay_amount', 'pay_date')"
                                 method="POST">
                                 {% csrf_token %}
                                 <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
@@ -66,9 +63,9 @@
                                     </div>
                                 </div>
                                 <div class="row form-group mb-5">
-                                    <label class="col-sm-2 col-form-label" for="date">Date</label>
+                                    <label class="col-sm-2 col-form-label" for="pay_date">Date</label>
                                     <div class="form-inline col-sm-10">
-                                        <input type=date class="form-control col-sm-4" role="input" id="date" name="pay_date"
+                                        <input type=date class="form-control col-sm-4" role="input" id="pay_date" name="pay_date"
                                             required>
                                         <div class="text-center col-sm-5">
                                             <div class="btn-group  pl-5" id="pay_freq">
@@ -87,7 +84,8 @@
                                 <div class="row form-group mb-5">
                                     <label class="col-sm-2 col-form-label" for="description">Description</label>
                                     <div class="col-sm-10 mb-3">
-                                        <textarea class="no-resize form-control" name="pay_description" row="3" id="description" placeholder="Type Something..." required></textarea>
+                                        <textarea class="no-resize form-control" name="pay_description" row="3" id="description"
+                                            placeholder="Type Something..." required></textarea>
                                     </div>
                                 </div>
                                 <div class="text-center p-4">
@@ -107,14 +105,14 @@
                                         <option>{{user}}</option>
                                         {% endfor %}
                                     </datalist>
-                                    <button class="col-sm-2 btn btn-primary" id="req_add" onclick="add('req_search', 'req_users')">Add
+                                    <button class="col-sm-2 btn btn-primary" id="req_add" onclick="add('req_search', 'req_users', 'req_amount'); update_value('req_users','req_amount')">Add
                                         <i class="fa fa-plus"></i></button>
                                 </div>
                             </div>
-                            <form role="form" id="req-form" onsubmit="event.preventDefault();popup('req_users','req-form','req_amount')"
+                            <form role="form" id="req-form" onsubmit="event.preventDefault();popup('req_users','req-form','req_amount', 'req_date')"
                                 method="POST">
                                 {% csrf_token %}
-                                <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
+                                <div class="col-sm-10  ml-5 pl-5 mb-3">
                                     <ul class="pt-2 form-inline" id="req_users"></ul>
                                 </div>
                                 <div class="row form-group mb-5">
@@ -124,13 +122,14 @@
                                             <span class="input-group-text">$</span>
                                         </div>
                                         <input type="number" class="form-control" id="req_amount" name="req_amount"
+                                            onchange="update_total('req_amount', 'summary_total'); update_value('req_users','req_amount')"
                                             required>
                                     </div>
                                 </div>
                                 <div class="row form-group mb-5">
-                                    <label class="col-sm-2 col-form-label" for="date">Date</label>
+                                    <label class="col-sm-2 col-form-label" for="req_date">Date</label>
                                     <div class="form-inline col-sm-10">
-                                        <input type=date class="form-control col-sm-4" role="input" id="date" name="req_date"
+                                        <input type=date class="form-control col-sm-4" role="input" id="req_date" name="req_date"
                                             required>
                                         <div class="text-center col-sm-5">
                                             <div class="btn-group  pl-5" id="req_freq">
@@ -149,73 +148,32 @@
                                 <div class="row form-group mb-5">
                                     <label class="col-sm-2 col-form-label" for="description">Description</label>
                                     <div class="col-sm-10 mb-3">
-                                        <textarea name="req_description" class="no-resize form-control" row="3" id="description" placeholder="Type Something..." required></textarea>
+                                        <textarea name="req_description" class="no-resize form-control" row="3" id="description"
+                                            placeholder="Type Something..." required></textarea>
+                                    </div>
+                                </div>
+                                <div class="row form-group mb-5 border-top" style="display:none" id="summary">
+                                    <p class="py-4">Request Summary</p>
+                                    <div class="form-group col-sm-10  ml-5 pl-5 mb-3 table-responsive-sm">
+                                        <!-- <ul class="ml-4 form-inline" id='summary'></ul> -->
+                                        <table class="ml-5 table" id="summary_table">
+                                            <thead>
+                                                <tr>
+                                                    <td class="w-50">Payee</td>
+                                                    <td class="w-50">Amount</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><label for="summary_total" class="col-sm-2 ml-5 col-form-label">Total</label></td>
+                                                    <td><input id="summary_total" class="form-control col-sm-7" value="0"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                                 <div class="text-center p-4">
                                     <button class="btn btn-lg btn-primary" type="submit">Request
-                                        <i class="fa fa-paper-plane px-2"></i></button>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="tab-pane container" id="split">
-                            <div class="row form-group mt-5">
-                                <label class="col-sm-2 col-form-label" for="split_search">TricklePay ID</label>
-                                <div class="col-sm-10 mb-3 form-inline">
-                                    <input class="col-sm-10 form-control autocomplete" type="search" placeholder="Search"
-                                        id="split_search" list="userList" required>
-                                    <datalist id="userList">
-                                        {% for user in users %}
-                                        <option>{{user}}</option>
-                                        {% endfor %}
-                                    </datalist>
-                                    <button class="col-sm-2 btn btn-primary" id="split_add" onclick="add('split_search', 'split_users')">Add
-                                        <i class="fa fa-plus"></i></button>
-                                </div>
-                            </div>
-                            <form role="form" id="split-form" onsubmit="event.preventDefault();popup('split_users','split-form','split_amount')"
-                                method="POST">
-                                {% csrf_token %}
-                                <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
-                                    <ul class="pt-2 form-inline" id='split_users'></ul>
-                                </div>
-                                <div class="row form-group mb-5">
-                                    <label for="amount" class="col-sm-2 col-form-label">Amount</label>
-                                    <div class="input-group col-sm-10">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">$</span>
-                                        </div>
-                                        <input name="split_amount" type="number" class="form-control" id="split_amount"
-                                            required>
-                                    </div>
-                                </div>
-                                <div class="row form-group mb-5">
-                                    <label class="col-sm-2 col-form-label" for="date">Date</label>
-                                    <div class="form-inline col-sm-10">
-                                        <input name="split_date" type=date class="form-control col-sm-4" role="input"
-                                            id="date" required>
-                                        <div class="text-center col-sm-5">
-                                            <div class="btn-group  pl-5" id="split_freq">
-                                                <input type="radio" name="split_freq" id="split_once" value="once"
-                                                    required><label for="split_once" class="btn">Once</label>
-                                                <input type="radio" name="split_freq" id="split_weekly" value="weekly"><label
-                                                    for="split_weekly" class="btn">Weekly</label>
-                                                <input type="radio" name="split_freq" id="split_monthly" value="monthly"><label
-                                                    for="split_monthly" class="btn ">Monthly</label>
-                                                <input type="radio" name="split_freq" id="split_yearly" value="yearly"><label
-                                                    for="split_yearly" class="btn ">Yearly</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row form-group mb-5">
-                                    <label class="col-sm-2 col-form-label" for="description">Description</label>
-                                    <div class="col-sm-10 mb-3">
-                                        <textarea class="no-resize form-control" name="split_description" row="3" id="description" placeholder="Type Something..." required></textarea>
-                                    </div>
-                                </div>
-                                <div class="text-center p-4">
-                                    <button class="btn btn-lg btn-primary" type="submit">Split
                                         <i class="fa fa-paper-plane px-2"></i></button>
                                 </div>
                             </form>
@@ -226,6 +184,5 @@
         </div>
     </div>
 </div>
-
 
 {% endblock %}
