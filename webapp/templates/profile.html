@@ -41,8 +41,16 @@ input[type="text"][readonly] {
         </br>
         <div id="upload-pic" style="display:none;">
           <h6>Upload New Profile Picture</h6>
-          <input type="file" class="file-upload">
-          </hr></br></br>
+
+          <form role="form" method="POST">
+            {% csrf_token %}
+            <input name="new_pic" id="new_pic" type="file" class="file-upload">
+            </br></br>
+            <button class="btn btn-xs"  type="submit">
+              <i class="fas fa-check"></i> &nbsp;Upload
+            </button>
+            </hr></br></br>
+          </form>
         </div>
       </div>
 
@@ -52,7 +60,6 @@ input[type="text"][readonly] {
         <li class="list-group-item text-right text-muted"><span style="float:left;">Requests</span>{{ user.account.num_requests }}</li>
         <li class="list-group-item text-right text-muted"><span style="float:left;">Groups</span>{{ user.account.num_groups }}</li>
       </ul>
-
 
       </div><!--/col-3-->
     	<div class="col-sm-9" style="padding-left:40px;">

@@ -42,15 +42,20 @@ def dashboard(request):
 def profile(request):
     if request.method == "POST":
         user = request.user
-        user.first_name = request.POST.get('first_name')
-        user.last_name = request.POST.get('last_name')
-        user.email = request.POST.get('email')
-        user.save()
-
-        new_pass = request.POST.get('password')
-        if new_pass:
-            user.set_password(new_pass)
+        if request.POST.get('new_pic'):
+            # Profile picture upload
+            # user.profile.avatar = request.POST.get('new_pic')
+        elif request.POST.get('first_name'):
+            # Editing profile fields.
+            user.first_name = request.POST.get('first_name')
+            user.last_name = request.POST.get('last_name')
+            user.email = request.POST.get('email')
             user.save()
+            # Checking for password change.
+            new_pass = request.POST.get('password')
+            if new_pass:
+                user.set_password(new_pass)
+                user.save()
     return render(request, 'profile.html')
 
 @login_required
