@@ -48,15 +48,16 @@ input[type="text"][readonly] {
 
       <ul class="list-group">
         <li class="list-group-item"><strong>Activity</strong><i class="fa fa-dashboard fa-1x"></i></li>
-        <li class="list-group-item text-right text-muted" style="text-align:left;"><span style="float:left;">Payments</span>$$ 125</li>
-        <li class="list-group-item text-right text-muted"><span style="float:left;">Requests</span> $$13</li>
-        <li class="list-group-item text-right text-muted"><span style="float:left;">Groups</span> $$37</li>
+        <li class="list-group-item text-right text-muted" style="text-align:left;"><span style="float:left;">Payments</span>{{ user.account.num_payments }}</li>
+        <li class="list-group-item text-right text-muted"><span style="float:left;">Requests</span>{{ user.account.num_requests }}</li>
+        <li class="list-group-item text-right text-muted"><span style="float:left;">Groups</span>{{ user.account.num_groups }}</li>
       </ul>
 
 
       </div><!--/col-3-->
     	<div class="col-sm-9" style="padding-left:40px;">
           <form id="edit-form" role="form" method="POST" onsubmit="event.preventDefault(); checkForm()">
+          {% csrf_token %}
               <div class="form-group">
                   <div class="col-xs-6">
                       <label for="first_name">

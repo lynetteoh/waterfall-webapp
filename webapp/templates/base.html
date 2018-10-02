@@ -32,10 +32,10 @@
 
             <ul class="nav navbar-nav navbar-right" id="navbar">
                 <li id="balance-name">BALANCE
-                  <p id="balance-text">${{ user.account.balance | floatformat:"2" }}</p>
+                  <p id="balance-text">${{ user.balance | floatformat:"2" }}</p>
                 </li>
                 <li>
-                  <a href="/"><img src="{% static "images/anon-user.svg" %}" id="user-icon"/></a>
+                  <a href="{% url 'profile' %}"><img src="{% static "images/anon-user.svg" %}" id="user-icon"/></a>
                 </li>
             </ul>
         </div>
@@ -58,7 +58,7 @@
                           </a>
                         </li>
                         <li class="subnav-list">
-                          <a id="about_nav" class="nav_text nav-link subnav"  role="button" href="#">Logout
+                          <a id="about_nav" class="nav_text nav-link subnav"  role="button" href="{% url 'logout'%}">Logout
                           </a>
                         </li>
                         <li>
