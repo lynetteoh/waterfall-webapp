@@ -92,7 +92,7 @@ def balance(request):
 @ensure_csrf_cookie
 def register_new(request):
     if request.POST:
-        #DO VALIDATION HERE, AND IF USER IS ADDED TO DB GO TO SUCCESS PAGE
+        #TODO VALIDATION HERE, AND IF USER IS ADDED TO DB GO TO SUCCESS PAGE
         username = request.POST['username']
         #pw = request.POST['password'] #PROBS NEED TO HASH THIS and STORE in DB
         email = request.POST['email']
@@ -103,16 +103,15 @@ def register_new(request):
         #CAN DO AN IF STATEMENT TO REDIRECT TO HOME PAGE IF FAILED
         #return redirect('/')
 
-    return render(request, "register_success.html.html")
+    return render(request, "register_success.html")
 
 @login_required
 def pay(request):
     user = request.user
-    all_users = User.objects.all().exclude(username='admin')
+    all_users = User.objects.all().exclude(username=user.username)
 
     if request.method == "POST":
         # Requires more extensive form validation
-
         tx_sender = user.account._create_transaction(-10,'hi','w')
 
         receiver_acc = User.objects.get(username=request.POST.get('pay_users')).account
@@ -122,13 +121,10 @@ def pay(request):
             tx_from = tx_sender,
             tx_to = tx_receiver
         )
-
         tx_sender.save()
         tx_receiver.save()
         link_tx.save()
-
         return redirect('/dashboard')
-
     else:
         pass
         context ={
@@ -139,7 +135,7 @@ def pay(request):
         return render(request, 'tricklepay.html', context)
 
 def request_page(request):
-    user = request.user 
+    user = request.user
     all_users = User.objects.all().exclude(username='admin')
 
     print(all_users)
@@ -149,4 +145,3 @@ def request_page(request):
         "users": all_users,
     }
     return render(request, 'request.html', context)
-

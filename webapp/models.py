@@ -41,9 +41,11 @@ class Account(models.Model):
 
     @property
     def balance(self):
-        return self.transaction_set\
-                    .filter(is_deleted=False, confirmed_at__isnull=False)\
-                    .aggregate(Sum('value'))['value__sum']
+        return 0
+        # return 0 + self.transaction_set\
+        #             .filter(is_deleted=False, confirmed_at__isnull=False)\
+        #             .aggregate(Sum('value'))['value__sum']
+
 
     @property
     def num_payments(self):
