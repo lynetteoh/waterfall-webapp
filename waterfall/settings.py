@@ -73,7 +73,7 @@ TEMPLATES = [
 
 # Cron Jobs tasked periodically; added by Steph.
 CRONJOBS = [
-    ('* * * * *', 'webapp.cron.update'),
+    ('* * * * *', 'webapp.management.commands.update'),
 ]
 
 WSGI_APPLICATION = 'waterfall.wsgi.application'

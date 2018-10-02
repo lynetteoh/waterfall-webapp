@@ -7,14 +7,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from .forms import SignUpForm
 
-# TODO:
-# * Handle User sessions instead of hard code
-# * User session authentication
-
 def index(request):
     # Temporary fixed user login
     user = User.objects.filter(username='admin').distinct()[0]
-
     context = {
         "user": user
         }
@@ -27,43 +22,19 @@ def index(request):
     #     user.save()
     #     login(request, user)
     #     return redirect('/dashboard')
-    
+
     # return render(request, 'index.html')
+
+def team(request):
+    return render(request, 'team.html')
+
 
 @login_required
 def dashboard(request):
-    # Temporary fixed user login
-    # user = User.objects.filter(username='admin').distinct()[0]
-
-    # context = {
-    #     "user": user
-    #     }
-    # return render_to_response('dashboard.html', context)
-
     return render(request, 'dashboard.html')
 
 @login_required
-def team(request):
-    # Temporary fixed user login
-    # user = User.objects.filter(username='admin').distinct()[0]
-
-    # context = {
-        # "user": user
-        # }
-
-    # return render_to_response('team.html', context)
-    return render(request, 'team.html')
-
-@login_required
 def profile(request):
-        # Temporary fixed user login
-    # user = User.objects.filter(username='admin').distinct()[0]
-
-    # context = {
-        # "user": user
-        # }
-    # return render_to_response('profile.html', context)
-    
     if request.method == "POST":
         user = request.user
         user.first_name = request.POST.get('first_name')
@@ -77,15 +48,13 @@ def profile(request):
             user.save()
     return render(request, 'profile.html')
 
+@login_required
 def balance(request):
-    # Temporary fixed user login
-    # user = User.objects.filter(username='admin').distinct()[0]
     user = request.user
 
     context = {
         "user": user
-        }
-
+    }
     if request.method == "POST":
         add_amount = request.POST.get('add_amount')
         minus_amount = request.POST.get('minus_amount')
@@ -109,9 +78,8 @@ def balance(request):
 
     return render(request, 'balance.html', context)
 
+@login_required
 def pay(request):
-    # Temporary fixed user login
-    # user = User.objects.filter(username='admin').distinct()[0]
     user = request.user
     all_users = User.objects.all().exclude(username='admin')
 
@@ -123,7 +91,7 @@ def pay(request):
         receiver_acc = User.objects.get(username=request.POST.get('pay_users')).account
         tx_receiver = receiver_acc._create_transaction(10,'hi','d')
 
-        link_tx = OneToOnePayment.objects.create(
+        link_tx = Transfer.objects.create(
             tx_from = tx_sender,
             tx_to = tx_receiver
         )
