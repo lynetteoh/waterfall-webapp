@@ -29,6 +29,7 @@ urlpatterns = [
     path('profile', views.profile, name='profile'),
     path('balance', views.balance, name='balance'),
     path('pay', views.pay, name='pay'),
+    path('request', views.request_page, name='request'),
     path('team', views.team, name='team'),
     path('login', auth_views.LoginView, name='login'),
     path('logout', auth_views.LogoutView, name='logout'),
