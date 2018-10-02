@@ -44,6 +44,7 @@ def profile(request):
         user = request.user
         if request.POST.get('new_pic'):
             # Profile picture upload
+            print("TODO upload")
             # user.profile.avatar = request.POST.get('new_pic')
         elif request.POST.get('first_name'):
             # Editing profile fields.
@@ -101,7 +102,7 @@ def register_new(request):
 
         #CAN DO AN IF STATEMENT TO REDIRECT TO HOME PAGE IF FAILED
         #return redirect('/')
-        
+
     return render(request, "register_success.html.html")
 
 @login_required
