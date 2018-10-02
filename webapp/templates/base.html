@@ -27,12 +27,12 @@
         <!-- Top Navbar -->
         <div class="navbar fixed-top navbar-light navbar-fixed-top">
             <div class="navbar-header">
-              <a href="/"><img src="{% static "images/waterfall-logo.png" %}"  id="header-logo"/></a>
+              <a href="/"><img src="{% static "images/waterfall-logo.png" %}" id="header-logo"/></a>
             </div>
 
             <ul class="nav navbar-nav navbar-right" id="navbar">
                 <li id="balance-name">BALANCE
-                  <p id="balance-text">${{ user.balance | floatformat:"2" }}</p>
+                  <p id="balance-text">${{ user.account.balance | floatformat:"2" }}</p>
                 </li>
                 <li>
                   <a href="{% url 'profile' %}"><img src="{% static "images/anon-user.svg" %}" id="user-icon"/></a>
