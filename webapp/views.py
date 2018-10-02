@@ -132,7 +132,21 @@ def pay(request):
     else:
         pass
         context ={
+            "pay_page": "active",
             "user" : user,
             "users": all_users,
         }
         return render(request, 'tricklepay.html', context)
+
+def request_page(request):
+    user = request.user 
+    all_users = User.objects.all().exclude(username='admin')
+
+    print(all_users)
+    context ={
+        "request_page": "active",
+        "user" : user,
+        "users": all_users,
+    }
+    return render(request, 'request.html', context)
+
