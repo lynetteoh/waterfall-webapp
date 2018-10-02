@@ -39,17 +39,32 @@ class Account(models.Model):
     def __str__(self):
         return '@{}'.format(self.user.username)
 
-    # TODO: Change to utilize filter for confirmed_at field for ALL funcs below and exclude is_deleted
     @property
     def balance(self):
-        return self.transaction_set.aggregate(Sum('value'))['value__sum']
-    # TODO @jqhils below for profile page
+        return self.transaction_set\
+                    .filter(is_deleted=False, confirmed_at__isnull=False)\
+                    .aggregate(Sum('value'))['value__sum']
+
     @property
     def num_payments(self):
-        return 0
+        num_payments = 0
+        payments = Transfer.objects.filter(is_deleted=True,\
+                                            confirmed_at__isnull=True)
+        for p in payments:
+            if p.tx_from.account == self.user.account:
+                num_payments += 1
+        return num_payments
+
     @property
     def num_requests(self):
-        return 0
+        num_requests = 0
+        requests = Transfer.objects.filter(is_deleted=True, is_request=True,\
+                                    confirmed_at__isnull=True)
+        for r in requests:
+            if r.tx_from.account == self.user.account:
+                num_requests += 1
+        return num_requests
+
     @property
     def num_groups(self):
         # TODO Change this after implementing groups
