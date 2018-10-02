@@ -3,6 +3,9 @@ from django.shortcuts import render, render_to_response, redirect, get_object_or
 
 from django.contrib.auth.models import User
 from .models import Profile, Account, Transaction, Transfer
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.template import RequestContext
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from .forms import SignUpForm
@@ -13,7 +16,8 @@ def index(request):
     context = {
         "user": user
         }
-    return render_to_response('index.html', context)
+    return render(request, 'index.html', context)
+
     # if request.method == 'POST':
     #     username = request.POST.get('username')
     #     email = request.POST.get('email')
@@ -22,6 +26,7 @@ def index(request):
     #     user.save()
     #     login(request, user)
     #     return redirect('/dashboard')
+
 
     # return render(request, 'index.html')
 
@@ -37,15 +42,20 @@ def dashboard(request):
 def profile(request):
     if request.method == "POST":
         user = request.user
-        user.first_name = request.POST.get('first_name')
-        user.last_name = request.POST.get('last_name')
-        user.email = request.POST.get('email')
-        user.save()
-
-        new_pass = request.POST.get('password')
-        if new_pass:
-            user.set_password(new_pass)
+        if request.POST.get('new_pic'):
+            # Profile picture upload
+            # user.profile.avatar = request.POST.get('new_pic')
+        elif request.POST.get('first_name'):
+            # Editing profile fields.
+            user.first_name = request.POST.get('first_name')
+            user.last_name = request.POST.get('last_name')
+            user.email = request.POST.get('email')
             user.save()
+            # Checking for password change.
+            new_pass = request.POST.get('password')
+            if new_pass:
+                user.set_password(new_pass)
+                user.save()
     return render(request, 'profile.html')
 
 @login_required
@@ -77,6 +87,22 @@ def balance(request):
             return render(request, 'balance.html', context)
 
     return render(request, 'balance.html', context)
+
+@ensure_csrf_cookie
+def register_new(request):
+    if request.POST:
+        #DO VALIDATION HERE, AND IF USER IS ADDED TO DB GO TO SUCCESS PAGE
+        username = request.POST['username']
+        #pw = request.POST['password'] #PROBS NEED TO HASH THIS and STORE in DB
+        email = request.POST['email']
+        print("The username is:", username)
+
+        return render(request, "register_success.html")
+
+        #CAN DO AN IF STATEMENT TO REDIRECT TO HOME PAGE IF FAILED
+        #return redirect('/')
+        
+    return render(request, "register_success.html.html")
 
 @login_required
 def pay(request):
