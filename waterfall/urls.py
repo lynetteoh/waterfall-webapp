@@ -30,7 +30,8 @@ urlpatterns = [
     path('balance', views.balance, name='balance'),
     path('pay', views.pay, name='pay'),
     path('team', views.team, name='team'),
-    path('login', auth_views.LoginView, name='login'),
+    path('login', views.login, name='login'),
+    path('register-new', views.register_new, name='register_new'),
     path('logout', auth_views.LogoutView, name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
