@@ -142,7 +142,7 @@ def request_page(request):
     user = request.user 
     all_users = User.objects.all().exclude(username='admin')
 
-    print(all_users)
+    print("all_users ", all_users)
     context ={
         "request_page": "active",
         "user" : user,
