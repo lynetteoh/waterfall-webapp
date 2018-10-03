@@ -81,10 +81,14 @@ def register_new(request):
         user = User.objects.create_user(username=username, email=email, password=password)
         if user:
             user.save()
+            account = Account(user = user)
+            account.save()
+            profile = Profile(user = user)
+            profile.save()
             login(request, user)
             return redirect('/dashboard')
-        else:
-            return render(request, 'index.html')
+    else:
+        return render(request, 'index.html')
           
 @login_required
 def pay(request):

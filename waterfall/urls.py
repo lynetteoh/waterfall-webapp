@@ -20,7 +20,6 @@ from django.conf.urls.static import static
 from webapp import views
 from django.urls import include
 from django.contrib.auth import views as auth_views
-# from django.conf.urls import url, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
