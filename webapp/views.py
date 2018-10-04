@@ -36,7 +36,7 @@ def profile(request):
             form = AvatarForm(request.POST, request.FILES)
 
             if form.is_valid():
-                profile = Profile.objects.get(id=user.id)
+                profile = user.profile
                 profile.avatar = form.cleaned_data["avatar"]
                 profile.save()
 
@@ -96,6 +96,13 @@ def register_new(request):
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
+            profile = Profile()
+            profile.user = user
+            profile.avatar = None
+            profile.save()
+            account = Account()
+            account.user = user
+            account.save()
             login(request, user)
             return redirect('/dashboard')
     else:
