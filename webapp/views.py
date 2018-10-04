@@ -106,39 +106,40 @@ def register_new(request):
     else:
         form = SignUpForm()
     return render(request, 'index.html', {'form': form})
-  
+
 @login_required
 def pay(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
     pay_users = []
     for u in all_users:
-        if(u != user.username):
+        if (u != user.username):
             pay_users.append(u.username)
-
     context = {
         "pay_page": "active",
         "user" : user,
         "filter_users": pay_users,
     }
-
     if request.method == "POST":
         try:
-            print (request.POST)
-            payees = [request.POST.get('pay_users0')]
-            print (payees)
-
+            # Collect all payees.
+            payees = []
+            i = 0
+            r = request.POST.get('pay_users0')
+            while r:
+                payees.append(r)
+                i += 1
+                r = request.POST.get('pay_users' + str(i))
             if not payees:
-                raise Exception("Invalid Payees.")
+                raise Exception("Invalid Payees")
+
+            subj = request.POST.get('pay_description')
+            recurr = request.POST.get('pay_freq')
+            date = request.POST.get('pay_date')
+            amount = request.POST.get('pay_amount')
 
             for p in payees:
-                print ("HERE + " + p)
                 receiver = User.objects.get(username=p).account
-                subj = request.POST.get('pay_description')
-                amount = request.POST.get('pay_amount')
-                recurr = request.POST.get('pay_freq')
-                date = request.POST.get('pay_date')
-
                 # Check for valid data.
                 if not receiver or (receiver is user.account):
                     raise Exception("Invalid User.")
@@ -160,31 +161,76 @@ def pay(request):
                 if deadline < today:
                     raise Exception("Invalid Past Payment Date")
 
-                print ("Creating transfer payment ")
                 transfer = user.account._create_transfer(receiver, subj, float(amount), int(recurr), deadline, False)
                 context['error'] = "Success"
         except Exception as e:
             print (e)
             context['error'] = str(e)
         finally:
-            return render(request, 'tricklepay.html', context)
+            return render(request, 'pay.html', context)
     # Regular pay view.
-    return render(request, 'tricklepay.html', context)
+    return render(request, 'pay.html', context)
 
-
-def request_page(request):
+@login_required
+def request(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
-    pay_users = []
+    req_users = []
     for u in all_users:
         if(u != user.username):
-            pay_users.append(u.username)
-
-    print("all_users ", all_users)
+            req_users.append(u.username)
     context ={
         "request_page": "active",
         "user" : user,
-        "filter_users": pay_users,
-
+        "filter_users": req_users,
     }
+    if request.method == "POST":
+        try:
+            # Collect all requests
+            requests = []
+            i = 0
+            r = request.POST.get('req_users0')
+            while r:
+                requests.append(r)
+                i += 1
+                r = request.POST.get('req_users' + str(i))
+            if not requests:
+                raise Exception("Invalid Request User")
+
+            subj = request.POST.get('req_description')
+            recurr = request.POST.get('req_freq')
+            date = request.POST.get('req_date')
+
+            for r in requests:
+                receiver = User.objects.get(username=r).account
+                amount = request.POST.get(r)
+
+                # Check for valid data.
+                if not receiver or (receiver is user.account):
+                    raise Exception("Invalid User.")
+                if not subj:
+                    raise Exception("Empty Payment Description")
+                if not amount or float(amount) < 0:
+                    raise Exception("Invalid Payment Amount")
+                if recurr is None or int(recurr) < 0:
+                    raise Exception("Invalid Payment Recurrence")
+                if not date:
+                    raise Exception("Invalid Payment Date")
+
+                timezone = pytz.UTC
+                today = timezone.localize(datetime.today()).date()
+                deadline = \
+                    timezone.localize(datetime.strptime(date, "%Y-%m-%d")).date() # yyyy-mm-dd
+                if deadline < today:
+                    raise Exception("Invalid Past Payment Date")
+
+                print ("Creating transfer payment ")
+                transfer = user.account._create_transfer(receiver, subj, float(amount), int(recurr), deadline, True)
+                context['error'] = "Success"
+        except Exception as e:
+            print (e)
+            context['error'] = str(e)
+        finally:
+            return render(request, 'request.html', context)
+    # Regular request view.
     return render(request, 'request.html', context)
