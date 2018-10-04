@@ -23,8 +23,8 @@
                             <input class="col-sm-10 form-control autocomplete" type="req_search" placeholder="Search"
                                 id="req_search" list="req_userList" required>
                             <datalist id="req_userList">
-                                {% for user in users %}
-                                <option>{{user}}</option>
+                                {% for f in filter_users %}
+                                <option>{{f}}</option>
                                 {% endfor %}
                             </datalist>
                             <button class="col-sm-2 btn btn-primary" id="req_add" onclick="add('req_search', 'req_users', 'req_amount'); update_value('req_users','req_amount')">Add
@@ -103,4 +103,9 @@
         </div>
     </div>
 </div>
+
+<script>
+    var f_users = "{{filter_users}}";
+    
+</script>
 {% endblock %}

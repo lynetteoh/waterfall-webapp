@@ -38,15 +38,11 @@ def profile(request):
             form = AvatarForm(request.POST, request.FILES)
 
             if form.is_valid():
-                print("form is valid")
                 profile = Profile.objects.get(id=user.id)
                 profile.avatar = form.cleaned_data["avatar"]
                 profile.save()
-            else:
-                print("form is invalid")
-                print(form.errors)
 
-        if request.POST.get('first_name'):
+        elif request.POST.get('first_name'):
             # Editing profile fields.
             user.first_name = request.POST.get('first_name')
             user.last_name = request.POST.get('last_name')
@@ -95,27 +91,27 @@ def balance(request):
 @ensure_csrf_cookie
 def register_new(request):
     if request.POST:
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        try:
-            user = User.objects.create_user(username=username, email=email, password=password)
-            user.save()
-            account = Account(user = user)
-            account.save()
-            profile = Profile(user = user)
-            profile.avatar = None
-            profile.save()
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
             login(request, user)
             return redirect('/dashboard')
-        except:
-            return render(request, 'index.html')
-    return render(request, 'index.html')
+    else:
+        form = SignUpForm()
+    return render(request, 'index.html', {'form': form})
+
 
 @login_required
 def pay(request):
     user = request.user
-    all_users = User.objects.all().exclude(username=user.username)
+    all_users = User.objects.all().exclude(username=request.user.username)
+    pay_users = []
+    for u in all_users:
+        if(u != user.username):
+            pay_users.append(u.username)
 
     if request.method == "POST":
         try:
@@ -149,25 +145,30 @@ def pay(request):
             context ={
                 "pay_page": "active",
                 "user" : user,
-                "users": all_users,
+                "filter_users": pay_users,
             }
             return render(request, 'tricklepay.html', context)
     # Regular pay view.
     context = {
         "pay_page": "active",
         "user" : user,
-        "users": all_users,
+        "filter_users": pay_users,
     }
     return render(request, 'tricklepay.html', context)
-
 def request_page(request):
     user = request.user
-    all_users = User.objects.all().exclude(username='admin')
+    all_users = User.objects.all().exclude(username=request.user.username)
+    pay_users = []
+    for u in all_users:
+        if(u != user.username):
+            pay_users.append(u.username)
+
 
     print("all_users ", all_users)
     context ={
         "request_page": "active",
         "user" : user,
-        "users": all_users,
+        "filter_users": pay_users,
+
     }
     return render(request, 'request.html', context)

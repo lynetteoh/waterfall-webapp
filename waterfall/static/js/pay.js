@@ -45,7 +45,14 @@ function popup(ul, form, amount, date) {
 }
 
 function add(search, user, amnt) {
+
     var text = document.getElementById(search).value;
+    var valid_user = 0;
+    valid_user = check_payee(text);
+    if(valid_user == 0) {
+        swal("You have chosen an invalid user !");
+        return;
+    }
     var list = document.createElement("li");
     var textnode = document.createTextNode(text);
     var input = document.createElement("input");
@@ -57,7 +64,7 @@ function add(search, user, amnt) {
     list.appendChild(input);
     list.appendChild(textnode);
     list.setAttribute('class', 'pr-5');
-    var result = 0
+    var result = 0;
     result = exist(search, user, text);
     if (result == 0) {
         document.getElementById(user).appendChild(list);
@@ -289,4 +296,24 @@ function show_div() {
     if (x.style.display === "none") {
         x.style.display = "block";
     }
+}
+
+function check_payee(user) {
+    users = f_users.split("&#39;");
+    // Removes the [] parantheses.
+    users.splice(0, 1);
+    users.pop();
+
+    // Removes all comma values.
+    for(var i = users.length-1; i--;){
+        if (users[i].match(",")) users.splice(i, 1);
+    }
+
+    console.log(users);
+    for (i = 0; i < users.length; i++) {
+        if(users[i] == user) {
+            return 1;
+        }
+    }
+    return 0;
 }
