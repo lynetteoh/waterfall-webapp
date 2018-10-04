@@ -34,7 +34,11 @@ def profile(request):
             form = AvatarForm(request.POST, request.FILES)
 
             if form.is_valid():
-                print("form is valid")
+                profile = Profile.objects.get(id=user.id)
+                profile.avatar = form.cleaned_data["avatar"]
+                profile.save()
+
+        elif request.POST.get('first_name'):
                 profile = Profile.objects.get(id=user.id)
                 profile.avatar = form.cleaned_data["avatar"]
                 profile.save()
@@ -107,12 +111,8 @@ def register_new(request):
             return redirect('/dashboard')
         except:
             return render(request, 'index.html')
+    
     return render(request, 'index.html')
-            profile.save()
-            login(request, user)
-            return redirect('/dashboard')
-    else:
-        return render(request, 'index.html')
           
 @login_required
 def pay(request):
