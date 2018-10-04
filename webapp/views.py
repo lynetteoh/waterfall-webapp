@@ -18,6 +18,8 @@ def index(request):
 def team(request):
     return render(request, 'team.html')
 
+def product(request):
+    return render(request, 'product.html')
 
 @login_required
 def dashboard(request):
@@ -44,7 +46,7 @@ def profile(request):
             user.last_name = request.POST.get('last_name')
             user.email = request.POST.get('email')
             user.save()
-            
+
             # Checking for password change.
             new_pass = request.POST.get('password')
             if new_pass:
@@ -52,7 +54,7 @@ def profile(request):
                 user.save()
     else:
         form = AvatarForm()
-    
+
     return render(request, 'profile.html')
 
 @login_required
@@ -88,28 +90,19 @@ def balance(request):
 @ensure_csrf_cookie
 def register_new(request):
     if request.POST:
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        try:
-            user = User.objects.create_user(username=username, email=email, password=password)
-            user.save()
-            account = Account(user = user)
-            account.save()
-            profile = Profile(user = user)
-            profile.avatar = None
-            profile.save()
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
             login(request, user)
             return redirect('/dashboard')
-        except:
-            error = "Invalid user input. Please try again."
-            context= {
-                'error': error,
-            }
-            return render(request, 'index.html', context)
-    
-    return render(request, 'index.html')
-          
+    else:
+        form = SignUpForm()
+    return render(request, 'index.html', {'form': form})
+  
+  
 @login_required
 def pay(request):
     user = request.user
@@ -125,7 +118,6 @@ def pay(request):
 
     if request.method == "POST":
         # Requires more extensive form validation
-
         tx_sender = user.account._create_transaction(-10,'hi','w')
 
         receiver_acc = User.objects.get(username=request.POST.get('pay_users')).account
@@ -135,13 +127,10 @@ def pay(request):
             tx_from = tx_sender,
             tx_to = tx_receiver
         )
-
         tx_sender.save()
         tx_receiver.save()
         link_tx.save()
-
         return redirect('/dashboard')
-
     else:
         pass
         context ={
@@ -168,4 +157,3 @@ def request_page(request):
 
     }
     return render(request, 'request.html', context)
-

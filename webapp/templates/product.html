@@ -1,0 +1,45 @@
+{% extends 'home-base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Waterfall</title>
+{% endblock %}
+
+{% block css %}
+<link href="{% static "css/team.css" %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+<br/><br/><br/><br/><br/><br/>
+<div class="main_landing">
+  <div class="team_back">
+      <div class="container">
+          <br/><br/>
+          <div class="team_header "><h1 class="display-4">Our Product</h1></div>
+          <br/>
+          <p>
+            Project Waterfall is a web application that enables easy payments, bill splitting and monitoring of recurring expenses between individuals and groups of people. Implementation will only use in-app currency as proof-of-concept, although this might be pursued in future iterations.
+            <br/><br/>
+            Users can pay, request and split money amounts with each other via in-app currency balance, as well as set up groups for common payment sharing. Each user and group of users will have a special TrickleID to identify payments going to and from such parties. Recurring and late payments as well as low account credit will result in an email notification. The main user experience comes in the form of a dashboard with various views for users to manage future and current payments.
+          </p>
+          <br/>
+          <h3 class="display-6">Technologies</h3>
+          <p>
+            Backend:  Python Django<br/>
+            Frontend: HTML, Javascript, Bootstrap, SweetAlert, Awesomplete <br/>
+            Database: SQLite3 & PostgreSQL<br/>
+            Cloud Deployment: Heroku<br/>
+          </p>
+          <br/><br/>
+          <h3 class="display-6">Credits</h3>
+          <p>
+            User icon and Waterfall Icon made by Freepik from www.flaticon.com. <br/>
+            Homepage & login background made by Unsplash from www.unsplash.com. <br/>
+            Chilly Cherry font by David Kerkhoff; free for non-commercial use. <br/>
+            Fashion Fetish font by Levi Szekeres; free for non-commercial use. <br/>
+          </p>
+          <br/><br/>
+      </div>
+  </div>
+</div>
+{% endblock %}

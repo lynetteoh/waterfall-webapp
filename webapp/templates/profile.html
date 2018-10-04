@@ -47,7 +47,6 @@ input[type="text"][readonly] {
           <h6>Upload New Profile Picture</h6>
 
           <form role="form" method="POST" enctype="multipart/form-data">
-          {% comment %} <form role="form" method="POST"> {% endcomment %}
             {% csrf_token %}
             {% if form.errors %}
             <p>Upload a valid image. The file you uploaded was either not an image or a corrupted image.</p>

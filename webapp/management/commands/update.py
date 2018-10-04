@@ -50,7 +50,7 @@ class Command(BaseCommand):
             if (w_tx.account.balance < w_tx.value):
                 continue        # as it will be auto deleted tomorrow
 
-            t.confirm(timezone.localize(datetime.now()))
+            t.confirm(timezone.localize(datetime.now()), False)
         return
 
     # Sends email notification.
