@@ -106,7 +106,15 @@ def register_new(request):
 @login_required
 def pay(request):
     user = request.user
-    all_users = User.objects.all().exclude(username=user.username)
+    all_users = User.objects.all().exclude(username=request.user.username)
+
+    pay_users = []
+    for u in all_users:
+        if(u != user.username):
+            pay_users.append(u.username)
+    
+    print(len(pay_users))
+            
 
     if request.method == "POST":
         # Requires more extensive form validation
@@ -128,18 +136,24 @@ def pay(request):
         context ={
             "pay_page": "active",
             "user" : user,
-            "users": all_users,
+            "filter_users": pay_users,
         }
         return render(request, 'tricklepay.html', context)
 
 def request_page(request):
-    user = request.user
-    all_users = User.objects.all().exclude(username='admin')
+    user = request.user 
+    all_users = User.objects.all().exclude(username=request.user.username)
+    pay_users = []
+    for u in all_users:
+        if(u != user.username):
+            pay_users.append(u.username)
+    
 
     print("all_users ", all_users)
     context ={
         "request_page": "active",
         "user" : user,
-        "users": all_users,
+        "filter_users": pay_users,
+
     }
     return render(request, 'request.html', context)
