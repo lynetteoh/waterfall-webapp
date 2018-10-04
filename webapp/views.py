@@ -39,14 +39,6 @@ def profile(request):
                 profile.save()
 
         elif request.POST.get('first_name'):
-                profile = Profile.objects.get(id=user.id)
-                profile.avatar = form.cleaned_data["avatar"]
-                profile.save()
-            else:
-                print("form is invalid")
-                print(form.errors)
-
-        if request.POST.get('first_name'):
             # Editing profile fields.
             user.first_name = request.POST.get('first_name')
             user.last_name = request.POST.get('last_name')
@@ -110,7 +102,11 @@ def register_new(request):
             login(request, user)
             return redirect('/dashboard')
         except:
-            return render(request, 'index.html')
+            error = "Invalid user input. Please try again."
+            context= {
+                'error': error,
+            }
+            return render(request, 'index.html', context)
     
     return render(request, 'index.html')
           
