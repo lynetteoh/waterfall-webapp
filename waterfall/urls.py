@@ -30,6 +30,7 @@ urlpatterns = [
     path('pay', views.pay, name='pay'),
     path('request', views.request_page, name='request'),
     path('team', views.team, name='team'),
+    path('product', views.product, name='product'),
     path('login', views.login, name='login'),
     path('register-new', views.register_new, name='register_new'),
     path('logout', auth_views.LogoutView, name='logout'),

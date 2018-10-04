@@ -18,6 +18,8 @@ def index(request):
 def team(request):
     return render(request, 'team.html')
 
+def product(request):
+    return render(request, 'product.html')
 
 @login_required
 def dashboard(request):
@@ -44,7 +46,7 @@ def profile(request):
             user.last_name = request.POST.get('last_name')
             user.email = request.POST.get('email')
             user.save()
-            
+
             # Checking for password change.
             new_pass = request.POST.get('password')
             if new_pass:
@@ -52,7 +54,7 @@ def profile(request):
                 user.save()
     else:
         form = AvatarForm()
-    
+
     return render(request, 'profile.html')
 
 @login_required
@@ -107,17 +109,15 @@ def register_new(request):
                 'error': error,
             }
             return render(request, 'index.html', context)
-    
     return render(request, 'index.html')
-          
+
 @login_required
 def pay(request):
     user = request.user
-    all_users = User.objects.all().exclude(username='admin')
+    all_users = User.objects.all().exclude(username=user.username)
 
     if request.method == "POST":
         # Requires more extensive form validation
-
         tx_sender = user.account._create_transaction(-10,'hi','w')
 
         receiver_acc = User.objects.get(username=request.POST.get('pay_users')).account
@@ -127,13 +127,10 @@ def pay(request):
             tx_from = tx_sender,
             tx_to = tx_receiver
         )
-
         tx_sender.save()
         tx_receiver.save()
         link_tx.save()
-
         return redirect('/dashboard')
-
     else:
         pass
         context ={
@@ -144,7 +141,7 @@ def pay(request):
         return render(request, 'tricklepay.html', context)
 
 def request_page(request):
-    user = request.user 
+    user = request.user
     all_users = User.objects.all().exclude(username='admin')
 
     print("all_users ", all_users)
@@ -154,4 +151,3 @@ def request_page(request):
         "users": all_users,
     }
     return render(request, 'request.html', context)
-
