@@ -56,13 +56,13 @@
                                     required>
                                 <div class="text-center col-sm-5">
                                     <div class="btn-group  pl-5" id="pay_freq">
-                                        <input type="radio" name="pay_freq" id="pay_once" value="once" required><label
+                                        <input type="radio" name="pay_freq" id="pay_once" value="0" required><label
                                             for="pay_once" class="btn">Once</label>
-                                        <input type="radio" name="pay_freq" id="pay_weekly" value="weekly"><label
+                                        <input type="radio" name="pay_freq" id="pay_weekly" value="7"><label
                                             for="pay_weekly" class="btn">Weekly</label>
-                                        <input type="radio" name="pay_freq" id="pay_monthly" value="monthly"><label
+                                        <input type="radio" name="pay_freq" id="pay_monthly" value="30"><label
                                             for="pay_monthly" class="btn ">Monthly</label>
-                                        <input type="radio" name="pay_freq" id="pay_yearly" value="yearly"><label
+                                        <input type="radio" name="pay_freq" id="pay_yearly" value="365"><label
                                             for="pay_yearly" class="btn ">Yearly</label>
                                     </div>
                                 </div>
@@ -86,9 +86,10 @@
     </div>
 </div>
 
+
 <script>
-    var f_users = "{{filter_users}}";
-    
+  var f_users = "{{filter_users}}";
+  checkError("{{error}}");
 </script>
 
 {% endblock %}

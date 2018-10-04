@@ -1,3 +1,20 @@
+function checkError(error) {
+  console.log("Checking error : " + error)
+  if (error == "Success") {
+    swal({
+      title: "Success!",
+      text:  "The transaction has been saved.",
+      icon:  "success",
+    });
+  } else if (error) {
+    swal({
+      title: error,
+      text:  "Please try again.",
+      icon:  "warning",
+    });
+  }
+}
+
 function popup(ul, form, amount, date) {
     var text = document.getElementById(amount).value;
     var error = validateForm(ul, amount, date, form);
@@ -10,19 +27,13 @@ function popup(ul, form, amount, date) {
             dangerMode: true,
         }).then((confirmed) => {
             if (confirmed) {
-                swal({
-                    title: "Success!",
-                    text: "The transaction has been sent.",
-                    icon: "success",
-                }).then((post) => {
-                    document.getElementById(form).submit();
-                });
+              document.getElementById(form).submit();
             } else {
-                swal({
-                    title: "Cancelled",
-                    text: "Your transaction request has been cancelled.",
-                    icon: "warning",
-                });
+              swal({
+                  title: "Cancelled",
+                  text: "Your transaction request has been cancelled.",
+                  icon: "warning",
+              });
             }
         });
     } else {
@@ -35,7 +46,7 @@ function popup(ul, form, amount, date) {
 }
 
 function add(search, user, amnt) {
-   
+
     var text = document.getElementById(search).value;
     var valid_user = 0;
     valid_user = check_payee(text);
@@ -58,7 +69,7 @@ function add(search, user, amnt) {
     result = exist(search, user, text);
     if (result == 0) {
         document.getElementById(user).appendChild(list);
-        if(user == 'req_users'){ 
+        if(user == 'req_users'){
             update_payee(user, text, amnt);
         }
     }
@@ -66,7 +77,7 @@ function add(search, user, amnt) {
     list.appendChild(remove);
     remove.onclick = function () {
         document.getElementById(user).removeChild(list);
-        if(user == 'req_users'){ 
+        if(user == 'req_users'){
             remove_payee(list);
             update_value(user, amnt);
         }
@@ -164,7 +175,7 @@ function update_value(users_list, amnt) {
             var input = ul.childNodes[i].getElementsByTagName("INPUT")[0]
             //get the html element value
             var text = input.attributes[3].value;
-            var input = document.getElementById(text); 
+            var input = document.getElementById(text);
             if(i < extra) {
                 // console.log("split_total" + split_total)
                 // console.log(extra)
@@ -172,7 +183,7 @@ function update_value(users_list, amnt) {
                 input.setAttribute('value', pay_amount.toFixed(2));
             }else {
                 input.setAttribute('value', payee_amount.toFixed(2));
-            } 
+            }
         }
     }
 }
@@ -291,9 +302,9 @@ function show_div() {
 function check_payee(user) {
     users = f_users.split("&#39;");
     // Removes the [] parantheses.
-    users.splice(0, 1);       
-    users.pop(); 
-    
+    users.splice(0, 1);
+    users.pop();
+
     // Removes all comma values.
     for(var i = users.length-1; i--;){
         if (users[i].match(",")) users.splice(i, 1);
@@ -307,5 +318,3 @@ function check_payee(user) {
     }
     return 0;
 }
-
-
