@@ -48,17 +48,21 @@ function add(search, user, amnt) {
     list.appendChild(textnode);
     list.setAttribute('class', 'pr-5');
     var result = 0
-    result = exist(search, user, text)
+    result = exist(search, user, text);
     if (result == 0) {
         document.getElementById(user).appendChild(list);
-        update_payee(user, text, amnt)
+        if(user == 'req_users'){ 
+            update_payee(user, text, amnt);
+        }
     }
     remove = removeBtn();
     list.appendChild(remove);
     remove.onclick = function () {
         document.getElementById(user).removeChild(list);
-        remove_payee(list);
-        update_value(user, amnt);
+        if(user == 'req_users'){ 
+            remove_payee(list);
+            update_value(user, amnt);
+        }
     }
 }
 
@@ -105,14 +109,6 @@ function validateForm(ul, amnt, d, form) {
         return "Please only input positive numeric amounts."
     }
 
-    result = check_split(amount, ul)
-
-    if (result == 1) {
-        return "incorrect split! sum of split does not add up"
-    } else {
-        return "";
-    }
-
     if (form != 'req-form') {
         //validate payee
         if (document.getElementById(ul).getElementsByTagName('li').length == 1) {
@@ -123,6 +119,13 @@ function validateForm(ul, amnt, d, form) {
             return "Please choose a payee !";
         }
     } else {
+        result = check_split(amount, ul);
+        if (result == 1) {
+            return "incorrect split! sum of split does not add up"
+        } else {
+            return "";
+        }
+
         if (document.getElementById(ul).getElementsByTagName('li').length >= 1) {
             return "";
         } else {
@@ -168,7 +171,7 @@ function update_value(users_list, amnt) {
 }
 
 function update_payee(users, text, amnt) {
-    show_div()
+    show_div();
     var table = document.getElementById("summary_table");
     var amount = document.getElementById(amnt).value;
     var ul_len = document.getElementById(users).childNodes.length;
@@ -276,5 +279,6 @@ function show_div() {
     if (x.style.display === "none") {
         x.style.display = "block";
     }
-
 }
+
+

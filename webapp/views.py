@@ -8,27 +8,12 @@ from django.template import RequestContext
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
-from .forms import SignUpForm
+from .forms import SignUpForm, AvatarForm
+
+from django.core.files.storage import FileSystemStorage
 
 def index(request):
-    # Temporary fixed user login
-    user = User.objects.filter(username='admin').distinct()[0]
-    context = {
-        "user": user
-        }
-    return render(request, 'index.html', context)
-
-    # if request.method == 'POST':
-    #     username = request.POST.get('username')
-    #     email = request.POST.get('email')
-    #     password = request.POST.get('password')
-    #     user = User.objects.create_user(username=username, email=email, password=password)
-    #     user.save()
-    #     login(request, user)
-    #     return redirect('/dashboard')
-
-
-    # return render(request, 'index.html')
+    return render(request, 'index.html')
 
 def team(request):
     return render(request, 'team.html')
@@ -42,23 +27,38 @@ def dashboard(request):
 
 @login_required
 def profile(request):
+
     if request.method == "POST":
         user = request.user
-        if request.POST.get('new_pic'):
-            # Profile picture upload
-            print("TODO upload")
-            # user.profile.avatar = request.POST.get('new_pic')
-        elif request.POST.get('first_name'):
+
+        if request.FILES:
+            # get the posted form
+            form = AvatarForm(request.POST, request.FILES)
+
+            if form.is_valid():
+                print("form is valid")
+                profile = Profile.objects.get(id=user.id)
+                profile.avatar = form.cleaned_data["avatar"]
+                profile.save()
+            else:
+                print("form is invalid")
+                print(form.errors)
+
+        if request.POST.get('first_name'):
             # Editing profile fields.
             user.first_name = request.POST.get('first_name')
             user.last_name = request.POST.get('last_name')
             user.email = request.POST.get('email')
             user.save()
+
             # Checking for password change.
             new_pass = request.POST.get('password')
             if new_pass:
                 user.set_password(new_pass)
                 user.save()
+    else:
+        form = AvatarForm()
+
     return render(request, 'profile.html')
 
 @login_required
@@ -94,18 +94,27 @@ def balance(request):
 @ensure_csrf_cookie
 def register_new(request):
     if request.POST:
-        #TODO VALIDATION HERE, AND IF USER IS ADDED TO DB GO TO SUCCESS PAGE
         username = request.POST['username']
-        #pw = request.POST['password'] #PROBS NEED TO HASH THIS and STORE in DB
         email = request.POST['email']
-        print("The username is:", username)
-
-        return render(request, "register_success.html")
-
-        #CAN DO AN IF STATEMENT TO REDIRECT TO HOME PAGE IF FAILED
-        #return redirect('/')
-
-    return render(request, "register_success.html")
+        password = request.POST['password']
+        try:
+            user = User.objects.create_user(username=username, email=email, password=password)
+            user.save()
+            account = Account(user = user)
+            account.save()
+            profile = Profile(user = user)
+            profile.avatar = None
+            profile.save()
+            login(request, user)
+            return redirect('/dashboard')
+        except:
+            return render(request, 'index.html')
+    return render(request, 'index.html')
+            profile.save()
+            login(request, user)
+            return redirect('/dashboard')
+    else:
+        return render(request, 'index.html')
 
 @login_required
 def pay(request):
@@ -140,7 +149,7 @@ def request_page(request):
     user = request.user
     all_users = User.objects.all().exclude(username='admin')
 
-    print(all_users)
+    print("all_users ", all_users)
     context ={
         "request_page": "active",
         "user" : user,

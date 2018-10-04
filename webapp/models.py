@@ -2,13 +2,18 @@ from django.db import models, transaction
 from django.db.models import Sum
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
+import os
+
+def user_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/avatars/user_<id>/<filename>
+    return 'avatars/{0}/{1}'.format(instance.user.id, filename)
 
 class Profile(models.Model):
     import pytz
     TIMEZONES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.ImageField()
+    avatar = models.ImageField(upload_to=user_directory_path, height_field=None, width_field=None)
     timezone = models.CharField(max_length=32, choices=TIMEZONES, default='UTC')
     # balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
 

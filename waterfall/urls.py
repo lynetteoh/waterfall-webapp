@@ -20,7 +20,6 @@ from django.conf.urls.static import static
 from webapp import views
 from django.urls import include
 from django.contrib.auth import views as auth_views
-# from django.conf.urls import url, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,3 +36,7 @@ urlpatterns = [
     path('logout', auth_views.LogoutView, name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

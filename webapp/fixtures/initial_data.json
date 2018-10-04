@@ -50,6 +50,20 @@
     }
   },
   {
+    "model": "webapp.profile",
+    "pk": 1,
+    "fields": {
+        "user": 1
+    }
+  },
+  {
+    "model": "webapp.profile",
+    "pk": 2,
+    "fields": {
+        "user": 2
+    }
+  },
+  {
     "model": "webapp.transaction",
     "pk": 1,
     "fields": {
