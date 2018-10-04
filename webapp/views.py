@@ -24,20 +24,34 @@ def team(request):
 def product(request):
     return render(request, 'product.html')
 
+
+@ensure_csrf_cookie
+def register_new(request):
+    if request.POST:
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('/dashboard')
+    else:
+        form = SignUpForm()
+    return render(request, 'index.html', {'form': form})
+
+
 @login_required
 def dashboard(request):
     return render(request, 'dashboard.html')
 
 @login_required
 def profile(request):
-
     if request.method == "POST":
         user = request.user
-
         if request.FILES:
             # get the posted form
             form = AvatarForm(request.POST, request.FILES)
-
             if form.is_valid():
                 profile = Profile.objects.get(id=user.id)
                 profile.avatar = form.cleaned_data["avatar"]
@@ -63,7 +77,6 @@ def profile(request):
 @login_required
 def balance(request):
     user = request.user
-
     context = {
         "user": user
     }
@@ -89,22 +102,6 @@ def balance(request):
 
     return render(request, 'balance.html', context)
 
-@ensure_csrf_cookie
-def register_new(request):
-    if request.POST:
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            return redirect('/dashboard')
-    else:
-        form = SignUpForm()
-    return render(request, 'index.html', {'form': form})
-
-
 @login_required
 def pay(request):
     user = request.user
@@ -123,7 +120,6 @@ def pay(request):
     if request.method == "POST":
         try:
             print (request.POST)
-
             payees = [request.POST.get('pay_users0')]
             print (payees)
 
@@ -178,7 +174,6 @@ def request_page(request):
     for u in all_users:
         if(u != user.username):
             pay_users.append(u.username)
-
 
     print("all_users ", all_users)
     context ={

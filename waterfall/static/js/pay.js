@@ -3,7 +3,7 @@ function checkError(error) {
   if (error == "Success") {
     swal({
       title: "Success!",
-      text:  "The transaction has been sent.",
+      text:  "The transaction has been saved.",
       icon:  "success",
     });
   } else if (error) {
