@@ -24,17 +24,17 @@ class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def register_deposit(self, title, value):
-        return self._create_transaction(value, title, 'd')
+        return self._create_transaction(value, title, 'd', False)
 
     def register_withdrawal(self, title, value):
         if self.balance >= value:
-            return self._create_transaction(0-value, title, 'w')
+            return self._create_transaction(0-value, title, 'w', False)
         else:
             print('Account funds are insufficient.')
             return None
 
-    def _create_transaction(self, value, title, type):
-        now = pytz.UTC.localize(datetime.now())
+    def _create_transaction(self, value, title, type, is_request):
+        now = pytz.UTC.localize(datetime.now()) if is_request else None
         return Transaction.objects.create(
             account=self,
             title=title,
@@ -133,6 +133,25 @@ class Transfer(models.Model):
 
     def __str__(self):
         return '{}-- ${} -->{}'.format(self.tx_from.account.user.username, self.tx_to.value, self.tx_to.account.user.username)
+
+    def _create_transfer(self, sender, receivers, subj, amount, recurr, date, is_request):
+        tx_sender = sender._create_transaction(0-amount, subj,'w', is_request)
+        tx_receiver = receiver_acc._create_transaction(amount, subj,'d', is_request)
+
+        today = timezone.localize(datetime.today()).date()
+        confirmed_at = pytz.UTC.localize(datetime.now()) if (today == date) else None
+        link_tx = Transfer.objects.create(
+            tx_from = tx_sender,
+            tx_to = tx_receiver,
+            is_request = is_request,
+            recurrence_days = recurr,
+            deadline = date,
+            confirmed_at = confirmed_at,
+        )
+        tx_sender.save()
+        tx_receiver.save()
+        link_tx.save()
+        print("Created new transfer.")
 
     @transaction.atomic
     def delete(self):

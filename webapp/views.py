@@ -12,6 +12,8 @@ from .forms import SignUpForm, AvatarForm
 
 from django.core.files.storage import FileSystemStorage
 
+from datetime import datetime
+
 def index(request):
     return render(request, 'index.html')
 
@@ -71,7 +73,6 @@ def balance(request):
     if request.method == "POST":
         add_amount = request.POST.get('add_amount')
         minus_amount = request.POST.get('minus_amount')
-
         try:
             if add_amount and float(add_amount) > 0:
                 tx = user.account.register_deposit("Deposit", float(add_amount))
@@ -117,28 +118,47 @@ def pay(request):
     all_users = User.objects.all().exclude(username=user.username)
 
     if request.method == "POST":
-        # Requires more extensive form validation
-        tx_sender = user.account._create_transaction(-10,'hi','w')
-
-        receiver_acc = User.objects.get(username=request.POST.get('pay_users')).account
-        tx_receiver = receiver_acc._create_transaction(10,'hi','d')
-
-        link_tx = Transfer.objects.create(
-            tx_from = tx_sender,
-            tx_to = tx_receiver
-        )
-        tx_sender.save()
-        tx_receiver.save()
-        link_tx.save()
-        return redirect('/dashboard')
-    else:
-        pass
-        context ={
-            "pay_page": "active",
-            "user" : user,
-            "users": all_users,
-        }
-        return render(request, 'tricklepay.html', context)
+        try:
+            receiver = User.objects.get(username=request.POST.get('pay_users')).account
+            subj = request.POST.get('pay_description')
+            amount = request.POST.get('pay_amount')
+            recurr = request.POST.get('pay_freq')
+            date = request.POST.get('pay_date')
+            if not receiver or (receiver is user.account):
+                context['error'] = "Invalid User."
+            elif not subj:
+                context['error'] = "Empty Payment Description"
+            elif not amount or float(amount) < 0:
+                context['error'] = "Invalid Payment Amount"
+            elif float(amount) <= receiver.balance:
+                context['error'] = "Insufficient Funds"
+            elif recurr is None or int(recurr) < 0:
+                context['error'] = "Invalid Payment Recurrence"
+            elif not date:
+                context['error'] = "Invalid Dates"
+            else:
+                print ("Creating transfer payment ")
+                deadline = datetime.strptime(date, "%Y %m %d") # yyyy-mm-dd
+                print (" for deadline ")
+                print (deadline)
+                transfer = Transaction._create_transfer(user.account, receiver, subj, float(amount), int(recurr), deadline, False)
+                context['error'] = "Success"
+        except:
+            context['error'] = "Invalid Payment Request."
+        finally:
+            context ={
+                "pay_page": "active",
+                "user" : user,
+                "users": all_users,
+            }
+            return render(request, 'tricklepay.html', context)
+    # Regular pay view.
+    context = {
+        "pay_page": "active",
+        "user" : user,
+        "users": all_users,
+    }
+    return render(request, 'tricklepay.html', context)
 
 def request_page(request):
     user = request.user
