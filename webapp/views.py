@@ -33,6 +33,8 @@ def index(request):
 def team(request):
     return render(request, 'team.html')
 
+def product(request):
+    return render(request, 'product.html')
 
 @login_required
 def dashboard(request):

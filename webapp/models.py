@@ -138,7 +138,13 @@ class Transfer(models.Model):
         self.save()
 
     @transaction.atomic
-    def confirm(self, today):
+    def approve_req(self, today):
+        if (not self.is_request) or self.is_deleted or self.confirmed_at:
+            return
+        self.confirm(today, True)
+
+    @transaction.atomic
+    def confirm(self, today, is_request):
         self.confirmed_at  = today
         self.save()
         self.tx_from.confirmed_at = today
@@ -169,6 +175,6 @@ class Transfer(models.Model):
                 tx_to=tx_to_copy,
                 deadline=new_exec_date,
                 recurrence_days=self.recurrence_days,
-                is_request=False,
+                is_request=is_request,
             )
             print("Created recurring transfer copy.")
