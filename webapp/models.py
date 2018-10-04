@@ -2,7 +2,7 @@ from django.db import models, transaction
 from django.db.models import Sum
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
-import os
+import os, pytz
 
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/avatars/user_<id>/<filename>
@@ -26,14 +26,6 @@ class Account(models.Model):
     def register_deposit(self, title, value):
         return self._create_transaction(value, title, 'd')
 
-    def _create_transaction(self, value, title, type):
-        return Transaction.objects.create(
-            account=self,
-            title=title,
-            value=value,
-            transaction_type=type
-        )
-
     def register_withdrawal(self, title, value):
         if self.balance >= value:
             return self._create_transaction(0-value, title, 'w')
@@ -41,16 +33,25 @@ class Account(models.Model):
             print('Account funds are insufficient.')
             return None
 
+    def _create_transaction(self, value, title, type):
+        now = pytz.UTC.localize(datetime.now())
+        return Transaction.objects.create(
+            account=self,
+            title=title,
+            value=value,
+            transaction_type=type,
+            confirmed_at=now,
+        )
+
     def __str__(self):
         return '@{}'.format(self.user.username)
 
     @property
     def balance(self):
-        return 0
-        # return 0 + self.transaction_set\
-        #             .filter(is_deleted=False, confirmed_at__isnull=False)\
-        #             .aggregate(Sum('value'))['value__sum']
-
+        bal = Transaction.objects\
+                    .filter(account=self, is_deleted=False, confirmed_at__isnull=False)\
+                    .aggregate(Sum('value'))['value__sum']
+        return bal if bal else 0
 
     @property
     def num_payments(self):

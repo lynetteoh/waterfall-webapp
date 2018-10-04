@@ -110,11 +110,6 @@ def register_new(request):
         except:
             return render(request, 'index.html')
     return render(request, 'index.html')
-            profile.save()
-            login(request, user)
-            return redirect('/dashboard')
-    else:
-        return render(request, 'index.html')
 
 @login_required
 def pay(request):
