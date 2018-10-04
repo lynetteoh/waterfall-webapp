@@ -52,7 +52,7 @@
                         <div class="row form-group mb-5">
                             <label class="col-sm-2 col-form-label" for="pay_date">Date</label>
                             <div class="form-inline col-sm-10">
-                                <input type=date class="form-control col-sm-4" role="input" id="pay_date" name="pay_date"
+                                <input type=date class="form-control col-sm-4" role="input" id="pay_date" name="pay_date" onload="today()"
                                     required>
                                 <div class="text-center col-sm-5">
                                     <div class="btn-group  pl-5" id="pay_freq">
@@ -88,6 +88,7 @@
 
 <script>
     var f_users = "{{filter_users}}";
+    document.getElementById('pay_date').valueAsDate = new Date();
     
 </script>
 
