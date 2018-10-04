@@ -90,27 +90,19 @@ def balance(request):
 @ensure_csrf_cookie
 def register_new(request):
     if request.POST:
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        try:
-            user = User.objects.create_user(username=username, email=email, password=password)
-            user.save()
-            account = Account(user = user)
-            account.save()
-            profile = Profile(user = user)
-            profile.avatar = None
-            profile.save()
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
             login(request, user)
             return redirect('/dashboard')
-        except:
-            error = "Invalid user input. Please try again."
-            context= {
-                'error': error,
-            }
-            return render(request, 'index.html', context)
-    return render(request, 'index.html')
-
+    else:
+        form = SignUpForm()
+    return render(request, 'index.html', {'form': form})
+  
+  
 @login_required
 def pay(request):
     user = request.user
