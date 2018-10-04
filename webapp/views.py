@@ -13,6 +13,7 @@ from .forms import SignUpForm, AvatarForm
 from django.core.files.storage import FileSystemStorage
 
 from datetime import datetime
+import pytz
 
 def index(request):
     return render(request, 'index.html')
@@ -113,48 +114,63 @@ def pay(request):
         if(u != user.username):
             pay_users.append(u.username)
 
-    if request.method == "POST":
-        try:
-            receiver = User.objects.get(username=request.POST.get('pay_users')).account
-            subj = request.POST.get('pay_description')
-            amount = request.POST.get('pay_amount')
-            recurr = request.POST.get('pay_freq')
-            date = request.POST.get('pay_date')
-            if not receiver or (receiver is user.account):
-                context['error'] = "Invalid User."
-            elif not subj:
-                context['error'] = "Empty Payment Description"
-            elif not amount or float(amount) < 0:
-                context['error'] = "Invalid Payment Amount"
-            elif float(amount) <= receiver.balance:
-                context['error'] = "Insufficient Funds"
-            elif recurr is None or int(recurr) < 0:
-                context['error'] = "Invalid Payment Recurrence"
-            elif not date:
-                context['error'] = "Invalid Dates"
-            else:
-                print ("Creating transfer payment ")
-                deadline = datetime.strptime(date, "%Y %m %d") # yyyy-mm-dd
-                print (" for deadline ")
-                print (deadline)
-                transfer = Transaction._create_transfer(user.account, receiver, subj, float(amount), int(recurr), deadline, False)
-                context['error'] = "Success"
-        except:
-            context['error'] = "Invalid Payment Request."
-        finally:
-            context ={
-                "pay_page": "active",
-                "user" : user,
-                "filter_users": pay_users,
-            }
-            return render(request, 'tricklepay.html', context)
-    # Regular pay view.
     context = {
         "pay_page": "active",
         "user" : user,
         "filter_users": pay_users,
     }
+
+    if request.method == "POST":
+        try:
+            print (request.POST)
+
+            payees = [request.POST.get('pay_users0')]
+            print (payees)
+
+            if not payees:
+                raise Exception("Invalid Payees.")
+
+            for p in payees:
+                print ("HERE + " + p)
+                receiver = User.objects.get(username=p).account
+                subj = request.POST.get('pay_description')
+                amount = request.POST.get('pay_amount')
+                recurr = request.POST.get('pay_freq')
+                date = request.POST.get('pay_date')
+
+                # Check for valid data.
+                if not receiver or (receiver is user.account):
+                    raise Exception("Invalid User.")
+                if not subj:
+                    raise Exception("Empty Payment Description")
+                if not amount or float(amount) < 0:
+                    raise Exception("Invalid Payment Amount")
+                if float(amount) > user.account.balance:
+                    raise Exception("Insufficient Funds")
+                if recurr is None or int(recurr) < 0:
+                    raise Exception("Invalid Payment Recurrence")
+                if not date:
+                    raise Exception("Invalid Payment Date")
+
+                timezone = pytz.UTC
+                today = timezone.localize(datetime.today()).date()
+                deadline = \
+                    timezone.localize(datetime.strptime(date, "%Y-%m-%d")).date() # yyyy-mm-dd
+                if deadline < today:
+                    raise Exception("Invalid Past Payment Date")
+
+                print ("Creating transfer payment ")
+                transfer = user.account._create_transfer(receiver, subj, float(amount), int(recurr), deadline, False)
+                context['error'] = "Success"
+        except Exception as e:
+            print (e)
+            context['error'] = str(e)
+        finally:
+            return render(request, 'tricklepay.html', context)
+    # Regular pay view.
     return render(request, 'tricklepay.html', context)
+
+
 def request_page(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)

@@ -1,4 +1,5 @@
 function checkError(error) {
+  console.log("Checking error : " + error)
   if (error == "Success") {
     swal({
       title: "Success!",
