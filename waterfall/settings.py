@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
+import django_heroku
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -72,9 +73,9 @@ TEMPLATES = [
 ]
 
 # Cron Jobs tasked periodically; added by Steph.
-CRONJOBS = [
-    ('* * * * *', 'webapp.management.commands.update'),
-]
+# CRONJOBS = [
+#     ('* * * * *', 'webapp.management.commands.update'),
+# ]
 
 WSGI_APPLICATION = 'waterfall.wsgi.application'
 
@@ -135,3 +136,6 @@ STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL = '/dashboard'
 
 LOGOUT_REDIRECT_URL = '/'
+
+# Added by Steph for Heroku Integration
+django_heroku.settings(locals())
