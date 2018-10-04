@@ -35,18 +35,25 @@ input[type="text"][readonly] {
   		<div class="col-sm-3" style="min-width:230px;"><!--left col-->
 
       <div class="text-center">
+      {% if user.profile.avatar %}
+        <img src="{{ user.profile.avatar.url }}" class="avatar img-circle img-thumbnail" alt="avatar">
+      {% else %}
         <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar">
-        {% comment %} <img src="{% static "iron_man.jpg" %}" class="avatar img-circle img-thumbnail" alt="avatar"> {% endcomment %}
+      {% endif %}
       </br></br>
         <h4>@{{ user.username }}</h4>
         </br>
         <div id="upload-pic" style="display:none;">
           <h6>Upload New Profile Picture</h6>
 
-          <form role="form" method="POST">
+          <form role="form" method="POST" enctype="multipart/form-data">
+          {% comment %} <form role="form" method="POST"> {% endcomment %}
             {% csrf_token %}
-            <input name="new_pic" id="new_pic" type="file" class="file-upload">
-            </br></br>
+            {% if form.errors %}
+            <p>Upload a valid image. The file you uploaded was either not an image or a corrupted image.</p>
+            {% endif %}
+            <input name="avatar" id="avatar" type="file" class="file-upload">
+            </br></br> 
             <button class="btn btn-xs"  type="submit">
               <i class="fas fa-check"></i> &nbsp;Upload
             </button>

@@ -8,7 +8,9 @@ from django.template import RequestContext
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
-from .forms import SignUpForm
+from .forms import SignUpForm, AvatarForm
+
+from django.core.files.storage import FileSystemStorage
 
 def index(request):
     return render(request, 'index.html')
@@ -23,23 +25,38 @@ def dashboard(request):
 
 @login_required
 def profile(request):
+
     if request.method == "POST":
         user = request.user
-        if request.POST.get('new_pic'):
-            # Profile picture upload
-            print("TODO upload")
-            # user.profile.avatar = request.POST.get('new_pic')
-        elif request.POST.get('first_name'):
+
+        if request.FILES:
+            # get the posted form
+            form = AvatarForm(request.POST, request.FILES)
+
+            if form.is_valid():
+                print("form is valid")
+                profile = Profile.objects.get(id=user.id)
+                profile.avatar = form.cleaned_data["avatar"]
+                profile.save()
+            else:
+                print("form is invalid")
+                print(form.errors)
+
+        if request.POST.get('first_name'):
             # Editing profile fields.
             user.first_name = request.POST.get('first_name')
             user.last_name = request.POST.get('last_name')
             user.email = request.POST.get('email')
             user.save()
+            
             # Checking for password change.
             new_pass = request.POST.get('password')
             if new_pass:
                 user.set_password(new_pass)
                 user.save()
+    else:
+        form = AvatarForm()
+    
     return render(request, 'profile.html')
 
 @login_required
@@ -78,12 +95,19 @@ def register_new(request):
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
-        user = User.objects.create_user(username=username, email=email, password=password)
-        if user:
+        try:
+            user = User.objects.create_user(username=username, email=email, password=password)
             user.save()
             account = Account(user = user)
             account.save()
             profile = Profile(user = user)
+            profile.avatar = None
+            profile.save()
+            login(request, user)
+            return redirect('/dashboard')
+        except:
+            return render(request, 'index.html')
+    return render(request, 'index.html')
             profile.save()
             login(request, user)
             return redirect('/dashboard')

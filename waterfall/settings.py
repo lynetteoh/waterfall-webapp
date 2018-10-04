@@ -137,5 +137,12 @@ LOGIN_REDIRECT_URL = '/dashboard'
 
 LOGOUT_REDIRECT_URL = '/'
 
+MEDIA_URL = '/media/' #this line is added and it creates a directory named media in your appfolder
+#where the uploaded images will be stored
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media') #this line is added and it serves as the root address of 
+#uploaded file
+MEDIA_ROOT = 'waterfall/static/'
+
 # Added by Steph for Heroku Integration
 django_heroku.settings(locals())
+
