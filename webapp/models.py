@@ -69,6 +69,7 @@ class Account(models.Model):
         tx_receiver = receiver._create_transaction(amount, subj,'d', is_request)
 
         today = pytz.UTC.localize(datetime.today()).date()
+        today = pytz.UTC.localize(datetime.combine(today, datetime.min.time()), is_dst=True)
         date = pytz.UTC.localize(datetime.combine(date, datetime.min.time()), is_dst=True)
         confirmed_at = pytz.UTC.localize(datetime.now()) \
                             if (today == date and not is_request) else None
