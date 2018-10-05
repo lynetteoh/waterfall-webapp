@@ -34,7 +34,7 @@ class Account(models.Model):
             return None
 
     def approve_req(self, transfer):
-        if (not transfer.is_request)
+        if (not transfer.is_request)\
             or transfer.is_deleted or transfer.confirmed_at:
             print("Invalid transfer to approve.")
             return
