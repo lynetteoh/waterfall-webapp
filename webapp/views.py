@@ -39,6 +39,13 @@ def profile(request):
                 profile = user.profile
                 profile.avatar = form.cleaned_data["avatar"]
                 profile.save()
+            else:
+                context = {
+                    "error": "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+
+                }
+                return render(request, 'profile.html', context)
+
 
         elif request.POST.get('first_name'):
             # Editing profile fields.
