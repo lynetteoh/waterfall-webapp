@@ -20,7 +20,6 @@ from django.conf.urls.static import static
 from webapp import views
 from django.urls import include
 from django.contrib.auth import views as auth_views
-# from django.conf.urls import url, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,10 +28,15 @@ urlpatterns = [
     path('profile', views.profile, name='profile'),
     path('balance', views.balance, name='balance'),
     path('pay', views.pay, name='pay'),
-    path('request', views.request_page, name='request'),
+    path('request', views.request, name='request'),
     path('team', views.team, name='team'),
-    path('login', views.login, name='login'),
+    path('login', auth_views.LoginView, name='login'),
+    path('product', views.product, name='product'),
     path('register-new', views.register_new, name='register_new'),
     path('logout', auth_views.LogoutView, name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
