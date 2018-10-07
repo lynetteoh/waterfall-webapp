@@ -38,12 +38,14 @@
                   <a href="{% url 'profile' %}"><img src="{% static "images/anon-user.svg" %}" id="user-icon"/></a>
                 </li>
             </ul>
+            
         </div>
 
         <div id="sidebar-wrapper">
-            <div class="row">
+            <div class="row stop_margin">
                 <!-- Sidebar -->
-                <div class="col-sm-3" id="sidebar" role="navigation">
+                <div class="col-md-3 position-fixed" id="sidebar" role="navigation">
+                    <div class="affix">
                     <ul class="nav" id="nav-list">
                         <li>
                           <a href="{% url 'dashboard'%}" id="about_nav" class="active nav_text nav-link" role="button">Dashboard
@@ -82,28 +84,32 @@
                           </a>
                         </li>
                     </ul>
+                    </div>
                 </div>
 
-                <div class="col-xs-12 col-sm-9" id="rendered-body">
+                <div class="no-pad col-md-9 offset-md-3">
                     <!-- Rendered Body -->
+                    <div id="rendered-body">
                     {% block content %} {% endblock %}
+                    </div>
+                    <div class="footer footer_base">
+                        <div class="container desktopView">
+                            <br/>
+                            <br/>
+                            <div class="copyright">
+                                <p id="footer" class="bottomText"> Project Waterfall &copy; 2018</p>
+                            </div>
+                            <div class="social_icons">
+                                <i class="fab fa-facebook-square icon"></i>
+                                <i class="fab fa-linkedin icon"></i>
+                                <i class="fab fa-instagram icon"></i>
+                            </div>
+                        </div>
+                        </div>
                 </div>
             </div>
         </div>
-        <div class="footer">
-                <div class="container desktopView">
-                    <br/>
-                    <br/>
-                    <div class="copyright">
-                        <p id="footer" class="bottomText"> Project Waterfall &copy; 2018</p>
-                    </div>
-                    <div class="social_icons">
-                        <i class="fab fa-facebook-square icon"></i>
-                        <i class="fab fa-linkedin icon"></i>
-                        <i class="fab fa-instagram icon"></i>
-                    </div>
-                </div>
-            </div>
+
     </body>
 </html>
 

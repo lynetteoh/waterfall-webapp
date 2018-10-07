@@ -36,7 +36,35 @@ def team(request):
 
 @login_required
 def dashboard(request):
-    return render(request, 'dashboard.html')
+    user = str(request.user)
+    incoming = []
+    outgoing = []
+    past = []
+
+    transfers = Transfer.objects.all()
+    print(transfers)
+
+    for t in transfers:
+        if t.tx_from.confirmed_at == None:
+            #outgoing or incoming
+            tx_to = str(t.tx_to.account).strip("@")
+            if tx_to == user:
+                #incoming payment
+                incoming.append(t)
+            else:
+                #outgoing payment
+                outgoing.append(t)
+        else:
+            past.append(t)
+
+    context ={
+        "past": past,
+        "incoming" : incoming,
+        "outgoing": outgoing,
+        "user1": user,
+    }
+
+    return render(request, 'dashboard.html', context)
 
 @login_required
 def profile(request):
