@@ -19,3 +19,32 @@
 .dash_heading {
     color: rgb(112, 112, 112);
 }
+
+.accept_btn {
+    color: #88cebc !important;
+    border-color:  #88cebc !important;
+    width: 60px;
+}
+
+.accept_btn:hover {
+    color: white !important;
+    border-color:  #88cebc !important;
+    background-color: #88cebc !important;
+}
+
+.reject_btn {
+    color:  #bd3c3c!important;
+    border-color:  #bd3c3c !important;
+    width: 60px;
+}
+
+.reject_btn:hover {
+    color: white !important;
+    border-color:  #bd3c3c !important;
+    background-color: #c24343 !important;
+}
+
+.request_btn {
+    padding-left:10px;
+    display: inline;
+}

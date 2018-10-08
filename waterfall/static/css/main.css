@@ -109,6 +109,8 @@
     background-color: #f3f3f3;
     color: #5b5b5b;
     width: 100%;
+    position: relative;
+    bottom: 0;
 }
 
 .landing {
