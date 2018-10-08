@@ -24,6 +24,10 @@
   padding-right: 0px !important;
 }
 
+.footer_pad {
+  min-height: 150px;
+}
+
 #navbar {
   max-height:120px;
   padding-right:10%;
@@ -59,7 +63,7 @@
 #rendered-body {
   padding-top: 5vh;
   min-width: 300px;
-  /*max-height: 100vh;*/
+  min-height: 70vh;
   padding-left:40px;
   padding-right:40px;
 

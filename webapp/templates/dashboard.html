@@ -27,6 +27,47 @@
     <br/><br/>
     <div class="row dash_heading">
         <div class="col">
+            <h3>Requests</h3>
+        </div>
+        <div  class="col">
+            <p style="float:right;"></p>
+        </div>
+    </div>
+    <br/>
+    <div class="income_table">
+            <table class="table">
+                    <thead>
+                      <tr class="income_header_row">
+                        <th style="width:60%;" scope="col">From</th>
+                        <th style="width:20%; text-align:center;" scope="col">Amount</th>
+                        <th style="width:20%; text-align:center;" scope="col"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in requests %}
+                        <tr>
+                            <td>{{ tx.tx_to.account }}</td>
+                            <td style="text-align:center;">${{ tx.tx_to.value }}</td>
+                            <td style="text-align:center;">
+                              <form style="float:right;">
+                              <div class="request_btn">
+                                  <button class="btn accept_btn btn-outline-success">&#10003;</button>
+                              </div>
+                              <div class="request_btn">
+                                  <button class="btn reject_btn btn-outline-success">&#10007;</button>
+                              </div>
+                            </form>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                  </table>
+
+    </div>
+    <br/><br/>
+    <div class="row dash_heading">
+        <div class="col">
             <h3>Incoming Payments</h3>
         </div>
         <div  class="col">
@@ -46,7 +87,7 @@
                         {% for tx in incoming %}
                         <tr>
                             <td>{{ tx.tx_from.account }}</td>
-                            <td style="text-align:center;">{{ tx.tx_to.value }}</td>
+                            <td style="text-align:center;">${{ tx.tx_to.value }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -67,7 +108,7 @@
                 <table class="table">
                         <thead>
                           <tr class="income_header_row">
-                            <th style="width:70%; text-align:center;" scope="col">Name</th>
+                            <th style="width:70%;" scope="col">Name</th>
                             <th style="width:30%; text-align:center;" scope="col">Amount</th>
                           </tr>
                         </thead>
@@ -97,7 +138,7 @@
                 <table class="table">
                         <thead>
                           <tr class="income_header_row">
-                            <th style="width:70%; text-align:center;" scope="col">Name</th>
+                            <th style="width:70%;" scope="col">Name</th>
                             <th style="width:30%; text-align:center;" scope="col">Amount</th>
                           </tr>
                         </thead>
@@ -111,7 +152,7 @@
                               {% else %}
                               <tr>
                                   <td>{{ tx.tx_from.account }}</td>
-                                  <td style="text-align:center; color:rgb(37, 165, 37);">{{ tx.tx_to.value }}</td>
+                                  <td style="text-align:center; color:rgb(37, 165, 37);">${{ tx.tx_to.value }}</td>
                               </tr>
                               {% endif %}
                             {% endfor %}

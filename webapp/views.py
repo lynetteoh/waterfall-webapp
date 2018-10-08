@@ -30,6 +30,7 @@ def dashboard(request):
     incoming = []
     outgoing = []
     past = []
+    requests = []
 
     transfers = Transfer.objects.all()
     print(transfers)
@@ -39,11 +40,14 @@ def dashboard(request):
             #outgoing or incoming
             tx_to = str(t.tx_to.account).strip("@")
             if tx_to == user:
-                #incoming payment
-                incoming.append(t)
+                if t.is_request != True:
+                    incoming.append(t)
             else:
                 #outgoing payment
-                outgoing.append(t)
+                if t.is_request:
+                    requests.append(t)
+                else:
+                    outgoing.append(t)
         else:
             past.append(t)
 
@@ -52,6 +56,7 @@ def dashboard(request):
         "incoming" : incoming,
         "outgoing": outgoing,
         "user1": user,
+        "requests": requests,
     }
 
     return render(request, 'dashboard.html', context)
