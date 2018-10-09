@@ -9,7 +9,7 @@ class OneSessionPerUserMiddleware:
     def __call__(self, request):
         # Code to be executed for each request before
         # the view (and later middleware) are called.
-        if request.user.is_authenticated and request.user.username != 'admin':
+        if request.user.is_authenticated:
             stored_session_key = request.user.logged_in_user.session_key
 
             # if there is a stored_session_key  in our database and it is
