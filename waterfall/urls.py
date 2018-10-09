@@ -35,6 +35,9 @@ urlpatterns = [
     path('register-new', views.register_new, name='register_new'),
     path('logout', auth_views.LogoutView, name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
+
+    # Groups
+    path('group/new/', views.group_create, name='newgroup'),
 ]
 
 if settings.DEBUG:

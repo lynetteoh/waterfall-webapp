@@ -157,3 +157,29 @@ def request_page(request):
 
     }
     return render(request, 'request.html', context)
+
+@login_required
+def group_create(request):
+    user = request.user
+    context = {
+        "user": user
+    }
+    other_users = User.objects.all().exclude(username=request.user.username)
+    context['other_users'] = other_users
+    # Collect all members
+    members = [user.profile]
+    i = 0
+    r = request.POST.get('members0')
+    while r:
+        members.append(r)
+        i += 1
+        r = request.POST.get('members' + str(i))
+
+    if request.method == "POST":
+        group_name = request.POST.get('name')
+
+
+        
+        return render(request, 'group/new.html', context)
+        
+    return render(request, 'group/new.html', context)

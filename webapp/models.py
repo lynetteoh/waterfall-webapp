@@ -8,20 +8,8 @@ def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/avatars/user_<id>/<filename>
     return 'avatars/{0}/{1}'.format(instance.user.id, filename)
 
-class Profile(models.Model):
-    import pytz
-    TIMEZONES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.ImageField(upload_to=user_directory_path, height_field=None, width_field=None)
-    timezone = models.CharField(max_length=32, choices=TIMEZONES, default='UTC')
-    # balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
-
-    def __str__(self):
-        return '@{}'.format(self.user.username)
-
 class Account(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
 
     def register_deposit(self, title, value):
         return self._create_transaction(value, title, 'd')
@@ -44,7 +32,10 @@ class Account(models.Model):
         )
 
     def __str__(self):
-        return '@{}'.format(self.user.username)
+        if self.user:
+            return 'Personal: @{}'.format(self.user.username)
+        else:
+            return 'Group: {}'.format('')
 
     @property
     def balance(self):
@@ -77,6 +68,26 @@ class Account(models.Model):
     def num_groups(self):
         # TODO Change this after implementing groups
         return 0
+
+class GroupAccount(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return ', '.join(['@{}'.format(p.user.username) for p in self.members.all()])
+
+class Profile(models.Model):
+    import pytz
+    TIMEZONES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to=user_directory_path, height_field=None, width_field=None, null=True, blank=True)
+    timezone = models.CharField(max_length=32, choices=TIMEZONES, default='UTC')
+    # balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    GroupAccount = models.ManyToManyField(GroupAccount,blank=True,related_name='members')
+
+    def __str__(self):
+        return '@{}'.format(self.user.username)
 
 class Transaction(models.Model):
     TRANSACTION_TYPES = {
