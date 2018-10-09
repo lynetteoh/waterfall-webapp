@@ -40,15 +40,16 @@ def dashboard(request):
 
         # Past transactions.
         if t.tx_from.confirmed_at:
+            t.confirmed_at = t.confirmed_at.date()
             past.append(t)
             continue
         # Pending or outgoing requests.
         if t.is_request:
             # Pending requests waiting for approval from user to transfer someone else.
             if str(t.tx_from.account).strip('@') == user:
-                user_requests.append(t)
-            else:
                 requests.append(t)
+            else:
+                user_requests.append(t)
             continue
         # Outgoing or Incoming payments.
         tx_to = str(t.tx_to.account).strip("@")
@@ -283,7 +284,6 @@ def request(request):
                 if deadline < today:
                     raise Exception("Invalid Past Payment Date")
 
-                print ("Creating transfer payment ")
                 transfer = user.account._create_transfer(receiver, subj, float(amount), int(recurr), deadline, True)
                 context['error'] = "Success"
         except Exception as e:

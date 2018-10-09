@@ -41,7 +41,7 @@
                     <thead>
                       <tr class="income_header_row">
                         <th style="width:20%; text-align:center;" scope="col">Deadline</th>
-                        <th style="width:20%;" scope="col">Name</th>
+                        <th style="width:20%;" scope="col">Requesting From</th>
                         <th style="width:25%;" scope="col">Description</th>
                         <th style="width:15%; text-align:center;" scope="col">Amount</th>
                         <th style="width:20%; text-align:center;" scope="col"></th>
@@ -101,7 +101,7 @@
                     <thead>
                       <tr class="income_header_row">
                         <th style="width:20%; text-align:center;" scope="col">Deadline</th>
-                        <th style="width:20%;" scope="col">Name</th>
+                        <th style="width:20%;" scope="col">Requested By</th>
                         <th style="width:25%;" scope="col">Description</th>
                         <th style="width:15%; text-align:center;" scope="col">Amount</th>
                         <th style="width:20%; text-align:center;" scope="col"></th>
@@ -111,8 +111,8 @@
                         {% for tx in user_requests %}
                         <tr>
                             <td>{{ tx.deadline }}</td>
-                            <td>{{ tx.tx_to.account }}</td>
-                            <td>{{ tx.tx_to.title | truncatechars:30 }}</td>
+                            <td>{{ tx.tx_from.account }}</td>
+                            <td>{{ tx.tx_from.title | truncatechars:30 }}</td>
                             <td style="text-align:center;">${{ tx.tx_to.value | floatformat:"2"}}</td>
                             <td style="text-align:center;">
                               <form style="float:right;" id="delete-req-form" onsubmit="event.preventDefault(); reqPopup(false)" method="POST">
@@ -125,18 +125,6 @@
                                           </button>
                                       </div>
                               </form>
-
-                              <form style="float:right;" id="approve-req-form" onsubmit="event.preventDefault(); reqPopup(true)" method="POST">
-                                    {% csrf_token %}
-                                      <input type="hidden" name="req" id="approve-req" value="approve-req">
-                                      <input type="hidden" name="transfer" value={{tx.id}}>
-                                      <div class="request_btn">
-                                          <button type="submit" value="approve-req" class="btn accept_btn btn-outline-success" style="outline:none;">
-                                            <i class="fas fa-check"></i>
-                                          </button>
-                                      </div>
-                                </form>
-
                             </form>
                             </td>
 
@@ -161,9 +149,9 @@
                     <thead>
                       <tr class="income_header_row">
                         <th style="width:20%; text-align:center;" scope="col">Date</th>
-                        <th style="width:20%;" scope="col">Name</th>
-                        <th style="width:30%;" scope="col">Description</th>
-                        <th style="width:30%; text-align:center;" scope="col">Amount</th>
+                        <th style="width:20%;" scope="col">Receiving From</th>
+                        <th style="width:25%;" scope="col">Description</th>
+                        <th style="width:35%; text-align:center;" scope="col">Amount</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -194,7 +182,7 @@
                         <thead>
                           <tr class="income_header_row">
                             <th style="width:20%; text-align:center;" scope="col">Date</th>
-                            <th style="width:20%;" scope="col">Name</th>
+                            <th style="width:20%;" scope="col">Transferring To</th>
                             <th style="width:25%;" scope="col">Description</th>
                             <th style="width:35%; text-align:center;" scope="col">Amount</th>
                           </tr>
@@ -226,10 +214,10 @@
                 <table class="table">
                         <thead>
                           <tr class="income_header_row">
-                            <th style="width:25%; text-align:center;" scope="col">Date</th>
-                            <th style="width:25%;" scope="col">Name</th>
-                            <th style="width:30%;" scope="col">Description</th>
-                            <th style="width:20%; text-align:center;" scope="col">Amount</th>
+                            <th style="width:20%; text-align:center;" scope="col">Date</th>
+                            <th style="width:20%;" scope="col">Name</th>
+                            <th style="width:25%;" scope="col">Description</th>
+                            <th style="width:35%; text-align:center;" scope="col">Amount</th>
                           </tr>
                         </thead>
                         <tbody>
