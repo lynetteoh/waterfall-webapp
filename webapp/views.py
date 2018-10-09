@@ -33,17 +33,16 @@ def dashboard(request):
     requests = []
 
     transfers = Transfer.objects.all()
-    print(transfers)
-
     for t in transfers:
-        if t.tx_from.confirmed_at == None:
-            #outgoing or incoming
+        t.deadline = t.deadline.date()
+        if not t.tx_from.confirmed_at:
+            # Outgoing or incoming payments.
             tx_to = str(t.tx_to.account).strip("@")
             if tx_to == user:
-                if t.is_request != True:
+                if not t.is_request:
                     incoming.append(t)
             else:
-                #outgoing payment
+                # Outgoing payment,
                 if t.is_request:
                     requests.append(t)
                 else:
@@ -59,6 +58,18 @@ def dashboard(request):
         "requests": requests,
     }
 
+    if request.method == "POST":
+        print(request.POST)
+        try:
+            transfer = request.POST.get('transfer')
+            if request.POST.get('req') is "approve-req":
+                context['error'] = user1.approve_req(transfer)
+            if request.POST.get('req') is "delete-req":
+                context['error'] = user1.delete_transfer(transfer)
+        except:
+            context['error'] = "Invalid Action"
+        finally:
+            return render(request, 'dashboard.html', context)
     return render(request, 'dashboard.html', context)
 
 @login_required

@@ -36,17 +36,36 @@ class Account(models.Model):
     def approve_req(self, transfer):
         if (not transfer.is_request)\
             or transfer.is_deleted or transfer.confirmed_at:
-            print("Invalid transfer to approve.")
-            return
+            return "Invalid Transfer"
+
         # Check request needs a withdrawal from self and sufficient balance.
-        tx = transfer.tx_from
-        if (tx.account is not self) or tx.amount > self.balance:
-            print ("Incorrect request or insufficient funds.")
-            return
+        tx = transfer.tx_to
+        if tx.account is not self:
+            return "Incorrect Request"
+        if tx.amount > self.balance:
+            return "Insufficient Funds"
+
         # Approve request and make recurring repeats if needed.
         now = pytz.UTC.localize(datetime.now())
         transfer.confirm(now, True)
-        return
+        print ("Request successfully approved.")
+        return "Success"
+
+    def delete_transfer(self, transfer):
+        if transfer.confirmed_at:
+            return "Past Transfer Cannot be Cancelled"
+
+        if transfer.is_request:
+            if transfer.tx_to.account is not self:
+                return "User does not control Request"
+        else:
+            if transfer.tx_from.account is not self:
+                return "User does not control Transfer"
+
+        # Approve request and make recurring repeats if needed.
+        transfer.delete()
+        print ("Request successfully deleted.")
+        return "Success"
 
     def _create_transaction(self, value, title, type, is_request):
         print("Created transaction " + type + " to " + self.user.username)
