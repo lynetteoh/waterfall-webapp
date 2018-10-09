@@ -46,6 +46,7 @@ function popup(ul, form, amount, date) {
 }
 
 function add(search, user, amnt) {
+   
     var text = document.getElementById(search).value;
     var valid_user = 0;
     valid_user = check_payee(text);
@@ -293,6 +294,7 @@ function check_payee(user) {
         if (users[i].match(",")) users.splice(i, 1);
     }
 
+    console.log(users);
     for (i = 0; i < users.length; i++) {
         if(users[i] == user) {
             return 1;
