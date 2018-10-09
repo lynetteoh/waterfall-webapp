@@ -33,7 +33,9 @@ class Account(models.Model):
             print('Account funds are insufficient.')
             return None
 
-    def approve_req(self, transfer):
+    def approve_req(self, id):
+        print ("Approving transfer....")
+        transfer = Transfer.objects.get(id=id)
         if (not transfer.is_request)\
             or transfer.is_deleted or transfer.confirmed_at:
             return "Invalid Transfer"
@@ -51,7 +53,9 @@ class Account(models.Model):
         print ("Request successfully approved.")
         return "Success"
 
-    def delete_transfer(self, transfer):
+    def delete_transfer(self, id):
+        print ("Deleting transfer")
+        transfer = Transfer.objects.get(id=id)
         if transfer.confirmed_at:
             return "Past Transfer Cannot be Cancelled"
 
