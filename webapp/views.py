@@ -26,43 +26,13 @@ def product(request):
 
 @login_required
 def dashboard(request):
-    user = str(request.user)
-    incoming = []
-    outgoing = []
-    past = []
-    requests = []
-    user_requests = []
-
-    transfers = Transfer.objects.all()
-    for t in transfers:
-        # Remove time from the date.
-        t.deadline = t.deadline.date()
-
-        # Past transactions.
-        if t.tx_from.confirmed_at:
-            t.confirmed_at = t.confirmed_at.date()
-            past.append(t)
-            continue
-        # Pending or outgoing requests.
-        if t.is_request:
-            # Pending requests waiting for approval from user to transfer someone else.
-            if str(t.tx_from.account).strip('@') == user:
-                requests.append(t)
-            else:
-                user_requests.append(t)
-            continue
-        # Outgoing or Incoming payments.
-        tx_to = str(t.tx_to.account).strip("@")
-        if tx_to == user:
-            incoming.append(t)
-        else:
-            outgoing.append(t)
-
-    context ={
+    user_str = str(request.user)
+    incoming, outgoing, past, requests, user_requests = collect_dash_transfers(user_str)
+    context = {
         "past": past,
         "incoming" : incoming,
         "outgoing": outgoing,
-        "user1": user,
+        "user1": user_str,
         "requests": requests,
         "user_requests": user_requests,
     }
@@ -78,6 +48,12 @@ def dashboard(request):
         except Exception as e:
             context['error'] = str(e)
         finally:
+            incoming, outgoing, past, requests, user_requests = collect_dash_transfers(user_str)
+            context['incoming'] = incoming
+            context['outgoing'] = outgoing
+            context['past'] = past
+            context['requests'] = requests
+            context['user_requests'] = user_requests
             return render(request, 'dashboard.html', context)
     return render(request, 'dashboard.html', context)
 
@@ -293,3 +269,39 @@ def request(request):
             return render(request, 'request.html', context)
     # Regular request view.
     return render(request, 'request.html', context)
+
+
+def collect_dash_transfers(user_str):
+    incoming = []
+    outgoing = []
+    past = []
+    requests = []
+    user_requests = []
+
+    for t in Transfer.objects.all():
+        if t.is_deleted:
+            continue
+
+        # Remove time from the date.
+        t.deadline = t.deadline.date()
+
+        # Past transactions.
+        if t.tx_from.confirmed_at:
+            t.confirmed_at = t.confirmed_at.date()
+            past.append(t)
+            continue
+        # Pending or outgoing requests.
+        if t.is_request:
+            # Pending requests waiting for approval from user to transfer someone else.
+            if str(t.tx_from.account).strip('@') == user_str:
+                requests.append(t)
+            else:
+                user_requests.append(t)
+            continue
+        # Outgoing or Incoming payments.
+        tx_to = str(t.tx_to.account).strip("@")
+        if tx_to == user_str:
+            incoming.append(t)
+        else:
+            outgoing.append(t)
+    return (incoming, outgoing, past, requests, user_requests)

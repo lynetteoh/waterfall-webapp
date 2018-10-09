@@ -41,15 +41,15 @@ class Account(models.Model):
             return "Invalid Transfer"
 
         # Check request needs a withdrawal from self and sufficient balance.
-        tx = transfer.tx_to
-        if tx.account is not self:
+        tx = transfer.tx_from
+        if not tx.account == self:
             return "Incorrect Request"
-        if tx.amount > self.balance:
+        if tx.value > self.balance:
             return "Insufficient Funds"
 
         # Approve request and make recurring repeats if needed.
         now = pytz.UTC.localize(datetime.now())
-        transfer.confirm(now, True)
+        transfer.confirm(now)
         print ("Request successfully approved.")
         return "Success"
 
@@ -60,11 +60,11 @@ class Account(models.Model):
             return "Past Transfer Cannot be Cancelled"
 
         if transfer.is_request:
-            if transfer.tx_to.account is not self:
-                return "User does not control Request"
+            if not transfer.tx_to.account == self:
+                return "Invalid User Request"
         else:
-            if transfer.tx_from.account is not self:
-                return "User does not control Transfer"
+            if not transfer.tx_from.account == self:
+                return "Invalid User Transfer"
 
         # Approve request and make recurring repeats if needed.
         transfer.delete()
