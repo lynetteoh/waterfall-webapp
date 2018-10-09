@@ -27,7 +27,7 @@ def product(request):
 @login_required
 def dashboard(request):
     user_str = str(request.user)
-    incoming, outgoing, past, requests, user_requests = collect_dash_transfers(user_str)
+    incoming, outgoing, past, requests, user_requests = collect_dash_transfers(request.user)
     context = {
         "past": past,
         "incoming" : incoming,
@@ -113,7 +113,8 @@ def balance(request):
                 else:
                     tx.save()
                     context['error'] = "Success"
-        except:
+        except Exception as e:
+            print(e)
             context['error'] = "Invalid Value"
         finally:
             return render(request, 'balance.html', context)
@@ -142,6 +143,17 @@ def register_new(request):
         form = SignUpForm()
     return render(request, 'index.html', {'form': form})
 
+def collect_payees(request, user_type):
+    # Collect all payees.
+    payees = []
+    i = 0
+    r = request.POST.get(user_type + '0')
+    while r:
+        payees.append(r)
+        i += 1
+        r = request.POST.get(user_type + str(i))
+    return payees
+
 @login_required
 def pay(request):
     user = request.user
@@ -157,14 +169,7 @@ def pay(request):
     }
     if request.method == "POST":
         try:
-            # Collect all payees.
-            payees = []
-            i = 0
-            r = request.POST.get('pay_users0')
-            while r:
-                payees.append(r)
-                i += 1
-                r = request.POST.get('pay_users' + str(i))
+            payees = collect_payees(request, 'pay_users')
             if not payees:
                 raise Exception("Invalid Payees")
 
@@ -221,14 +226,7 @@ def request(request):
     }
     if request.method == "POST":
         try:
-            # Collect all requests
-            requests = []
-            i = 0
-            r = request.POST.get('req_users0')
-            while r:
-                requests.append(r)
-                i += 1
-                r = request.POST.get('req_users' + str(i))
+            requests = collect_payees(request, 'req_users')
             if not requests:
                 raise Exception("Invalid Request User")
 
@@ -270,7 +268,7 @@ def request(request):
     return render(request, 'request.html', context)
 
 
-def collect_dash_transfers(user_str):
+def collect_dash_transfers(user):
     incoming = []
     outgoing = []
     past = []
@@ -278,28 +276,27 @@ def collect_dash_transfers(user_str):
     user_requests = []
 
     for t in Transfer.objects.all():
-        if t.is_deleted:
+        if t.is_deleted or not (t.tx_from.account == user.account or t.tx_to.account == user.account):
             continue
 
         # Remove time from the date.
         t.deadline = t.deadline.date()
 
         # Past transactions.
-        if t.tx_from.confirmed_at:
+        if t.confirmed_at:
             t.confirmed_at = t.confirmed_at.date()
             past.append(t)
             continue
         # Pending or outgoing requests.
         if t.is_request:
             # Pending requests waiting for approval from user to transfer someone else.
-            if str(t.tx_from.account).strip('@') == user_str:
+            if t.tx_from.account == user.account:
                 requests.append(t)
             else:
                 user_requests.append(t)
             continue
         # Outgoing or Incoming payments.
-        tx_to = str(t.tx_to.account).strip("@")
-        if tx_to == user_str:
+        if t.tx_to.account == user.account:
             incoming.append(t)
         else:
             outgoing.append(t)

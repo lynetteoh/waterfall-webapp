@@ -1,5 +1,4 @@
 function checkError(error) {
-  console.log("Checking error : " + error)
   if (error == "Success") {
     swal({
       title: "Success!",
@@ -14,7 +13,6 @@ function checkError(error) {
     });
   }
 }
-
 
 /* Produces a popup confirmation for request approvals and rejections. */
 function confirmPopup(form_id) {
