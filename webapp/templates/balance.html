@@ -11,39 +11,41 @@
 
 {% block content %}
 <div class="container bootstrap snippet" onload="checkError("{{ error }}")">
-  <div class="row">
-      <div class="col-sm-10">
+  <div class="">
+      <div class="">
         <h1>Balance Management &nbsp;&nbsp;</h1>
-        <h3 class="subheader" style="padding-top:15px;">Current Balance </h3>
+        <br/>
+        <h3 class="subheader" style="padding-top:15px; text-align: center;">Current Balance </h3>
         <p id="balance-value">${{ user.account.balance | floatformat:"2" }}</p>
       </div>
         <!-- Balance Edit Buttons -->
-      <div class="col-sm-10" id="balance-buttons">
+      <div class="col" id="balance-buttons">
         <div class="row">
-          <div class="button-row">
-            <form role="form" id="deposit" onsubmit="event.preventDefault(); balancePopup(false)" method="POST">
+          <div class="col button-row">
+            <form class="form-inline" role="form" id="deposit" onsubmit="event.preventDefault(); balancePopup(false)" method="POST">
               {% csrf_token %}
-              <input type="text" class="text-center form-control" name="add_amount" placeholder="0.00" value="0.00" id="add-amount">
-              <p style="font-size:0.1px;"><br></p>
-              <div style="padding-left:5%;">
-                <button class="btn btn-lg btn-success text-center" type="submit" value="Add" id="plus-button">
-                  <i class="fas fa-plus"></i>
+              <div class="deposit_inner">
+              
+              <input type="text" style="display: inline-block;" class="text-center form-control" name="add_amount" placeholder="0.00" value="0.00" id="add-amount">
+                <button style="display: inline-block !important;" class="btn btn-lg btn-success text-center" type="submit" value="Add" id="plus-button">
+                  Deposit
                 </button>
               </div>
             </form>
           </div>
-          <form role="form" id="withdraw" onsubmit="event.preventDefault(); balancePopup(true)" method="POST">
+          <div class="col button-row">
+          <center>
+          <form class="form-inline" role="form" id="withdraw" onsubmit="event.preventDefault(); balancePopup(true)" method="POST">
             {% csrf_token %}
-            <div class="button-row" style="padding-left:36%; float:right;">
-              <input type="text" class="text-center form-control" name="minus_amount" id="minus-amount" value="0.00" placeholder="0.00">
-              <p style="font-size:0.1px;"><br></p>
-              <div style="padding-right:25%">
-                <button class="btn btn-lg btn-danger" type="submit" value="Withdraw" id="minus-button">
-                  <i class="fas fa-minus"></i>
+            <div class="deposit_inner">
+
+              <input type="text" style="display: inline-block;" class="text-center form-control" name="minus_amount" id="minus-amount" value="0.00" placeholder="0.00">
+                <button style="display: inline-block !important;" class="btn btn-lg btn-danger" type="submit" value="Withdraw" id="minus-button">
+                  Withdraw
                 </button>
               </div>
-            </div>
-          </form>
+          </form></center>
+        </div>
         </div>
       </div><!-- end of buttons -->
     </div>
