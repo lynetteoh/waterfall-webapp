@@ -48,19 +48,19 @@
                             </div>
                         </div>
                         <div class="row form-group mb-5">
-                            <label class="col-sm-2 col-form-label" for="req_date">Date</label>
+                            <label class="col-sm-2 col-form-label" for="req_date">Deadline</label>
                             <div class="form-inline col-sm-10">
                                 <input type=date class="form-control col-sm-4" role="input" id="req_date" name="req_date"
                                     required>
                                 <div class="text-center col-sm-5">
                                     <div class="btn-group  pl-5" id="req_freq">
-                                        <input type="radio" name="req_freq" id="req_once" value="once" required><label
+                                        <input type="radio" name="req_freq" id="req_once" value="0" required><label
                                             for="req_once" class="btn">Once</label>
-                                        <input type="radio" name="req_freq" id="req_weekly" value="weekly"><label for="req_weekly"
+                                        <input type="radio" name="req_freq" id="req_weekly" value="7"><label for="req_weekly"
                                             class="btn">Weekly</label>
-                                        <input type="radio" name="req_freq" id="req_monthly" value="monthly"><label for="req_monthly"
+                                        <input type="radio" name="req_freq" id="req_monthly" value="30"><label for="req_monthly"
                                             class="btn ">Monthly</label>
-                                        <input type="radio" name="req_freq" id="req_yearly" value="yearly"><label for="req_yearly"
+                                        <input type="radio" name="req_freq" id="req_yearly" value="365"><label for="req_yearly"
                                             class="btn ">Yearly</label>
                                     </div>
                                 </div>
@@ -97,16 +97,17 @@
                             <button class="btn btn-lg btn-primary" type="submit">Request
                                 <i class="fa fa-paper-plane px-2"></i></button>
                         </div>
+                        <br/>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+</div>
 <script>
     var f_users = "{{filter_users}}";
+    checkError("{{error}}");
     document.getElementById('pay_date').valueAsDate = new Date();
-    
 </script>
 {% endblock %}

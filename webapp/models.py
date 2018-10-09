@@ -24,17 +24,33 @@ class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def register_deposit(self, title, value):
-        return self._create_transaction(value, title, 'd')
+        return self._create_transaction(value, title, 'd', False)
 
     def register_withdrawal(self, title, value):
         if self.balance >= value:
-            return self._create_transaction(0-value, title, 'w')
+            return self._create_transaction(0-value, title, 'w', False)
         else:
             print('Account funds are insufficient.')
             return None
 
-    def _create_transaction(self, value, title, type):
+    def approve_req(self, transfer):
+        if (not transfer.is_request)\
+            or transfer.is_deleted or transfer.confirmed_at:
+            print("Invalid transfer to approve.")
+            return
+        # Check request needs a withdrawal from self and sufficient balance.
+        tx = transfer.tx_from
+        if (tx.account is not self) or tx.amount > self.balance:
+            print ("Incorrect request or insufficient funds.")
+            return
+        # Approve request and make recurring repeats if needed.
         now = pytz.UTC.localize(datetime.now())
+        transfer.confirm(now, True)
+        return
+
+    def _create_transaction(self, value, title, type, is_request):
+        print("Created transaction " + type + " to " + self.user.username)
+        now = None if is_request else pytz.UTC.localize(datetime.now())
         return Transaction.objects.create(
             account=self,
             title=title,
@@ -42,6 +58,43 @@ class Account(models.Model):
             transaction_type=type,
             confirmed_at=now,
         )
+
+    def _create_transfer(self, receiver, subj, amount, recurr, date, is_request):
+        # Reverse if it is a request.
+        sender = self
+        if is_request:
+            sender, receiver = receiver, sender
+
+        tx_sender = sender._create_transaction(0-amount, subj, 'w', is_request)
+        tx_receiver = receiver._create_transaction(amount, subj,'d', is_request)
+
+        today = pytz.UTC.localize(datetime.today()).date()
+        today = pytz.UTC.localize(datetime.combine(today, datetime.min.time()), is_dst=True)
+        date = pytz.UTC.localize(datetime.combine(date, datetime.min.time()), is_dst=True)
+        confirmed_at = pytz.UTC.localize(datetime.now()) \
+                            if (today == date and not is_request) else None
+        pending = True if confirmed_at else False
+        link_tx = Transfer.objects.create(
+            tx_from = tx_sender,
+            tx_to = tx_receiver,
+            is_request = is_request,
+            recurrence_days = recurr,
+            deadline = date,
+            confirmed_at = confirmed_at,
+        )
+        tx_sender.confirmed_at = confirmed_at
+        tx_sender.is_pending = pending
+        tx_sender.save()
+        tx_receiver.confirmed_at = confirmed_at
+        tx_receiver.is_pending = pending
+        tx_receiver.save()
+        link_tx.save()
+        print("Created new transfer.")
+
+        # Create recurring copy of transfer if it is a payment made today.
+        if (not is_request and recurr and recurr > 0):
+            link_tx.create_recurring_copy(today)
+        return
 
     def __str__(self):
         return '@{}'.format(self.user.username)
@@ -144,13 +197,7 @@ class Transfer(models.Model):
         self.save()
 
     @transaction.atomic
-    def approve_req(self, today):
-        if (not self.is_request) or self.is_deleted or self.confirmed_at:
-            return
-        self.confirm(today, True)
-
-    @transaction.atomic
-    def confirm(self, today, is_request):
+    def confirm(self, today):
         self.confirmed_at  = today
         self.save()
         self.tx_from.confirmed_at = today
@@ -163,24 +210,28 @@ class Transfer(models.Model):
 
         # Create recurring copy of transfer.
         if (self.recurrence_days and self.recurrence_days > 0):
-            new_exec_date = today + timedelta(days=self.recurrence_days)
-            tx_from_copy = self.tx_from._copy()
-            tx_from_copy.created_at = today
-            tx_from_copy.modified_at = today
-            tx_from_copy.confirmed_at = None
-            tx_from_copy.save()
+            self.create_recurring_copy(today)
 
-            tx_to_copy = self.tx_to._copy()
-            tx_to_copy.created_at = today
-            tx_to_copy.modified_at = today
-            tx_to_copy.confirmed_at = None
-            tx_to_copy.save()
+    @transaction.atomic
+    def create_recurring_copy(self, today):
+        new_exec_date = today + timedelta(days=self.recurrence_days)
+        tx_from_copy = self.tx_from._copy()
+        tx_from_copy.created_at = self.tx_from.created_at
+        tx_from_copy.modified_at = today
+        tx_from_copy.confirmed_at = None
+        tx_from_copy.save()
 
-            Transfer.objects.create(
-                tx_from=tx_from_copy,
-                tx_to=tx_to_copy,
-                deadline=new_exec_date,
-                recurrence_days=self.recurrence_days,
-                is_request=is_request,
-            )
-            print("Created recurring transfer copy.")
+        tx_to_copy = self.tx_to._copy()
+        tx_to_copy.created_at = self.tx_to.created_at
+        tx_to_copy.modified_at = today
+        tx_to_copy.confirmed_at = None
+        tx_to_copy.save()
+
+        Transfer.objects.create(
+            tx_from=tx_from_copy,
+            tx_to=tx_to_copy,
+            deadline=new_exec_date,
+            recurrence_days=self.recurrence_days,
+            is_request=self.is_request,
+        )
+        print("Created recurring transfer copy.")

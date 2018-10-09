@@ -1,3 +1,20 @@
+function checkError(error) {
+  console.log("Checking error : " + error)
+  if (error == "Success") {
+    swal({
+      title: "Success!",
+      text:  "The transaction has been saved.",
+      icon:  "success",
+    });
+  } else if (error) {
+    swal({
+      title: error,
+      text:  "Please try again.",
+      icon:  "warning",
+    });
+  }
+}
+
 function popup(ul, form, amount, date) {
     var text = document.getElementById(amount).value;
     var error = validateForm(ul, amount, date, form);
@@ -10,19 +27,13 @@ function popup(ul, form, amount, date) {
             dangerMode: true,
         }).then((confirmed) => {
             if (confirmed) {
-                swal({
-                    title: "Success!",
-                    text: "The transaction has been sent.",
-                    icon: "success",
-                }).then((post) => {
-                    document.getElementById(form).submit();
-                });
+              document.getElementById(form).submit();
             } else {
-                swal({
-                    title: "Cancelled",
-                    text: "Your transaction request has been cancelled.",
-                    icon: "warning",
-                });
+              swal({
+                  title: "Cancelled",
+                  text: "Your transaction request has been cancelled.",
+                  icon: "warning",
+              });
             }
         });
     } else {
@@ -39,9 +50,13 @@ function add(search, user, amnt) {
     var text = document.getElementById(search).value;
     var valid_user = 0;
     valid_user = check_payee(text);
-    if(valid_user == 0) {
-        swal("You have chosen an invalid user !");
-        return;
+    if (valid_user == 0) {
+      swal({
+          title: "Invalid User",
+          text: "Please try again.",
+          icon: "warning",
+      });
+      return;
     }
     var list = document.createElement("li");
     var textnode = document.createTextNode(text);
@@ -58,7 +73,7 @@ function add(search, user, amnt) {
     result = exist(search, user, text);
     if (result == 0) {
         document.getElementById(user).appendChild(list);
-        if(user == 'req_users'){ 
+        if(user == 'req_users'){
             update_payee(user, text, amnt);
         }
     }
@@ -66,7 +81,7 @@ function add(search, user, amnt) {
     list.appendChild(remove);
     remove.onclick = function () {
         document.getElementById(user).removeChild(list);
-        if(user == 'req_users'){ 
+        if(user == 'req_users'){
             remove_payee(list);
             update_value(user, amnt);
         }
@@ -81,15 +96,13 @@ function removeBtn() {
 }
 
 function validateForm(ul, amnt, d, form) {
-
-    //validate date
+    // Validate dates.
     var date = document.getElementById(d).value;
     console.log(date)
     date = date.split("-");
     if (date.length != 3) {
         return "Please ensure you use the correct YYYY-MM-DD format."
     }
-
     var day = date[2];
     var month = date[1];
     var year = date[0];
@@ -97,47 +110,37 @@ function validateForm(ul, amnt, d, form) {
     month = month.replace(/\D/g, '');
     year = year.replace(/\D/g, '');
     if (parseInt(day, 10) > 31 || parseInt(day, 10) <= 0) {
-        return "Please ensure you have a valid day and follow the YYYY-MM-DD format."
+        return "Please ensure you have a valid day and follow the MM-DD-YYYY format."
     }
-
     if (parseInt(month, 10) > 12 || parseInt(month, 10) <= 0) {
-        return "Please ensure you have a valid month and follow the YYYY-MM-DD format."
+        return "Please ensure you have a valid month and follow the MM-DD-YYYY format."
     }
 
     var dt = new Date();
-    if (parseInt(year, 10) < dt.getFullYear() || parseInt(month, 10) < dt.getMonth() || parseInt(day, 10) < dt.getDate()) {
+    if (parseInt(year, 10) < dt.getFullYear()
+        || parseInt(month, 10) < dt.getMonth()
+        || parseInt(day, 10) < dt.getDate()) {
         return "The date has passed."
     }
-
-
-    //validate amount
+    // Validate amount.
     var amount = document.getElementById(amnt).value;
     if (parseFloat(amount) <= 0) {
         return "Please only input positive numeric amounts."
     }
-
-    if (form != 'req-form') {
-        //validate payee
-        if (document.getElementById(ul).getElementsByTagName('li').length == 1) {
-            return "";
-        } else if (document.getElementById(ul).getElementsByTagName('li').length >= 1) {
-            return "Please choose only a single payee !";
-        } else {
-            return "Please choose a payee !";
-        }
-    } else {
+    // Checks split amounts for a request form.
+    if (form == 'req-form') {
         result = check_split(amount, ul);
         if (result == 1) {
-            return "incorrect split! sum of split does not add up"
+            return "Split amounts do not sum up to requested amount."
         } else {
             return "";
         }
-
-        if (document.getElementById(ul).getElementsByTagName('li').length >= 1) {
-            return "";
-        } else {
-            return "Please choose a payee !";
-        }
+    }
+    // Ensure at least one payee is selected.
+    if (document.getElementById(ul).getElementsByTagName('li').length >= 1) {
+        return "";
+    } else {
+        return "Please choose at least one payee.";
     }
 }
 
@@ -150,12 +153,11 @@ function update_value(users_list, amnt) {
     var floor = Math.floor(payee_amount * 100) / 100
     var split_total = floor * ul_len
     split_total = Math.floor(split_total * 100) / 100
-    // console.log("split_total" + split_total)
+
+    // Cases where not everyone would pay equally.
     if(split_total != amount) {
         var remainder = Math.round((amount - split_total)*100) / 100
-        // console.log("remainder" + remainder)
         extra = remainder / 0.01
-        // console.log(extra)
     }
 
     for (var i = 0; i < ul.childNodes.length; i++) {
@@ -164,15 +166,13 @@ function update_value(users_list, amnt) {
             var input = ul.childNodes[i].getElementsByTagName("INPUT")[0]
             //get the html element value
             var text = input.attributes[3].value;
-            var input = document.getElementById(text); 
+            var input = document.getElementById(text);
             if(i < extra) {
-                // console.log("split_total" + split_total)
-                // console.log(extra)
                 pay_amount = payee_amount + 0.01
                 input.setAttribute('value', pay_amount.toFixed(2));
             }else {
                 input.setAttribute('value', payee_amount.toFixed(2));
-            } 
+            }
         }
     }
 }
@@ -218,12 +218,7 @@ function check_split(amount, users_list) {
             sum += val;
         }
     }
-
-    if (sum != amount) {
-        return 1
-    } else {
-        return 0
-    }
+    return (sum != amount) ? 1 : 0;
 }
 
 function exist(search, user, text) {
@@ -291,9 +286,9 @@ function show_div() {
 function check_payee(user) {
     users = f_users.split("&#39;");
     // Removes the [] parantheses.
-    users.splice(0, 1);       
-    users.pop(); 
-    
+    users.splice(0, 1);
+    users.pop();
+
     // Removes all comma values.
     for(var i = users.length-1; i--;){
         if (users[i].match(",")) users.splice(i, 1);
@@ -307,5 +302,3 @@ function check_payee(user) {
     }
     return 0;
 }
-
-

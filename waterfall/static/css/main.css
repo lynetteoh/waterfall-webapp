@@ -21,6 +21,9 @@
     border-radius: 8px;
 }
 
+.footer_base {
+}
+
 .register_form {
     padding: 35px;
 }
@@ -102,9 +105,12 @@
 }
 
 .footer {
-    min-height: 200px;
-    background-color: white;
+    min-height: 150px;
+    background-color: #f3f3f3;
     color: #5b5b5b;
+    width: 100%;
+    position: relative;
+    bottom: 0;
 }
 
 .landing {
@@ -113,7 +119,7 @@
 
 .nav_text {
     color: white !important;
-    padding-left: 4em !important;
+    padding-left: 1em !important;
     font-size: 1.2em;
 }
 
@@ -171,30 +177,6 @@
 #footer {
    max-width:200px;
    margin-right: 10px !important;
-}
-
-#sidebar-wrapper {
-  padding-top:135px;
-  width: 1500px;
-}
-
-#sidebar {
-  background-color:#666666;
-  padding-top: 5vh;
-  width: 400x;
-  min-height: 100vh;
-}
-
-#rendered-body {
-  padding-top: 5vh;
-  min-width: 300px;
-  max-height: 100vh;
-  padding-left:70px;
-}
-
-#nav-list {
-  display: block;
-  position: fixed;
 }
 
 .subnav {

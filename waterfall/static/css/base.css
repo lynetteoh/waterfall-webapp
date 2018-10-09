@@ -19,6 +19,15 @@
   font-size: 25px;
 }
 
+.no-pad {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+
+.footer_pad {
+  min-height: 150px;
+}
+
 #navbar {
   max-height:120px;
   padding-right:10%;
@@ -37,7 +46,11 @@
 
 #sidebar-wrapper {
   padding-top:135px;
-  width: 1500px;
+}
+
+.stop_margin {
+  margin-left: 0px !important;
+  margin-right: 0px !important;
 }
 
 #sidebar {
@@ -50,13 +63,14 @@
 #rendered-body {
   padding-top: 5vh;
   min-width: 300px;
-  max-height: 100vh;
-  padding-left:70px;
+  min-height: 70vh;
+  padding-left:40px;
+  padding-right:40px;
+
 }
 
 #nav-list {
   display: block;
-  position: fixed;
 }
 
 .subnav {

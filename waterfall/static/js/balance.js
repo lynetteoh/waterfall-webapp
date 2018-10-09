@@ -14,6 +14,7 @@ function checkError(error) {
     });
   }
 }
+
 /* Produces a popup confirmation for withdrawals and deposits. */
 function balancePopup(isWithdraw) {
   var id = isWithdraw ? "minus-amount" : "add-amount";
@@ -49,16 +50,6 @@ function validAmount(txt) {
   }
   return true;
 }
-
-/* To remove if not going to allow edit card functions. */
-// function editCard() {
-//   if (document.getElementById("card-form").style.display == "none") {
-//     document.getElementById("card-form").style.display = "block"
-//   } else {
-//     document.getElementById("card-form").style.display = "none"
-//   }
-// }
-
 
 /* Confirms card details and gives relevant message. */
 function checkCard() {
