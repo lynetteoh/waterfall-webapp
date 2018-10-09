@@ -17,7 +17,7 @@ function checkError(error) {
 
 
 /* Produces a popup confirmation for request approvals and rejections. */
-function reqPopup(is_approve) {
+function confirmPopup(form_id) {
   swal({
     title: "Are you sure?",
     text:  "Once processed, this action cannot be undone.",
@@ -25,11 +25,7 @@ function reqPopup(is_approve) {
     buttons: true,
   }).then((confirmed) => {
     if (confirmed) {
-      if (is_approve) {
-        document.getElementById("approve-req-form").submit();
-      } else {
-        document.getElementById("delete-req-form").submit();
-      }
+      document.getElementById(form_id).submit();
     }
   });
 }

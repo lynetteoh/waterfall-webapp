@@ -41,7 +41,7 @@
                     <thead>
                       <tr class="income_header_row">
                         <th style="width:20%; text-align:center;" scope="col">Deadline</th>
-                        <th style="width:20%;" scope="col">Name</th>
+                        <th style="width:20%;" scope="col">Requesting From</th>
                         <th style="width:25%;" scope="col">Description</th>
                         <th style="width:15%; text-align:center;" scope="col">Amount</th>
                         <th style="width:20%; text-align:center;" scope="col"></th>
@@ -55,7 +55,7 @@
                             <td>{{ tx.tx_to.title | truncatechars:30 }}</td>
                             <td style="text-align:center;">${{ tx.tx_to.value | floatformat:"2"}}</td>
                             <td style="text-align:center;">
-                              <form style="float:right;" id="delete-req-form" onsubmit="event.preventDefault(); reqPopup(false)" method="POST">
+                              <form style="float:right;" id="delete-req-form" onsubmit="event.preventDefault(); confirmPopup("delete-req-form")" method="POST">
                                     {% csrf_token %}
                                       <input type="hidden" name="req" id="delete-req" value="delete-req">
                                       <input type="hidden" name="transfer" value={{tx.id}}>
@@ -66,7 +66,7 @@
                                       </div>
                               </form>
 
-                              <form style="float:right;" id="approve-req-form" onsubmit="event.preventDefault(); reqPopup(true)" method="POST">
+                              <form style="float:right;" id="approve-req-form" onsubmit="event.preventDefault(); confirmPopup("approve-req-form")" method="POST">
                                     {% csrf_token %}
                                       <input type="hidden" name="req" id="approve-req" value="approve-req">
                                       <input type="hidden" name="transfer" value={{tx.id}}>
@@ -101,7 +101,7 @@
                     <thead>
                       <tr class="income_header_row">
                         <th style="width:20%; text-align:center;" scope="col">Deadline</th>
-                        <th style="width:20%;" scope="col">Name</th>
+                        <th style="width:20%;" scope="col">Requested By</th>
                         <th style="width:25%;" scope="col">Description</th>
                         <th style="width:15%; text-align:center;" scope="col">Amount</th>
                         <th style="width:20%; text-align:center;" scope="col"></th>
@@ -111,11 +111,11 @@
                         {% for tx in user_requests %}
                         <tr>
                             <td>{{ tx.deadline }}</td>
-                            <td>{{ tx.tx_to.account }}</td>
-                            <td>{{ tx.tx_to.title | truncatechars:30 }}</td>
-                            <td style="text-align:center;">${{ tx.tx_to.value | floatformat:"2"}}</td>
+                            <td>{{ tx.tx_from.account }}</td>
+                            <td>{{ tx.tx_from.title | truncatechars:30 }}</td>
+                            <td style="text-align:center;">${{ tx.tx_from.value | floatformat:"2"}}</td>
                             <td style="text-align:center;">
-                              <form style="float:right;" id="delete-req-form" onsubmit="event.preventDefault(); reqPopup(false)" method="POST">
+                              <form style="float:right;" id="delete-outreq-form" onsubmit="event.preventDefault(); confirmPopup("delete-outreq-form")" method="POST">
                                     {% csrf_token %}
                                       <input type="hidden" name="req" id="delete-req" value="delete-req">
                                       <input type="hidden" name="transfer" value={{tx.id}}>
@@ -125,18 +125,6 @@
                                           </button>
                                       </div>
                               </form>
-
-                              <form style="float:right;" id="approve-req-form" onsubmit="event.preventDefault(); reqPopup(true)" method="POST">
-                                    {% csrf_token %}
-                                      <input type="hidden" name="req" id="approve-req" value="approve-req">
-                                      <input type="hidden" name="transfer" value={{tx.id}}>
-                                      <div class="request_btn">
-                                          <button type="submit" value="approve-req" class="btn accept_btn btn-outline-success" style="outline:none;">
-                                            <i class="fas fa-check"></i>
-                                          </button>
-                                      </div>
-                                </form>
-
                             </form>
                             </td>
 
@@ -161,9 +149,9 @@
                     <thead>
                       <tr class="income_header_row">
                         <th style="width:20%; text-align:center;" scope="col">Date</th>
-                        <th style="width:20%;" scope="col">Name</th>
-                        <th style="width:30%;" scope="col">Description</th>
-                        <th style="width:30%; text-align:center;" scope="col">Amount</th>
+                        <th style="width:20%;" scope="col">Receiving From</th>
+                        <th style="width:25%;" scope="col">Description</th>
+                        <th style="width:35%; text-align:center;" scope="col">Amount</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -194,9 +182,10 @@
                         <thead>
                           <tr class="income_header_row">
                             <th style="width:20%; text-align:center;" scope="col">Date</th>
-                            <th style="width:20%;" scope="col">Name</th>
+                            <th style="width:20%;" scope="col">Transferring To</th>
                             <th style="width:25%;" scope="col">Description</th>
-                            <th style="width:35%; text-align:center;" scope="col">Amount</th>
+                            <th style="width:25%; text-align:center;" scope="col">Amount</th>
+                            <th style="width:10%; text-align:center;" scope="col"></th>
                           </tr>
                         </thead>
                         <tbody>
@@ -205,7 +194,19 @@
                                 <td>{{ tx.deadline }}</td>
                                 <td>{{ tx.tx_to.account }}</td>
                                 <td>{{ tx.tx_to.title | truncatechars:30 }}</td>
-                                <td style="text-align:center;">{{ tx.tx_from.value | floatformat:"2" }}</td>
+                                <td style="text-align:center;">${{ tx.tx_from.value | floatformat:"2" }}</td>
+                                <td style="text-align:center;">
+                                  <form style="float:right;" id="delete-form" onsubmit="event.preventDefault(); confirmPopup("delete-form")" method="POST">
+                                        {% csrf_token %}
+                                          <input type="hidden" name="req" id="delete-req" value="delete-req">
+                                          <input type="hidden" name="transfer" value={{tx.id}}>
+                                          <div class="request_btn">
+                                              <button type="submit" value="delete-req" class="btn reject_btn btn-outline-success" style="outline:none;">
+                                                <i class="fas fa-times"></i>
+                                              </button>
+                                          </div>
+                                  </form>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -226,10 +227,10 @@
                 <table class="table">
                         <thead>
                           <tr class="income_header_row">
-                            <th style="width:25%; text-align:center;" scope="col">Date</th>
-                            <th style="width:25%;" scope="col">Name</th>
-                            <th style="width:30%;" scope="col">Description</th>
-                            <th style="width:20%; text-align:center;" scope="col">Amount</th>
+                            <th style="width:20%; text-align:center;" scope="col">Date</th>
+                            <th style="width:20%;" scope="col">Name</th>
+                            <th style="width:25%;" scope="col">Description</th>
+                            <th style="width:35%; text-align:center;" scope="col">Amount</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -239,7 +240,7 @@
                                   <td>{{ tx.confirmed_at }}</td>
                                   <td>{{ tx.tx_to.account }}</td>
                                   <td>{{ tx.tx_to.title | truncatechars:30 }}</td>
-                                  <td style="text-align:center; color:rgb(223, 65, 65);">{{ tx.tx_from.value | floatformat:"2" }}</td>
+                                  <td style="text-align:center; color:rgb(223, 65, 65);">${{ tx.tx_from.value | floatformat:"2" }}</td>
                               </tr>
                               {% else %}
                               <tr>
