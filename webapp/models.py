@@ -259,3 +259,24 @@ class Transfer(models.Model):
             is_request=self.is_request,
         )
         print("Created recurring transfer copy.")
+
+class LoggedInUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='logged_in_user')
+    # Session keys are 32 characters long
+    session_key = models.CharField(max_length=32, null=True, blank=True)
+
+    def __str__(self):
+        return self.user.username
+
+from django.contrib.auth import user_logged_in, user_logged_out
+from django.dispatch import receiver
+
+@receiver(user_logged_in)
+def on_user_logged_in(sender, request, **kwargs):
+    print(f"user {request.user} logging in")
+    LoggedInUser.objects.get_or_create(user=kwargs.get('user')) 
+
+@receiver(user_logged_out)
+def on_user_logged_out(sender, **kwargs):
+    print(f"user {kwargs.get('user')} logging out")
+    LoggedInUser.objects.filter(user=kwargs.get('user')).delete()
