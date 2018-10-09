@@ -17,7 +17,7 @@ function checkError(error) {
 
 
 /* Produces a popup confirmation for request approvals and rejections. */
-function reqPopup(form_id) {
+function confirmPopup(form_id) {
   swal({
     title: "Are you sure?",
     text:  "Once processed, this action cannot be undone.",

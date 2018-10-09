@@ -38,7 +38,6 @@ def dashboard(request):
     }
 
     if request.method == "POST":
-        print (request.POST)
         try:
             transfer = request.POST.get('transfer')
             if request.POST.get('req') == "approve-req":

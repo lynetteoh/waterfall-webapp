@@ -44,7 +44,8 @@ class Account(models.Model):
         tx = transfer.tx_from
         if not tx.account == self:
             return "Incorrect Request"
-        if tx.value > self.balance:
+
+        if (tx.value + self.balance) < 0:
             return "Insufficient Funds"
 
         # Approve request and make recurring repeats if needed.
@@ -60,7 +61,7 @@ class Account(models.Model):
             return "Past Transfer Cannot be Cancelled"
 
         if transfer.is_request:
-            if not transfer.tx_to.account == self:
+            if not transfer.tx_to.account == self and not transfer.tx_from.account == self:
                 return "Invalid User Request"
         else:
             if not transfer.tx_from.account == self:
