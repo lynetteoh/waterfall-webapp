@@ -31,25 +31,31 @@ def dashboard(request):
     outgoing = []
     past = []
     requests = []
+    user_requests = []
 
     transfers = Transfer.objects.all()
-    print(transfers)
-
     for t in transfers:
-        if t.tx_from.confirmed_at == None:
-            #outgoing or incoming
-            tx_to = str(t.tx_to.account).strip("@")
-            if tx_to == user:
-                if t.is_request != True:
-                    incoming.append(t)
-            else:
-                #outgoing payment
-                if t.is_request:
-                    requests.append(t)
-                else:
-                    outgoing.append(t)
-        else:
+        # Remove time from the date.
+        t.deadline = t.deadline.date()
+
+        # Past transactions.
+        if t.tx_from.confirmed_at:
             past.append(t)
+            continue
+        # Pending or outgoing requests.
+        if t.is_request:
+            # Pending requests waiting for approval from user to transfer someone else.
+            if str(t.tx_from.account).strip('@') == user:
+                user_requests.append(t)
+            else:
+                requests.append(t)
+            continue
+        # Outgoing or Incoming payments.
+        tx_to = str(t.tx_to.account).strip("@")
+        if tx_to == user:
+            incoming.append(t)
+        else:
+            outgoing.append(t)
 
     context ={
         "past": past,
@@ -57,8 +63,21 @@ def dashboard(request):
         "outgoing": outgoing,
         "user1": user,
         "requests": requests,
+        "user_requests": user_requests,
     }
 
+    if request.method == "POST":
+        print (request.POST)
+        try:
+            transfer = request.POST.get('transfer')
+            if request.POST.get('req') == "approve-req":
+                context['error'] = request.user.account.approve_req(transfer)
+            if request.POST.get('req') == "delete-req":
+                context['error'] = request.user.account.delete_transfer(transfer)
+        except Exception as e:
+            context['error'] = str(e)
+        finally:
+            return render(request, 'dashboard.html', context)
     return render(request, 'dashboard.html', context)
 
 @login_required
