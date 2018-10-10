@@ -26,39 +26,35 @@ def product(request):
 
 @login_required
 def dashboard(request):
-    user = str(request.user)
-    incoming = []
-    outgoing = []
-    past = []
-    requests = []
-
-    transfers = Transfer.objects.all()
-    print(transfers)
-
-    for t in transfers:
-        if t.tx_from.confirmed_at == None:
-            #outgoing or incoming
-            tx_to = str(t.tx_to.account).strip("@")
-            if tx_to == user:
-                if t.is_request != True:
-                    incoming.append(t)
-            else:
-                #outgoing payment
-                if t.is_request:
-                    requests.append(t)
-                else:
-                    outgoing.append(t)
-        else:
-            past.append(t)
-
-    context ={
+    user_str = str(request.user)
+    incoming, outgoing, past, requests, user_requests = collect_dash_transfers(request.user)
+    context = {
         "past": past,
         "incoming" : incoming,
         "outgoing": outgoing,
-        "user1": user,
+        "user1": user_str,
         "requests": requests,
+        "user_requests": user_requests,
     }
 
+    if request.method == "POST":
+        transfer = request.POST.get('transfer')
+        try:
+            if request.POST.get('req') == "approve-req":
+                context['error'] = request.user.account.approve_req(transfer)
+            if request.POST.get('req') == "delete-req":
+                context['error'] = request.user.account.delete_transfer(transfer)
+        except Exception as e:
+            context['error'] = str(e)
+        finally:
+            incoming, outgoing, past, requests, user_requests =\
+                                            collect_dash_transfers(request.user)
+            context['incoming'] = incoming
+            context['outgoing'] = outgoing
+            context['past'] = past
+            context['requests'] = requests
+            context['user_requests'] = user_requests
+            return render(request, 'dashboard.html', context)
     return render(request, 'dashboard.html', context)
 
 @login_required
@@ -118,7 +114,8 @@ def balance(request):
                 else:
                     tx.save()
                     context['error'] = "Success"
-        except:
+        except Exception as e:
+            print(e)
             context['error'] = "Invalid Value"
         finally:
             return render(request, 'balance.html', context)
@@ -162,14 +159,7 @@ def pay(request):
     }
     if request.method == "POST":
         try:
-            # Collect all payees.
-            payees = []
-            i = 0
-            r = request.POST.get('pay_users0')
-            while r:
-                payees.append(r)
-                i += 1
-                r = request.POST.get('pay_users' + str(i))
+            payees = collect_recipients(request, 'pay_users')
             if not payees:
                 raise Exception("Invalid Payees")
 
@@ -194,10 +184,12 @@ def pay(request):
                 if not date:
                     raise Exception("Invalid Payment Date")
 
-                timezone = pytz.UTC
+                timezone = pytz.timezone('Australia/Sydney')
                 today = timezone.localize(datetime.today()).date()
                 deadline = \
                     timezone.localize(datetime.strptime(date, "%Y-%m-%d")).date() # yyyy-mm-dd
+                print(deadline)
+                print(today)
                 if deadline < today:
                     raise Exception("Invalid Past Payment Date")
 
@@ -226,14 +218,7 @@ def request(request):
     }
     if request.method == "POST":
         try:
-            # Collect all requests
-            requests = []
-            i = 0
-            r = request.POST.get('req_users0')
-            while r:
-                requests.append(r)
-                i += 1
-                r = request.POST.get('req_users' + str(i))
+            requests = collect_recipients(request, 'req_users')
             if not requests:
                 raise Exception("Invalid Request User")
 
@@ -257,14 +242,13 @@ def request(request):
                 if not date:
                     raise Exception("Invalid Payment Date")
 
-                timezone = pytz.UTC
+                timezone = pytz.timezone('Australia/Sydney')
                 today = timezone.localize(datetime.today()).date()
                 deadline = \
                     timezone.localize(datetime.strptime(date, "%Y-%m-%d")).date() # yyyy-mm-dd
                 if deadline < today:
                     raise Exception("Invalid Past Payment Date")
 
-                print ("Creating transfer payment ")
                 transfer = user.account._create_transfer(receiver, subj, float(amount), int(recurr), deadline, True)
                 context['error'] = "Success"
         except Exception as e:
@@ -304,3 +288,49 @@ def group_management(request):
         "group_members": manage_members,
     }
     return render(request, 'group_management.html', context)
+
+def collect_dash_transfers(user):
+    incoming = []
+    outgoing = []
+    past = []
+    requests = []
+    user_requests = []
+
+    for t in Transfer.objects.all():
+        if t.is_deleted or not (t.tx_from.account == user.account or t.tx_to.account == user.account):
+            continue
+
+        # Remove time from the date.
+        t.deadline = t.deadline.date()
+
+        # Past transactions.
+        if t.confirmed_at:
+            t.confirmed_at = t.confirmed_at.date()
+            past.append(t)
+            continue
+        # Pending or outgoing requests.
+        if t.is_request:
+            # Pending requests waiting for approval from user to transfer someone else.
+            if t.tx_from.account == user.account:
+                requests.append(t)
+            else:
+                user_requests.append(t)
+            continue
+        # Outgoing or Incoming payments.
+        if t.tx_to.account == user.account:
+            incoming.append(t)
+        else:
+            outgoing.append(t)
+    return (incoming, outgoing, past, requests, user_requests)
+
+# Collects payees for multi pay and multi requests.
+def collect_recipients(request, user_type):
+    # Collect all payees.
+    payees = []
+    i = 0
+    r = request.POST.get(user_type + '0')
+    while r:
+        payees.append(r)
+        i += 1
+        r = request.POST.get(user_type + str(i))
+    return payees

@@ -31,14 +31,25 @@
             </div>
 
             <ul class="nav navbar-nav navbar-right" id="navbar">
-                <li id="balance-name">BALANCE
-                  <p id="balance-text">${{ user.account.balance | floatformat:"2" }}</p>
-                </li>
+                <a href="{% url 'balance' %}" style="text-decoration:none;">
+                  <li id="balance-name">BALANCE
+                    <p id="balance-text">${{ user.account.balance | floatformat:"2" }}</p>
+                  </li>
+                </a>
                 <li>
-                  <a href="{% url 'profile' %}"><img src="{% static "images/anon-user.svg" %}" id="user-icon"/></a>
+                  <div id="profile">
+                  <a href="{% url 'profile' %}">
+                    {% if user.profile.avatar %}
+                      <img id="user-icon" src="{{ user.profile.avatar.url }}"/>
+                    {% else %}
+                      <img src="{% static "images/anon-user.svg" %}" id="user-icon"/>
+                    {% endif %}
+                  </a>
+                  <p id="username">@{{ user.username }}</p>
+                  </div>
                 </li>
             </ul>
-            
+
         </div>
 
         <div id="sidebar-wrapper">

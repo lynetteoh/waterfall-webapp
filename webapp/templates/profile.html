@@ -34,42 +34,42 @@ input[type="text"][readonly] {
     <div class="row">
   		<div class="col-sm-3" style="min-width:230px;"><!--left col-->
 
-      <div class="text-center">
-      {% if user.profile.avatar %}
-        <img src="{{ user.profile.avatar.url }}" class="avatar img-circle img-thumbnail" alt="avatar">
-      {% else %}
-        <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar">
-      {% endif %}
-      </br></br>
-        <h4>@{{ user.username }}</h4>
-        </br>
-        <div id="upload-pic" style="display:none;">
-          <h6>Upload New Profile Picture</h6>
+        <div class="text-center">
+        {% if user.profile.avatar %}
+          <img id="prof-pic" src="{{ user.profile.avatar.url }}" class="avatar img-circle img-thumbnail" alt="avatar">
+        {% else %}
+          <img id="prof-pic" src="{% static "images/anon-user.svg" %}" class="avatar img-circle img-thumbnail" alt="avatar">
+        {% endif %}
+        </br></br>
+          <h4>@{{ user.username }}</h4>
+          </br>
+          <div id="upload-pic" style="display:none;">
+            <h6>Upload New Profile Picture</h6>
 
-          <form role="form" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            {% if form.errors %}
-            <p>Upload a valid image. The file you uploaded was either not an image or a corrupted image.</p>
-            {% endif %}
-            <input name="avatar" id="avatar" type="file" class="file-upload">
-            </br></br> 
-            <button class="btn btn-xs"  type="submit">
-              <i class="fas fa-check"></i> &nbsp;Upload
-            </button>
-            </hr></br></br>
-          </form>
+            <form role="form" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              {% if form.errors %}
+              <p>Upload a valid image. The file you uploaded was either not an image or a corrupted image.</p>
+              {% endif %}
+              <input name="avatar" id="avatar" type="file" class="file-upload">
+              </br></br>
+              <button class="btn btn-xs"  type="submit">
+                <i class="fas fa-check"></i> &nbsp;Upload
+              </button>
+              </hr></br></br>
+            </form>
+          </div>
         </div>
-      </div>
 
-      <ul class="list-group">
-        <li class="list-group-item"><strong>Activity</strong><i class="fa fa-dashboard fa-1x"></i></li>
-        <li class="list-group-item text-right text-muted" style="text-align:left;"><span style="float:left;">Payments</span>{{ user.account.num_payments }}</li>
-        <li class="list-group-item text-right text-muted"><span style="float:left;">Requests</span>{{ user.account.num_requests }}</li>
-        <li class="list-group-item text-right text-muted"><span style="float:left;">Groups</span>{{ user.account.num_groups }}</li>
-      </ul>
+        <ul class="list-group">
+          <li class="list-group-item"><strong>Activity</strong><i class="fa fa-dashboard fa-1x"></i></li>
+          <li class="list-group-item text-right text-muted" style="text-align:left;"><span style="float:left;">Payments</span>{{ user.account.num_payments }}</li>
+          <li class="list-group-item text-right text-muted"><span style="float:left;">Requests</span>{{ user.account.num_requests }}</li>
+          <li class="list-group-item text-right text-muted"><span style="float:left;">Groups</span>{{ user.account.num_groups }}</li>
+        </ul>
 
       </div><!--/col-3-->
-    	<div class="col-sm-9" style="padding-left:40px;">
+    	<div class="col" style="padding-left:40px;">
           <form id="edit-form" role="form" method="POST" onsubmit="event.preventDefault(); checkForm()">
           {% csrf_token %}
               <div class="form-group">
@@ -81,7 +81,7 @@ input[type="text"][readonly] {
               </div>
               <div class="form-group">
                   <div class="col-xs-6">
-                    <label for="last_name"><h4>Last name</h4></label>
+                    <label for="last_name"><h5>Last name</h5></label>
                       <input type="text" class="form-control" name="last_name" id="last_name" readonly value="{{ user.last_name }}">
                   </div>
               </div>

@@ -8,11 +8,11 @@
 }
 
 #balance-name {
-  padding-top:20px;
+  padding-top:33px;
   text-align:right;
   color:white;
   font-size:18px;
-  padding-right:35px;
+  padding-right:20px;
 }
 
 #balance-text {
@@ -33,10 +33,26 @@
   padding-right:10%;
 }
 
-#user-icon {
+#profile {
   padding-top: 5px;
   padding-bottom: 5px;
-  height: 95px;
+  padding-left: 40px;
+}
+
+#user-icon {
+  align:center;
+  vertical-align: middle;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+#username {
+  align:center;
+  vertical-align: middle;
+  color:white;
+  text-align: center;
+  font-size:20px;
 }
 
 #footer {
@@ -66,11 +82,18 @@
   min-height: 70vh;
   padding-left:40px;
   padding-right:40px;
-
 }
 
 #nav-list {
   display: block;
+}
+
+#prof-pic {
+  align:center;
+  vertical-align: middle;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
 }
 
 .subnav {
