@@ -16,8 +16,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-#print("The base dir is: ", os.path.join(BASE_DIR, "static/"))
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -52,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'webapp.middleware.OneSessionPerUserMiddleware'
 ]
 
 ROOT_URLCONF = 'waterfall.urls'
@@ -116,7 +115,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Australia/Sydney'
 
 USE_I18N = True
 
@@ -139,7 +138,7 @@ LOGOUT_REDIRECT_URL = '/'
 
 MEDIA_URL = '/media/' #this line is added and it creates a directory named media in your appfolder
 #where the uploaded images will be stored
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media') #this line is added and it serves as the root address of 
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media') #this line is added and it serves as the root address of
 #uploaded file
 MEDIA_ROOT = 'waterfall/static/'
 MEDIA_ROOT = 'waterfall/static/'
@@ -147,3 +146,9 @@ MEDIA_ROOT = 'waterfall/static/'
 # Added by Steph for Heroku Integration
 django_heroku.settings(locals())
 
+# Email Notification Settings
+EMAIL_HOST ='smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'waterfallpay@gmail.com'
+EMAIL_HOST_PASSWORD = os.environ.get('WEBAPP_EMAIL_PASSWORD', '')
+EMAIL_USE_TLS = True

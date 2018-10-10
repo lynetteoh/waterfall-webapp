@@ -39,12 +39,20 @@
     <div class="income_table">
             <table class="table">
                     <thead>
-                      <tr class="income_header_row">
-                        <th style="width:25%; text-align:center;" scope="col">Date</th>
-                        <th style="width:25%;" scope="col">Name</th>
-                        <th style="width:30%;" scope="col">Description</th>
-                        <th style="width:20%; text-align:center;" scope="col">Amount</th>
-                      </tr>
+                        <tr class="income_header_row">
+                            <th style="width:20%; text-align:center;" scope="col">Date</th>
+                            {% if key == "op" %}
+                                <th style="width:20%;" scope="col">Transferring To</th>
+                            {% elif key == "ip" %}
+                                <th style="width:20%;" scope="col">Recieving From</th>
+                            {% else %}
+                                <th style="width:20%;" scope="col">Name</th>
+                            {% endif %}
+                            <th style="width:25%;" scope="col">Description</th>
+                            <th style="width:25%; text-align:center;" scope="col">Amount</th>
+                            <th style="width:10%; text-align:center;" scope="col"></th>
+
+                        </tr>
                     </thead>
                     <tbody>
                         {% if key == "op" %}
@@ -72,7 +80,7 @@
                                     <td>{{ tx.confirmed_at }}</td>
                                     <td>{{ tx.tx_to.account }}</td>
                                     <td>{{ tx.tx_to.title | truncatechars:30 }}</td>
-                                    <td style="text-align:center; color:rgb(223, 65, 65);">{{ tx.tx_from.value | floatformat:"2" }}</td>
+                                    <td style="text-align:center; color:rgb(223, 65, 65);">${{ tx.tx_from.value | floatformat:"2" }}</td>
                                 </tr>
                                 {% else %}
                                 <tr>
