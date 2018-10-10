@@ -175,8 +175,8 @@ class Account(models.Model):
     @property
     def num_payments(self):
         num_payments = 0
-        payments = Transfer.objects.filter(is_deleted=True,\
-                                            confirmed_at__isnull=True)
+        payments = Transfer.objects.filter(is_deleted=False,\
+                                            confirmed_at__isnull=False)
         for p in payments:
             if p.tx_from.account == self.user.account:
                 num_payments += 1
@@ -185,10 +185,10 @@ class Account(models.Model):
     @property
     def num_requests(self):
         num_requests = 0
-        requests = Transfer.objects.filter(is_deleted=True, is_request=True,\
-                                    confirmed_at__isnull=True)
+        requests = Transfer.objects.filter(is_deleted=False, is_request=True,\
+                                    confirmed_at__isnull=False)
         for r in requests:
-            if r.tx_from.account == self.user.account:
+            if r.tx_to.account == self.user.account:
                 num_requests += 1
         return num_requests
 
