@@ -36,7 +36,13 @@
                 </li>
                 <li>
                   <div id="profile">
-                  <a href="{% url 'profile' %}"><img src="{% static "images/anon-user.svg" %}" id="user-icon"/></a>
+                  <a href="{% url 'profile' %}">
+                    {% if user.profile.avatar %}
+                      <img id="user-icon" src="{{ user.profile.avatar.url }}"/>
+                    {% else %}
+                      <img src="{% static "images/anon-user.svg" %}" id="user-icon"/>
+                    {% endif %}
+                  </a>
                   <p id="username">@{{ user.username }}</p>
                   </div>
                 </li>
