@@ -128,9 +128,9 @@ function validateForm(members) {
 }
 
 //add group creator
-function add_creator(members) {
+function add_creator(members, user) {
     var list = document.createElement("li");
-    var textnode = document.createTextNode("{{user}}");
+    var textnode = document.createTextNode(user);
     var length = document.getElementById(members).childNodes.length;
 
     //create input element

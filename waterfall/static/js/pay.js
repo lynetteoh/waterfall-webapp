@@ -133,8 +133,8 @@ function validateForm(ul, amnt, d, form) {
 
     var dt = new Date();
     if (parseInt(year, 10) < dt.getFullYear()
-        || parseInt(month, 10) < dt.getMonth()
-        || parseInt(day, 10) < dt.getDate()) {
+        && parseInt(month, 10) < dt.getMonth()
+        && parseInt(day, 10) < dt.getDate()) {
         return "The date has passed."
     }
 
