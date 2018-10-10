@@ -38,8 +38,8 @@ def dashboard(request):
     }
 
     if request.method == "POST":
+        transfer = request.POST.get('transfer')
         try:
-            transfer = request.POST.get('transfer')
             if request.POST.get('req') == "approve-req":
                 context['error'] = request.user.account.approve_req(transfer)
             if request.POST.get('req') == "delete-req":
@@ -47,7 +47,8 @@ def dashboard(request):
         except Exception as e:
             context['error'] = str(e)
         finally:
-            incoming, outgoing, past, requests, user_requests = collect_dash_transfers(user_str)
+            incoming, outgoing, past, requests, user_requests =\
+                                            collect_dash_transfers(request.user)
             context['incoming'] = incoming
             context['outgoing'] = outgoing
             context['past'] = past
@@ -143,17 +144,6 @@ def register_new(request):
         form = SignUpForm()
     return render(request, 'index.html', {'form': form})
 
-def collect_payees(request, user_type):
-    # Collect all payees.
-    payees = []
-    i = 0
-    r = request.POST.get(user_type + '0')
-    while r:
-        payees.append(r)
-        i += 1
-        r = request.POST.get(user_type + str(i))
-    return payees
-
 @login_required
 def pay(request):
     user = request.user
@@ -169,7 +159,7 @@ def pay(request):
     }
     if request.method == "POST":
         try:
-            payees = collect_payees(request, 'pay_users')
+            payees = collect_recipients(request, 'pay_users')
             if not payees:
                 raise Exception("Invalid Payees")
 
@@ -226,7 +216,7 @@ def request(request):
     }
     if request.method == "POST":
         try:
-            requests = collect_payees(request, 'req_users')
+            requests = collect_recipients(request, 'req_users')
             if not requests:
                 raise Exception("Invalid Request User")
 
@@ -301,3 +291,15 @@ def collect_dash_transfers(user):
         else:
             outgoing.append(t)
     return (incoming, outgoing, past, requests, user_requests)
+
+# Collects payees for multi pay and multi requests.
+def collect_recipients(request, user_type):
+    # Collect all payees.
+    payees = []
+    i = 0
+    r = request.POST.get(user_type + '0')
+    while r:
+        payees.append(r)
+        i += 1
+        r = request.POST.get(user_type + str(i))
+    return payees
