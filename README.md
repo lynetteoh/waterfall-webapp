@@ -7,7 +7,13 @@
 Update/install virtualenv using pip: pip install virtualenv
 ```
 virtualenv venv -p python3.6
-
+```
+Add this line to set email password, at the bottom of venv/bin/activate:
+```
+export WEBAPP_EMAIL_PASSWORD="email-password-here"
+```
+Run the development environment:
+```
 source venv/bin/activate
 
 pip install -r requirements.txt
