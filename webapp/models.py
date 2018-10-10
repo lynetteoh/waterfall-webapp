@@ -21,7 +21,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to=user_directory_path, height_field=None, width_field=None)
     timezone = models.CharField(max_length=32, choices=TIMEZONES, default='Australia/Sydney')
-    
+
     def __str__(self):
         return '@{}'.format(self.user.username)
 
@@ -58,11 +58,19 @@ class Account(models.Model):
         now = tz.localize(datetime.now())
         transfer.confirm(now)
 
-        # Attempt to send email notification
+        # Attempt to send email notifications.
         try:
             t = threading.Thread(target=transfer.notify,\
                 args=("Approved TricklePay Request", 'email/approve-req.html',))
             t.start()
+
+            # Reminders for low balance.
+            w = transfer.tx_from
+            if (w.account.balance < 10):
+                tR = threading.Thread(target=w.notify,\
+                    args=("Warning: Low Waterfall Balance",\
+                            "email/reminder-balance.html",))
+                tR.start()
         except Exception as e:
             print("Failed to send mail: " + str(e))
 
@@ -98,17 +106,26 @@ class Account(models.Model):
         print ("Request successfully deleted.")
         return "Success"
 
-    def _create_transaction(self, value, title, type, is_request):
+    def _create_transaction(self, value, title, type, is_pending):
         print("Created transaction " + type + " to " + self.user.username)
         tz = pytz.timezone('Australia/Sydney')
-        now = None if is_request else tz.localize(datetime.now())
-        return Transaction.objects.create(
+        now = None if is_pending else tz.localize(datetime.now())
+        tx = Transaction.objects.create(
             account=self,
             title=title,
             value=value,
             transaction_type=type,
             confirmed_at=now,
+            is_pending=is_pending,
         )
+        if (self.balance < 10) and not is_pending:
+            try:
+                t = threading.Thread(target=tx.notify,\
+                    args=("Warning: Low Waterfall Balance", "email/reminder-balance.html",))
+                t.start()
+            except Exception as e:
+                print("Failed to send mail: " + str(e))
+        return tx
 
     def _create_transfer(self, receiver, subj, amount, recurr, date, is_request):
         # Reverse if it is a request.
@@ -116,16 +133,17 @@ class Account(models.Model):
         if is_request:
             sender, receiver = receiver, sender
 
-        tx_sender = sender._create_transaction(0-amount, subj, 'w', is_request)
-        tx_receiver = receiver._create_transaction(amount, subj,'d', is_request)
-
         tz = pytz.timezone('Australia/Sydney')
         today = tz.localize(datetime.today()).date()
         today = tz.localize(datetime.combine(today, datetime.min.time()), is_dst=True)
         date = tz.localize(datetime.combine(date, datetime.min.time()), is_dst=True)
         confirmed_at = tz.localize(datetime.now()) \
                             if (today == date and not is_request) else None
-        pending = True if confirmed_at else False
+
+        is_pending = False if confirmed_at else True
+        tx_sender = sender._create_transaction(0-amount, subj, 'w', is_pending)
+        tx_receiver = receiver._create_transaction(amount, subj,'d', is_pending)
+
         link_tx = Transfer.objects.create(
             tx_from = tx_sender,
             tx_to = tx_receiver,
@@ -134,11 +152,7 @@ class Account(models.Model):
             deadline = date,
             confirmed_at = confirmed_at,
         )
-        tx_sender.confirmed_at = confirmed_at
-        tx_sender.is_pending = pending
         tx_sender.save()
-        tx_receiver.confirmed_at = confirmed_at
-        tx_receiver.is_pending = pending
         tx_receiver.save()
         link_tx.save()
         print("Created new transfer.")
@@ -196,7 +210,6 @@ class Transaction(models.Model):
 
     title = models.CharField(max_length=255)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
-
     transaction_type = models.CharField(
         max_length=1,
         default='d',
@@ -223,6 +236,31 @@ class Transaction(models.Model):
             modified_at=self.modified_at,
             confirmed_at=self.confirmed_at,
         )
+
+    # Sends email notification about a transac
+    @transaction.atomic
+    def notify(self, subj, template):
+        print("Notifying...")
+        amount = self.value if self.value > 0 else self.value*(-1)
+        txt = "deposit" if self.transaction_type == 'd' else "withdraw"
+        context = {
+            "bal" : self.account.balance,
+            "val" : amount,
+            "subj" : subj,
+            "txt" : txt,
+            "usr" : "@" + self.account.user.username,
+        }
+        try:
+            html_body = render_to_string(template, context)
+            txt_body = strip_tags(html_body)
+            mail.send_mail(subj, txt_body, 'waterfallpay@gmail.com', \
+                        [self.account.user.email], html_message=html_body,\
+                        fail_silently=False)
+            print ("Email notifications successfully sent.")
+        except Exception as e:
+            print ("Email Error: " + str(e))
+        return
+
 
 class Transfer(models.Model):
     tx_from = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='tx_from')
