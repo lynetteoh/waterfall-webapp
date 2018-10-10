@@ -35,6 +35,9 @@ urlpatterns = [
     path('register-new', views.register_new, name='register_new'),
     path('logout', auth_views.LogoutView, name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('dashboard/view-more-op/', views.viewMoreOp, name='viewMoreOp'),
+    path('dashboard/view-more-ip/', views.viewMoreIp, name='viewMoreIp'),
+    path('dashboard/view-more-h/', views.viewMoreH, name='viewMoreH'),
 ]
 
 if settings.DEBUG:

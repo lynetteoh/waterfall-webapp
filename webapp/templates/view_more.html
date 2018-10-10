@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Waterfall - View More</title>
+{% endblock %}
+
+{% block css %}
+<link href="{% static "css/dash.css" %}" rel="stylesheet" type="text/css">
+<link href="{% static "css/more.css" %}" rel="stylesheet" type="text/css">
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+{% endblock %}
+
+
+{% block content %}
+<div class="dash_back">
+    <div class="dash_form">
+        <form class="form">
+            <div class="form-row">
+                <div style="padding: 0px !important;" class="col-md-10 form-group">
+                    <input type="text" style="width: 100%;" class="form-control" placeholder="Search" id="usr">
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn search_btn btn-outline-success">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <br/><br/>
+
+    <div class="row dash_heading">
+        <div class="col">
+            <h3>{{ title }}</h3>
+        </div>
+        <div  class="col">
+        </div>
+    </div>
+    <br/>
+    <div class="income_table">
+            <table class="table">
+                    <thead>
+                      <tr class="income_header_row">
+                        <th style="width:25%; text-align:center;" scope="col">Date</th>
+                        <th style="width:25%;" scope="col">Name</th>
+                        <th style="width:30%;" scope="col">Description</th>
+                        <th style="width:20%; text-align:center;" scope="col">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% if key == "op" %}
+                            {% for tx in outgoing %}
+                            <tr>
+                                <td>{{ tx.deadline }}</td>
+                                <td>{{ tx.tx_to.account }}</td>
+                                <td>{{ tx.tx_to.title | truncatechars:30 }}</td>
+                                <td style="text-align:center;">{{ tx.tx_from.value | floatformat:"2" }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% elif key == "ip" %}
+                            {% for tx in incoming %}
+                            <tr>
+                                <td>{{ tx.deadline }}</td>
+                                <td>{{ tx.tx_from.account }}</td>
+                                <td>{{ tx.tx_from.title | truncatechars:30 }}</td>
+                                <td style="text-align:center;">${{ tx.tx_to.value | floatformat:"2" }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            {% for tx in past %}
+                                {% if tx.tx_from.account|slugify == user1 %}
+                                <tr>
+                                    <td>{{ tx.confirmed_at }}</td>
+                                    <td>{{ tx.tx_to.account }}</td>
+                                    <td>{{ tx.tx_to.title | truncatechars:30 }}</td>
+                                    <td style="text-align:center; color:rgb(223, 65, 65);">{{ tx.tx_from.value | floatformat:"2" }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td>{{ tx.confirmed_at }}</td>
+                                    <td>{{ tx.tx_from.account }}</td>
+                                    <td>{{ tx.tx_from.title | truncatechars:30 }}</td>
+                                    <td style="text-align:center; color:rgb(37, 165, 37);">${{ tx.tx_to.value | floatformat:"2" }}</td>
+                                </tr>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                  </table>
+
+    </div>
+    <br/><br/>
+    
+</div>
+<br/><br/>
+
+<script>
+checkError("{{error}}");
+</script>
+{% endblock %}

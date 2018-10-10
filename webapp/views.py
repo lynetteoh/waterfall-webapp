@@ -24,6 +24,72 @@ def team(request):
 def product(request):
     return render(request, 'product.html')
 
+def viewMoreOp(request):
+    title = "Outgoing Payments"
+    user = str(request.user)
+    outgoing = []
+
+    transfers = Transfer.objects.all()
+    for t in transfers:
+        # Remove time from the date.
+        # Outgoing or Incoming payments.
+        tx_to = str(t.tx_to.account).strip("@")
+        if tx_to != user and not t.is_request and not t.tx_from.confirmed_at:
+            outgoing.append(t)
+
+    context ={
+        "title": title,
+        "outgoing": outgoing,
+        "user1": user,
+        "key": "op",
+    }
+
+    return render(request, 'view_more.html', context)
+
+def viewMoreIp(request):
+    title = "Incoming Payments"
+    user = str(request.user)
+    incoming = []
+
+    transfers = Transfer.objects.all()
+    for t in transfers:
+        # Remove time from the date.
+        # Outgoing or Incoming payments.
+        tx_to = str(t.tx_to.account).strip("@")
+        if tx_to == user and not t.is_request and not t.tx_from.confirmed_at:
+            incoming.append(t)
+
+
+    context ={
+        "title": title,
+        "incoming": incoming,
+        "user1": user,
+        "key": "ip",
+    }
+
+    return render(request, 'view_more.html', context)
+
+def viewMoreH(request):
+    title = "Transaction History"
+    user = str(request.user)
+    past = []
+
+    transfers = Transfer.objects.all()
+    for t in transfers:
+        if t.tx_from.confirmed_at:
+            past.append(t)
+
+    context ={
+        "title": title,
+        "past": past,
+        "user1": user,
+        "key": "th",
+    }
+
+    return render(request, 'view_more.html', context)
+
+
+
 @login_required
 def dashboard(request):
     user = str(request.user)
