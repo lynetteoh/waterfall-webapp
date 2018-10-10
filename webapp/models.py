@@ -20,9 +20,8 @@ class Profile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to=user_directory_path, height_field=None, width_field=None)
-    timezone = models.CharField(max_length=32, choices=TIMEZONES, default='UTC')
-    # balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
-
+    timezone = models.CharField(max_length=32, choices=TIMEZONES, default='Australia/Sydney')
+    
     def __str__(self):
         return '@{}'.format(self.user.username)
 
@@ -55,7 +54,8 @@ class Account(models.Model):
             return "Insufficient Funds"
 
         # Approve request and make recurring repeats if needed.
-        now = pytz.UTC.localize(datetime.now())
+        tz = pytz.timezone('Australia/Sydney')
+        now = tz.localize(datetime.now())
         transfer.confirm(now)
 
         # Attempt to send email notification
@@ -72,10 +72,14 @@ class Account(models.Model):
     def delete_transfer(self, id):
         print ("Deleting transfer")
         transfer = Transfer.objects.get(id=id)
-        if transfer.confirmed_at:
-            return "Past Transfer Cannot be Cancelled"
+        subj = "Pending TricklePay Transfer has been Cancelled"
+        template = "email/delete-outgoing.html"
 
+        if transfer.confirmed_at:
+            return "Invalid Past Transfer"
         if transfer.is_request:
+            subj = "Cancelled TricklePay Request"
+            template = "email/delete-req.html"
             if not transfer.tx_to.account == self and not transfer.tx_from.account == self:
                 return "Invalid User Request"
         else:
@@ -84,12 +88,20 @@ class Account(models.Model):
 
         # Approve request and make recurring repeats if needed.
         transfer.delete()
+
+        # Attempt to send email notification
+        try:
+            t = threading.Thread(target=transfer.notify, args=(subj, template,))
+            t.start()
+        except Exception as e:
+            print("Failed to send mail: " + str(e))
         print ("Request successfully deleted.")
         return "Success"
 
     def _create_transaction(self, value, title, type, is_request):
         print("Created transaction " + type + " to " + self.user.username)
-        now = None if is_request else pytz.UTC.localize(datetime.now())
+        tz = pytz.timezone('Australia/Sydney')
+        now = None if is_request else tz.localize(datetime.now())
         return Transaction.objects.create(
             account=self,
             title=title,
@@ -107,10 +119,11 @@ class Account(models.Model):
         tx_sender = sender._create_transaction(0-amount, subj, 'w', is_request)
         tx_receiver = receiver._create_transaction(amount, subj,'d', is_request)
 
-        today = pytz.UTC.localize(datetime.today()).date()
-        today = pytz.UTC.localize(datetime.combine(today, datetime.min.time()), is_dst=True)
-        date = pytz.UTC.localize(datetime.combine(date, datetime.min.time()), is_dst=True)
-        confirmed_at = pytz.UTC.localize(datetime.now()) \
+        tz = pytz.timezone('Australia/Sydney')
+        today = tz.localize(datetime.today()).date()
+        today = tz.localize(datetime.combine(today, datetime.min.time()), is_dst=True)
+        date = tz.localize(datetime.combine(date, datetime.min.time()), is_dst=True)
+        confirmed_at = tz.localize(datetime.now()) \
                             if (today == date and not is_request) else None
         pending = True if confirmed_at else False
         link_tx = Transfer.objects.create(
@@ -189,7 +202,6 @@ class Transaction(models.Model):
         default='d',
         choices=TRANSACTION_TYPE_CHOICES,
     )
-
     value = models.DecimalField(max_digits=10, decimal_places=4)
     is_deleted = models.BooleanField(default=False)
     is_pending = models.BooleanField(default=False)
@@ -284,21 +296,19 @@ class Transfer(models.Model):
         tx_to   = self.tx_to
         if (tx_from.transaction_type is not 'w'):
             tx_from, tx_to = tx_to, tx_from
-        acc_from = tx_from.account
-        acc_to = tx_to.account
-        from_usr = acc_from.user
-        to_usr = acc_to.user
+        from_usr = tx_from.account.user
+        to_usr =  tx_to.account.user
 
         # Get email templates, format with the right fields and send mail.
         context_from = {
-            "bal" : acc_from.balance,
+            "bal" : tx_from.account.balance,
             "val" : tx_to.value,
             "subj" : subj,
             "other_txt" : "to",
             "other_usr" : "@" + to_usr.username,
         }
         context_to = {
-            "bal" : acc_to.balance,
+            "bal" :  tx_to.account.balance,
             "val" : tx_to.value,
             "subj" : subj,
             "other_txt" : "from",
@@ -317,23 +327,6 @@ class Transfer(models.Model):
             print ("Email Error: " + str(e))
         return
 
-    # Email notification template about deleting a request.
-    def delete_req_template(self):
-        subj = "Rejected TricklePay Request"
-        body = """This is an automated email notification.
-                   We would like to inform you that a TricklePay request for a \
-                   transfer of $%f %s has been rejected.
-                   Your Waterfall balance is currently $%f."""
-        return (subj, body)
-
-    # Email notification template about an outgoing payment.
-    def delete_outgoing_template(self):
-        subj = "Pending TricklePay Transfer has been Cancelled"
-        body = """This is an automated email notification.
-                   We would like to inform you that a TricklePay payment \
-                   transfer of $%f %s has been cancelled.
-                   Your Waterfall balance is currently $%f."""
-        return (subj, body)
 
 class LoggedInUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='logged_in_user')
