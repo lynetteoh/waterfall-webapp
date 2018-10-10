@@ -36,12 +36,15 @@
 #profile {
   padding-top: 5px;
   padding-bottom: 5px;
-  padding-left:40px;
+  padding-left: 20px;
 }
 
 #user-icon {
   align:center;
-  height: 75px;
+  vertical-align: middle;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
 }
 
 #username {
@@ -77,11 +80,18 @@
   min-height: 70vh;
   padding-left:40px;
   padding-right:40px;
-
 }
 
 #nav-list {
   display: block;
+}
+
+#prof-pic {
+  align:center;
+  vertical-align: middle;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
 }
 
 .subnav {

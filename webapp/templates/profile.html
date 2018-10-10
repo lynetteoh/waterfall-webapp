@@ -36,9 +36,9 @@ input[type="text"][readonly] {
 
         <div class="text-center">
         {% if user.profile.avatar %}
-          <img src="{{ user.profile.avatar.url }}" class="avatar img-circle img-thumbnail" alt="avatar">
+          <img id="prof-pic" src="{{ user.profile.avatar.url }}" class="avatar img-circle img-thumbnail" alt="avatar">
         {% else %}
-          <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar">
+          <img id="prof-pic" src="{% static "images/anon-user.svg" %}" class="avatar img-circle img-thumbnail" alt="avatar">
         {% endif %}
         </br></br>
           <h4>@{{ user.username }}</h4>
@@ -52,7 +52,7 @@ input[type="text"][readonly] {
               <p>Upload a valid image. The file you uploaded was either not an image or a corrupted image.</p>
               {% endif %}
               <input name="avatar" id="avatar" type="file" class="file-upload">
-              </br></br> 
+              </br></br>
               <button class="btn btn-xs"  type="submit">
                 <i class="fas fa-check"></i> &nbsp;Upload
               </button>
