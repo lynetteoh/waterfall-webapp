@@ -31,9 +31,11 @@
             </div>
 
             <ul class="nav navbar-nav navbar-right" id="navbar">
-                <li id="balance-name">BALANCE
-                  <p id="balance-text">${{ user.account.balance | floatformat:"2" }}</p>
-                </li>
+                <a href="{% url 'balance' %}" style="text-decoration:none;">
+                  <li id="balance-name">BALANCE
+                    <p id="balance-text">${{ user.account.balance | floatformat:"2" }}</p>
+                  </li>
+                </a>
                 <li>
                   <div id="profile">
                   <a href="{% url 'profile' %}">
