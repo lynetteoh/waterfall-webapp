@@ -184,7 +184,7 @@ def pay(request):
                 if not date:
                     raise Exception("Invalid Payment Date")
 
-                timezone = pytz.UTC
+                timezone = pytz.timezone('Australia/Sydney')
                 today = timezone.localize(datetime.today()).date()
                 deadline = \
                     timezone.localize(datetime.strptime(date, "%Y-%m-%d")).date() # yyyy-mm-dd
@@ -240,7 +240,7 @@ def request(request):
                 if not date:
                     raise Exception("Invalid Payment Date")
 
-                timezone = pytz.UTC
+                timezone = pytz.timezone('Australia/Sydney')
                 today = timezone.localize(datetime.today()).date()
                 deadline = \
                     timezone.localize(datetime.strptime(date, "%Y-%m-%d")).date() # yyyy-mm-dd
