@@ -274,3 +274,33 @@ def request(request):
             return render(request, 'request.html', context)
     # Regular request view.
     return render(request, 'request.html', context)
+
+@login_required
+def create_group(request):
+    user = request.user
+    all_users = User.objects.all().exclude(username=request.user.username)
+    create_members = []
+    for u in all_users:
+        if(u != user.username):
+            create_members.append(u.username)
+    context ={
+        "user" : user,
+        "filter_members": create_members,
+    }
+    return render(request, 'create_group.html', context)
+
+@login_required
+def group_management(request):
+    user = request.user
+    all_users = User.objects.all().exclude(username=request.user.username)
+    manage_members = []
+    for u in all_users:
+        if(u != user.username):
+            manage_members.append(u.username)
+    context ={
+        "user" : user,
+        "filter_members": manage_members,
+        "group_id": '1',
+        "group_members": manage_members,
+    }
+    return render(request, 'group_management.html', context)

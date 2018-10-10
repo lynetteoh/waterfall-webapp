@@ -48,6 +48,8 @@ function popup(ul, form, amount, date) {
 function add(search, user, amnt) {
    
     var text = document.getElementById(search).value;
+
+    //check for valid user
     var valid_user = 0;
     valid_user = check_payee(text);
     if (valid_user == 0) {
@@ -60,15 +62,19 @@ function add(search, user, amnt) {
     }
     var list = document.createElement("li");
     var textnode = document.createTextNode(text);
-    var input = document.createElement("input");
-    var ul_len = document.getElementById(user).childNodes.length
+    var ul_len = document.getElementById(user).childNodes.length;
+    //create input element
+    var input = document.createElement("input");  
     input.setAttribute("type", "hidden");
     input.setAttribute("name", user + ul_len);
     input.setAttribute("id", user + ul_len);
     input.setAttribute("value", text);
+
+    //add element to list
     list.appendChild(input);
     list.appendChild(textnode);
     list.setAttribute('class', 'pr-5');
+
     var result = 0;
     result = exist(search, user, text);
     if (result == 0) {
@@ -77,6 +83,8 @@ function add(search, user, amnt) {
             update_payee(user, text, amnt);
         }
     }
+
+    //add remove button
     remove = removeBtn();
     list.appendChild(remove);
     remove.onclick = function () {
@@ -88,6 +96,7 @@ function add(search, user, amnt) {
     }
 }
 
+//create remove button
 function removeBtn() {
     var btn = document.createElement("a");
     btn.innerHTML = '<i class="fa fa-trash" aria-hidden="true"></i>';
@@ -96,6 +105,12 @@ function removeBtn() {
 }
 
 function validateForm(ul, amnt, d, form) {
+
+    // Ensure at least one payee is selected.
+    if (document.getElementById(ul).getElementsByTagName('li').length < 1) {
+        return "Please choose at least one payee.";
+    }
+
     // Validate dates.
     var date = document.getElementById(d).value;
     console.log(date)
@@ -122,28 +137,25 @@ function validateForm(ul, amnt, d, form) {
         || parseInt(day, 10) < dt.getDate()) {
         return "The date has passed."
     }
+
     // Validate amount.
     var amount = document.getElementById(amnt).value;
     if (parseFloat(amount) <= 0) {
         return "Please only input positive numeric amounts."
     }
+
     // Checks split amounts for a request form.
     if (form == 'req-form') {
         result = check_split(amount, ul);
         if (result == 1) {
             return "Split amounts do not sum up to requested amount."
-        } else {
-            return "";
         }
     }
-    // Ensure at least one payee is selected.
-    if (document.getElementById(ul).getElementsByTagName('li').length >= 1) {
-        return "";
-    } else {
-        return "Please choose at least one payee.";
-    }
+
+    return "";
 }
 
+//update value for each payee in summary table
 function update_value(users_list, amnt) {
     var extra = 0
     var amount = document.getElementById(amnt).value;
@@ -177,6 +189,7 @@ function update_value(users_list, amnt) {
     }
 }
 
+// update payee in summary table
 function update_payee(users, text, amnt) {
     show_div();
     var table = document.getElementById("summary_table");
@@ -187,15 +200,21 @@ function update_payee(users, text, amnt) {
     var payee = document.createElement("td");
     var amount = document.createElement("td");
     var textnode = document.createTextNode(text);
-    var input = document.createElement("input");
+    
+    //create label
     var label = document.createElement("label");
     label.setAttribute('for', text);
     label.setAttribute('class', 'col-sm-2 col-form-label');
-    label.appendChild(textnode)
+    label.appendChild(textnode);
+    
+    //create input
+    var input = document.createElement("input");
     input.setAttribute("name", text);
     input.setAttribute("value", payee_amount);
     input.setAttribute('id', text);
     input.setAttribute('class', 'form-control col-sm-7');
+
+    //add to row in table
     row.setAttribute('id', "row_" + text);
     payee.appendChild(label);
     amount.appendChild(input);
@@ -203,6 +222,7 @@ function update_payee(users, text, amnt) {
     row.appendChild(amount);
 }
 
+// check if the split is correct
 function check_split(amount, users_list) {
     sum = 0
     var ul = document.getElementById(users_list);
@@ -261,21 +281,25 @@ function exist(search, user, text) {
     return result
 }
 
+//remove payee from list
 function remove_payee(list) {
     var input = list.getElementsByTagName("INPUT")[0]
     //get the html element value
     var text = input.attributes[3].value;
     text = "row_" + text;
     var row = document.getElementById(text);
+    //remove the html element
     row.parentNode.removeChild(row);
 }
 
+// update total in summary table
 function update_total(amnt, summary_total) {
     var amount = document.getElementById(amnt).value
     var total = document.getElementById(summary_total)
     total.setAttribute('value', amount);
 }
 
+// show hidden div
 function show_div() {
     var x = document.getElementById("summary");
     if (x.style.display === "none") {
@@ -283,6 +307,7 @@ function show_div() {
     }
 }
 
+// check if valid user is selected
 function check_payee(user) {
     users = f_users.split("&#39;");
     // Removes the [] parantheses.
@@ -294,7 +319,6 @@ function check_payee(user) {
         if (users[i].match(",")) users.splice(i, 1);
     }
 
-    console.log(users);
     for (i = 0; i < users.length; i++) {
         if(users[i] == user) {
             return 1;
