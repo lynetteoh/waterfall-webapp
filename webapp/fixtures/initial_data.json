@@ -50,17 +50,38 @@
     }
   },
   {
+    "model": "webapp.account",
+    "pk": 3,
+    "fields": {
+      "user": null
+    }
+  },
+  {
+    "model": "webapp.groupaccount",
+    "pk": 1,
+    "fields": {
+      "account": 3,
+      "name": "Spotify Fam"
+    }
+  },
+  {
     "model": "webapp.profile",
     "pk": 1,
     "fields": {
-        "user": 1
+        "user": 1,
+        "GroupAccount": [
+          1
+        ]
     }
   },
   {
     "model": "webapp.profile",
     "pk": 2,
     "fields": {
-        "user": 2
+        "user": 2,
+        "GroupAccount": [
+          1
+        ]
     }
   },
   {
