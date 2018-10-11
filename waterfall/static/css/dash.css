@@ -16,6 +16,14 @@
     background-color: #88cebc !important;
 }
 
+.view-more-link {
+    color: grey;
+}
+
+.view-more-link:hover {
+    color: grey;
+}
+
 .dash_heading {
     color: rgb(112, 112, 112);
 }
