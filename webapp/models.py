@@ -17,15 +17,37 @@ def user_directory_path(instance, filename):
 class Account(models.Model):
     user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
 
-    def register_deposit(self, title, value):
-        return self._create_transaction(value, title, 'd', False)
+    def deposit(self, value, user_acc=None):
+        # Group deposits are transfers between user and group account.
+        if user_acc:
+            if (user_acc.balance < value):
+                print("Insufficient balance.")
+                return None
+            title = "Deposit into Group"
+            date = tz.localize(datetime.now())
+            return user_acc._create_transfer(self, title, value, 0, date, False)
 
-    def register_withdrawal(self, title, value):
-        if self.balance >= value:
-            return self._create_transaction(0-value, title, 'w', False)
-        else:
+        # Regular user deposits.
+        title = "Deposit"
+        return self._create_transaction(value, "Deposit", 'd', False)
+
+    def withdraw(self, value, user_acc=None):
+        # Group withdrawals are a transfer between user and group account.
+        if user_acc:
+            if (self.balance < value):
+                print("Insufficient balance.")
+                return None
+            date = tz.localize(datetime.now())
+            title = "Withdrawal from Group"
+            return self._create_transfer(user_acc, title, value, 0, date, False)
+
+        # Regular user withdrawal.
+        title = "Withdrawal"
+        if self.balance < value:
             print('Account funds are insufficient.')
             return None
+        return self._create_transaction(0-value, title, 'w', False)
+
 
     def approve_req(self, id):
         print ("Approving request....")
@@ -116,6 +138,8 @@ class Account(models.Model):
                 print("Failed to send mail: " + str(e))
         return tx
 
+    # Creates a payment or request from user to receiver (and reversed).
+    # Does not validate.
     def _create_transfer(self, receiver, subj, amount, recurr, date, is_request):
         # Reverse if it is a request.
         sender = self
@@ -153,9 +177,9 @@ class Account(models.Model):
 
     def __str__(self):
         if self.user:
-            return 'Personal: @{}'.format(self.user.username)
+            return '@{}'.format(self.user.username)
         else:
-            return 'Group: {}'.format(self.groupaccount.name)
+            return '{} (Group)'.format(self.groupaccount.name)
 
     @property
     def balance(self):
@@ -186,8 +210,9 @@ class Account(models.Model):
 
     @property
     def num_groups(self):
-        # TODO Change this after implementing groups
-        return 0
+        groups = self.user.profile.groups
+        print(groups)
+        return groups
 
 class GroupAccount(models.Model):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
@@ -203,7 +228,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to=user_directory_path, height_field=None, width_field=None)
     timezone = models.CharField(max_length=32, choices=TIMEZONES, default='Australia/Sydney')
-    GroupAccount = models.ManyToManyField(GroupAccount,blank=True,related_name='members')
+    groups = models.ManyToManyField(GroupAccount,blank=True,related_name='members')
 
     def __str__(self):
         return '@{}'.format(self.user.username)
