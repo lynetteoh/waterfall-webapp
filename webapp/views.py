@@ -400,6 +400,8 @@ def collect_dash_transfers(user):
             incoming.append(t)
         else:
             outgoing.append(t)
+
+    past.reverse()
     return (incoming, outgoing, past, requests, user_requests)
 
 # Collects payees for multi pay and multi requests.
