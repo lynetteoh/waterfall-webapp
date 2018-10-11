@@ -272,7 +272,7 @@ def pay(request):
                 if deadline < today:
                     raise Exception("Invalid Past Payment Date")
 
-                transfer = user.account._create_transfer(receiver, subj, float(amount), int(recurr), deadline, False)
+                user.account._create_transfer(receiver, subj, float(amount), int(recurr), deadline, False)
                 context['error'] = "Success"
         except Exception as e:
             print (e)
@@ -401,7 +401,12 @@ def collect_dash_transfers(user):
         else:
             outgoing.append(t)
 
-    past.reverse()
+    incoming.sort(key=lambda x: x.deadline)
+    outgoing.sort(key=lambda x: x.deadline)
+    past.sort(key=lambda x: x.confirmed_at, reverse=True)
+    requests.sort(key=lambda x: x.deadline)
+    user_requests.sort(key=lambda x: x.deadline)
+
     return (incoming, outgoing, past, requests, user_requests)
 
 # Collects payees for multi pay and multi requests.
