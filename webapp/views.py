@@ -188,8 +188,7 @@ def pay(request):
                 today = timezone.localize(datetime.today()).date()
                 deadline = \
                     timezone.localize(datetime.strptime(date, "%Y-%m-%d")).date() # yyyy-mm-dd
-                print(deadline)
-                print(today)
+    
                 if deadline < today:
                     raise Exception("Invalid Past Payment Date")
 
