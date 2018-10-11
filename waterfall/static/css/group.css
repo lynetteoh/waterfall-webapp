@@ -1,0 +1,29 @@
+{% load static %}
+
+.btn-primary {
+    background-color: rgb(136, 206, 188) !important;
+    border-color: rgb(136, 206, 188) !important;
+    color: black;
+
+}
+
+.ul_style{
+    list-style-type: none;
+    -webkit-column-count: 2;
+       -moz-column-count: 2;
+            column-count: 2;
+}
+
+.btn:hover,
+.btn:focus {
+    background-color: rgb(96, 204, 177) !important;
+    border-color: rgb(96, 204, 177) !important;
+}
+
+.fa-trash {
+    color: rgb(136, 206, 188);
+}
+
+.fa-trash:hover {
+    color:rgb(83, 190, 164);
+}
