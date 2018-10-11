@@ -110,6 +110,8 @@
     width: 100%;
     position: relative;
     bottom: 0;
+    padding-left:40px;
+    padding-right:40px;
 }
 
 .landing {
