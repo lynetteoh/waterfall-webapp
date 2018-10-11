@@ -155,11 +155,7 @@ class Account(models.Model):
         if self.user:
             return 'Personal: @{}'.format(self.user.username)
         else:
-<<<<<<< HEAD
             return 'Group: {}'.format(self.groupaccount.name)
-=======
-            return 'Group: {}'.format('')
->>>>>>> c9494fc093c2ad094abd1cd874cd731bbe6bc5be
 
     @property
     def balance(self):
@@ -194,33 +190,19 @@ class Account(models.Model):
         return 0
 
 class GroupAccount(models.Model):
-<<<<<<< HEAD
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name+': '+', '.join(['@{}'.format(p.user.username) for p in self.members.all()])
-=======
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return ', '.join(['@{}'.format(p.user.username) for p in self.members.all()])
->>>>>>> c9494fc093c2ad094abd1cd874cd731bbe6bc5be
 
 class Profile(models.Model):
     import pytz
     TIMEZONES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-<<<<<<< HEAD
     avatar = models.ImageField(upload_to=user_directory_path, height_field=None, width_field=None)
     timezone = models.CharField(max_length=32, choices=TIMEZONES, default='Australia/Sydney')
-=======
-    avatar = models.ImageField(upload_to=user_directory_path, height_field=None, width_field=None, null=True, blank=True)
-    timezone = models.CharField(max_length=32, choices=TIMEZONES, default='UTC')
-    # balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
->>>>>>> c9494fc093c2ad094abd1cd874cd731bbe6bc5be
     GroupAccount = models.ManyToManyField(GroupAccount,blank=True,related_name='members')
 
     def __str__(self):

@@ -35,17 +35,11 @@ urlpatterns = [
     path('register-new', views.register_new, name='register_new'),
     path('logout', auth_views.LogoutView, name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
-<<<<<<< HEAD
     path('dashboard/view-more-op/', views.viewMoreOp, name='viewMoreOp'),
     path('dashboard/view-more-ip/', views.viewMoreIp, name='viewMoreIp'),
     path('dashboard/view-more-h/', views.viewMoreH, name='viewMoreH'),
     path('create-group', views.create_group, name='create_group'),
     path('group-management', views.group_management, name='group_management'),
-=======
-
-    # Groups
-    path('group/new/', views.group_create, name='newgroup'),
->>>>>>> c9494fc093c2ad094abd1cd874cd731bbe6bc5be
 ]
 
 if settings.DEBUG:
