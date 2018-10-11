@@ -210,9 +210,10 @@ class Account(models.Model):
 
     @property
     def num_groups(self):
-        groups = self.user.profile.groups
-        print(groups)
-        return groups
+        if (not self.user):
+            print("Attempting to get num_groups for Group Account")
+            return 0
+        return len(self.user.profile.GroupAccount.all())
 
 class GroupAccount(models.Model):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
@@ -228,7 +229,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to=user_directory_path, height_field=None, width_field=None)
     timezone = models.CharField(max_length=32, choices=TIMEZONES, default='Australia/Sydney')
-    groups = models.ManyToManyField(GroupAccount,blank=True,related_name='members')
+    GroupAccount = models.ManyToManyField(GroupAccount,blank=True,related_name='members')
 
     def __str__(self):
         return '@{}'.format(self.user.username)
