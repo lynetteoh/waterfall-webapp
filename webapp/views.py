@@ -24,6 +24,75 @@ def team(request):
 def product(request):
     return render(request, 'product.html')
 
+def viewMoreOp(request):
+    title = "Outgoing Payments"
+    user = str(request.user)
+    outgoing = []
+
+    transfers = Transfer.objects.all()
+    for t in transfers:
+        # Remove time from the date.
+        # Outgoing or Incoming payments.
+        tx_to = str(t.tx_to.account).strip("@")
+        if tx_to != user and not t.is_request and not t.tx_from.confirmed_at:
+            t.deadline = t.deadline.date()
+            outgoing.append(t)
+
+    context ={
+        "title": title,
+        "outgoing": outgoing,
+        "user1": user,
+        "key": "op",
+    }
+
+    return render(request, 'view_more.html', context)
+
+def viewMoreIp(request):
+    title = "Incoming Payments"
+    user = str(request.user)
+    incoming = []
+    
+    transfers = Transfer.objects.all()
+    for t in transfers:
+        # Remove time from the date.
+        # Outgoing or Incoming payments.
+        tx_to = str(t.tx_to.account).strip("@")
+        if tx_to == user and not t.is_request and not t.tx_from.confirmed_at:
+            t.deadline = t.deadline.date()
+            incoming.append(t)
+
+
+    context ={
+        "title": title,
+        "incoming": incoming,
+        "user1": user,
+        "key": "ip",
+    }
+
+    return render(request, 'view_more.html', context)
+
+def viewMoreH(request):
+    title = "Transaction History"
+    user = str(request.user)
+    past = []
+
+    transfers = Transfer.objects.all()
+    for t in transfers:
+        if t.tx_from.confirmed_at:
+            t.confirmed_at = t.confirmed_at.date()
+            past.append(t)
+
+    context ={
+        "title": title,
+        "past": past,
+        "user1": user,
+        "key": "th",
+    }
+
+    return render(request, 'view_more.html', context)
+
+
+
 @login_required
 def dashboard(request):
     user_str = str(request.user)
@@ -37,6 +106,12 @@ def dashboard(request):
         "user_requests": user_requests,
     }
 
+    #if len(incoming) == 0:
+     #   context['incoming'] = None
+        
+    print("outgoing is:", context['outgoing'])
+            
+
     if request.method == "POST":
         transfer = request.POST.get('transfer')
         try:
@@ -49,11 +124,16 @@ def dashboard(request):
         finally:
             incoming, outgoing, past, requests, user_requests =\
                                             collect_dash_transfers(request.user)
+            
             context['incoming'] = incoming
             context['outgoing'] = outgoing
             context['past'] = past
             context['requests'] = requests
             context['user_requests'] = user_requests
+
+            if len(outgoing) == 0:
+                context['outgoing'] = None
+            
             return render(request, 'dashboard.html', context)
     return render(request, 'dashboard.html', context)
 
@@ -258,6 +338,35 @@ def request(request):
     # Regular request view.
     return render(request, 'request.html', context)
 
+@login_required
+def create_group(request):
+    user = request.user
+    all_users = User.objects.all().exclude(username=request.user.username)
+    create_members = []
+    for u in all_users:
+        if(u != user.username):
+            create_members.append(u.username)
+    context ={
+        "user" : user,
+        "filter_members": create_members,
+    }
+    return render(request, 'create_group.html', context)
+
+@login_required
+def group_management(request):
+    user = request.user
+    all_users = User.objects.all().exclude(username=request.user.username)
+    manage_members = []
+    for u in all_users:
+        if(u != user.username):
+            manage_members.append(u.username)
+    context ={
+        "user" : user,
+        "filter_members": manage_members,
+        "group_id": '1',
+        "group_members": manage_members,
+    }
+    return render(request, 'group_management.html', context)
 
 def collect_dash_transfers(user):
     incoming = []

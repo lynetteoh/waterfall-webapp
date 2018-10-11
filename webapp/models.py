@@ -376,10 +376,10 @@ class LoggedInUser(models.Model):
 
 @receiver(user_logged_in)
 def on_user_logged_in(sender, request, **kwargs):
-    print(f"user {request.user} logging in")
+    #print(f"user {request.user} logging in")
     LoggedInUser.objects.get_or_create(user=kwargs.get('user'))
 
 @receiver(user_logged_out)
 def on_user_logged_out(sender, **kwargs):
-    print(f"user {kwargs.get('user')} logging out")
+    #print(f"user {kwargs.get('user')} logging out")
     LoggedInUser.objects.filter(user=kwargs.get('user')).delete()
