@@ -21,16 +21,13 @@
                         method="POST">
                         {% csrf_token %}
                         <div class="row form-group mt-5">
-                            <label for="from_search" class="col-sm-2 col-form-label">From</label>
-                            <div class="col-sm-10 mb-3 form-inline">
-                                <input class="col-sm-10 form-control autocomplete" placeholder="Search"
-                                    id="from_search" list="from_userList" required>
-                                <datalist id="from_userList">
+                            <label for="from" class="col-sm-2 col-form-label">From</label>
+                            <div class="col-sm-10 mb-3">
+                                <select lass="col-sm-10 form-control" name="from">
                                     {% for f in from_users %}
-                                    <option>{{f}}</option>
+                                    <option value="{{f}}">{{ f }}</option>
                                     {% endfor %}
-                                </datalist>
-                                <input type="button" class="fa fa-plus col-sm-2 btn btn-primary" id="req_add" onclick="add('from_search', 'from_users')"  value="Add &#xf067">
+                                </select>
                             </div>
                         </div>
                         <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
@@ -46,7 +43,9 @@
                                     <option>{{f}}</option>
                                     {% endfor %}
                                 </datalist>
-                                <input type="button" class="fa fa-plus col-sm-2 btn btn-primary" id="req_add" onclick="add('req_search', 'req_users', 'req_amount'); update_value('req_users','req_amount')" value="Add &#xf067">
+                                <input type="button" class="fa fa-plus col-sm-2 btn btn-primary font-weight-bold" id="req_add"
+                                    onclick="add('req_search', 'req_users', 'req_amount'); update_value('req_users','req_amount')"
+                                    value="Add &#xf067">
                             </div>
                         </div>
                         <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">

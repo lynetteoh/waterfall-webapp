@@ -45,6 +45,7 @@ function popup(ul, form, amount, date) {
     }
 }
 
+
 function add(search, user, amnt) {
 
     var text = document.getElementById(search).value;

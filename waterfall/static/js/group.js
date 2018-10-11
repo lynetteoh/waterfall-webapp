@@ -185,6 +185,21 @@ function add_all_members(members) {
 
 }
 
-function leave_group() {
-
+function leave_group(form) {
+    swal({
+        text: "Leave Group ?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    }).then((confirmed) => {
+        if (confirmed) {
+            document.getElementById(form).submit();
+        } else {
+            swal({
+                title: "Cancelled",
+                text: "Action cancelled",
+                icon: "warning",
+            });
+        }
+    });
 }

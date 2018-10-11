@@ -22,18 +22,13 @@
                         method="POST">
                         {% csrf_token %}
                         <div class="row form-group mt-5">
-                            <label class="col-sm-2 col-form-label" for="from_search">From</label>
-                            <div class="col-sm-10 mb-3 form-inline">
-                                <input class="col-sm-10 form-control" placeholder="Search" id="from_search" list="from_userList"
-                                    required>
-                                <!-- autocomplete type="search" -->
-                                <datalist id="from_userList">
-                                    {% for f in filter_users %}
-                                    <option>{{ f }}</option>
+                            <label class="col-sm-2 col-form-label" for="from">From</label>
+                            <div class="col-sm-10 mb-3">
+                                <select lass="col-sm-10 form-control" name="from">
+                                    {% for f in from_users %}
+                                    <option value="{{f}}">{{ f }}</option>
                                     {% endfor %}
-                                </datalist>
-                                <input type="button" class="col-sm-2 btn btn-primary" id="add" onclick="add('from_search', 'from_users')"
-                                    value="Add &#xf067">
+                                </select>
                             </div>
                         </div>
                         <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
@@ -50,7 +45,7 @@
                                     <option>{{ f }}</option>
                                     {% endfor %}
                                 </datalist>
-                                <input type="button" class="col-sm-2 btn btn-primary" id="add" onclick="add('pay_search', 'pay_users')"
+                                <input type="button" class="fa fa-plus col-sm-2 btn btn-primary font-weight-bold" id="add" onclick="add('pay_search', 'pay_users', 'pay_amount')"
                                     value="Add &#xf067">
                             </div>
                         </div>

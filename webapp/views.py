@@ -228,6 +228,9 @@ def register_new(request):
 def pay(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
+    from_users = []
+    from_users.append(user.username)
+    from_users.append(user.profile.GroupAccount.name)
     pay_users = []
     for u in all_users:
         if (u != user.username):
@@ -236,6 +239,7 @@ def pay(request):
         "pay_page": "active",
         "user" : user,
         "filter_users": pay_users,
+        "from_users": from_users,
     }
     if request.method == "POST":
         try:
@@ -286,6 +290,11 @@ def pay(request):
 def request(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
+    from_users = []
+    from_users.append(user.username)
+    from_users.append(user.profile.GroupAccount.name)
+    print(user.profile.GroupAccount.name)
+    
     req_users = []
     for u in all_users:
         if(u != user.username):
@@ -294,6 +303,7 @@ def request(request):
         "request_page": "active",
         "user" : user,
         "filter_users": req_users,
+        "from_users": from_users,
     }
     if request.method == "POST":
         try:
@@ -342,7 +352,7 @@ def request(request):
 def create_group(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
-    print(User.profile.group)
+    
     create_members = []
     for u in all_users:
         if(u != user.username):
@@ -350,6 +360,7 @@ def create_group(request):
     context ={
         "user" : user,
         "filter_members": create_members,
+        
     }
     return render(request, 'create_group.html', context)
 
@@ -365,7 +376,7 @@ def group_management(request):
         "user" : user,
         "filter_members": manage_members,
         "group_id": '1',
-        "group_members": manage_members,
+        "group_members": '',
     }
     return render(request, 'group_management.html', context)
 
