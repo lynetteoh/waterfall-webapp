@@ -263,6 +263,7 @@ def request(request):
 def create_group(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
+    print(User.profile.group)
     create_members = []
     for u in all_users:
         if(u != user.username):

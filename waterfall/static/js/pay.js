@@ -1,18 +1,18 @@
 function checkError(error) {
-  console.log("Checking error : " + error)
-  if (error == "Success") {
-    swal({
-      title: "Success!",
-      text:  "The transaction has been saved.",
-      icon:  "success",
-    });
-  } else if (error) {
-    swal({
-      title: error,
-      text:  "Please try again.",
-      icon:  "warning",
-    });
-  }
+    console.log("Checking error : " + error)
+    if (error == "Success") {
+        swal({
+            title: "Success!",
+            text: "The transaction has been saved.",
+            icon: "success",
+        });
+    } else if (error) {
+        swal({
+            title: error,
+            text: "Please try again.",
+            icon: "warning",
+        });
+    }
 }
 
 function popup(ul, form, amount, date) {
@@ -27,13 +27,13 @@ function popup(ul, form, amount, date) {
             dangerMode: true,
         }).then((confirmed) => {
             if (confirmed) {
-              document.getElementById(form).submit();
+                document.getElementById(form).submit();
             } else {
-              swal({
-                  title: "Cancelled",
-                  text: "Your transaction request has been cancelled.",
-                  icon: "warning",
-              });
+                swal({
+                    title: "Cancelled",
+                    text: "Your transaction request has been cancelled.",
+                    icon: "warning",
+                });
             }
         });
     } else {
@@ -46,25 +46,25 @@ function popup(ul, form, amount, date) {
 }
 
 function add(search, user, amnt) {
-   
+
     var text = document.getElementById(search).value;
 
     //check for valid user
     var valid_user = 0;
     valid_user = check_payee(text);
     if (valid_user == 0) {
-      swal({
-          title: "Invalid User",
-          text: "Please try again.",
-          icon: "warning",
-      });
-      return;
+        swal({
+            title: "Invalid User",
+            text: "Please try again.",
+            icon: "warning",
+        });
+        return;
     }
     var list = document.createElement("li");
     var textnode = document.createTextNode(text);
     var ul_len = document.getElementById(user).childNodes.length;
     //create input element
-    var input = document.createElement("input");  
+    var input = document.createElement("input");
     input.setAttribute("type", "hidden");
     input.setAttribute("name", user + ul_len);
     input.setAttribute("id", user + ul_len);
@@ -79,7 +79,7 @@ function add(search, user, amnt) {
     result = exist(search, user, text);
     if (result == 0) {
         document.getElementById(user).appendChild(list);
-        if(user == 'req_users'){
+        if (user == 'req_users') {
             update_payee(user, text, amnt);
         }
     }
@@ -89,7 +89,7 @@ function add(search, user, amnt) {
     list.appendChild(remove);
     remove.onclick = function () {
         document.getElementById(user).removeChild(list);
-        if(user == 'req_users'){
+        if (user == 'req_users') {
             remove_payee(list);
             update_value(user, amnt);
         }
@@ -159,18 +159,29 @@ function validateForm(ul, amnt, d, form) {
 function update_value(users_list, amnt) {
     var extra = 0
     var amount = document.getElementById(amnt).value;
+    console.log(amount);
     var ul = document.getElementById(users_list);
     var ul_len = document.getElementById(users_list).childNodes.length;
-    var payee_amount = amount / ul_len;
-    var floor = Math.floor(payee_amount * 100) / 100
-    var split_total = floor * ul_len
-    split_total = Math.floor(split_total * 100) / 100
+    console.log(ul_len);
+    if (ul_len != 1) {
+        var payee_amount = amount / ul_len;
+        console.log(payee_amount);
+        var floor = Math.floor(payee_amount * 100) / 100
+        var split_total = floor * ul_len
+        split_total = Math.floor(split_total * 100) / 100
+        console.log(split_total);
 
-    // Cases where not everyone would pay equally.
-    if(split_total != amount) {
-        var remainder = Math.round((amount - split_total)*100) / 100
-        extra = remainder / 0.01
+        // Cases where not everyone would pay equally.
+        if (split_total != amount) {
+            var remainder = Math.round((amount - split_total) * 100) / 100
+            extra = remainder / 0.01
+            console.log(extra)
+        }
+
+    }else {
+        var payee_amount = amount/ul_len;
     }
+
 
     for (var i = 0; i < ul.childNodes.length; i++) {
         if (ul.childNodes[i].nodeName == "LI") {
@@ -179,10 +190,12 @@ function update_value(users_list, amnt) {
             //get the html element value
             var text = input.attributes[3].value;
             var input = document.getElementById(text);
-            if(i < extra) {
-                pay_amount = payee_amount + 0.01
+            if (i < extra) {
+                payee_amount = Math.floor(payee_amount*100) / 100;
+                var pay_amount = payee_amount + 0.01
                 input.setAttribute('value', pay_amount.toFixed(2));
-            }else {
+            } else {
+                var pay_amount = Math.floor(payee_amount*100) / 100;
                 input.setAttribute('value', payee_amount.toFixed(2));
             }
         }
@@ -200,13 +213,13 @@ function update_payee(users, text, amnt) {
     var payee = document.createElement("td");
     var amount = document.createElement("td");
     var textnode = document.createTextNode(text);
-    
+
     //create label
     var label = document.createElement("label");
     label.setAttribute('for', text);
     label.setAttribute('class', 'col-sm-2 col-form-label');
     label.appendChild(textnode);
-    
+
     //create input
     var input = document.createElement("input");
     input.setAttribute("name", text);
@@ -315,12 +328,12 @@ function check_payee(user) {
     users.pop();
 
     // Removes all comma values.
-    for(var i = users.length-1; i--;){
+    for (var i = users.length - 1; i--;) {
         if (users[i].match(",")) users.splice(i, 1);
     }
 
     for (i = 0; i < users.length; i++) {
-        if(users[i] == user) {
+        if (users[i] == user) {
             return 1;
         }
     }

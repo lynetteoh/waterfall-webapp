@@ -18,24 +18,42 @@
         <div class="panel-body">
             <div class="tab-content">
                 <div class="tab-pane container active" id="pay">
-                    <div class="row form-group mt-5">
-                        <label class="col-sm-2 col-form-label" for="pay_search">TricklePay ID</label>
-                        <div class="col-sm-10 mb-3 form-inline">
-                            <input class="col-sm-10 form-control" placeholder="Search"
-                                id="pay_search" list="pay_userList" required>
-                                <!-- autocomplete type="search" -->
-                            <datalist id="pay_userList">
-                                {% for f in filter_users %}
-                                <option>{{ f }}</option>
-                                {% endfor %}
-                            </datalist>
-                            <button class="col-sm-2 btn btn-primary" id="add" onclick="add('pay_search', 'pay_users')">Add
-                                <i class="fa fa-plus"></i></button>
-                        </div>
-                    </div>
                     <form role="form" id="pay-form" onsubmit="event.preventDefault();popup('pay_users','pay-form','pay_amount', 'pay_date')"
                         method="POST">
                         {% csrf_token %}
+                        <div class="row form-group mt-5">
+                            <label class="col-sm-2 col-form-label" for="from_search">From</label>
+                            <div class="col-sm-10 mb-3 form-inline">
+                                <input class="col-sm-10 form-control" placeholder="Search" id="from_search" list="from_userList"
+                                    required>
+                                <!-- autocomplete type="search" -->
+                                <datalist id="from_userList">
+                                    {% for f in filter_users %}
+                                    <option>{{ f }}</option>
+                                    {% endfor %}
+                                </datalist>
+                                <input type="button" class="col-sm-2 btn btn-primary" id="add" onclick="add('from_search', 'from_users')"
+                                    value="Add &#xf067">
+                            </div>
+                        </div>
+                        <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
+                            <ul class="ml-4 form-inline" id='from_users'></ul>
+                        </div>
+                        <div class="row form-group mb-5">
+                            <label class="col-sm-2 col-form-label" for="pay_search">TricklePay ID</label>
+                            <div class="col-sm-10 mb-3 form-inline">
+                                <input class="col-sm-10 form-control" placeholder="Search" id="pay_search" list="pay_userList"
+                                    required>
+                                <!-- autocomplete type="search" -->
+                                <datalist id="pay_userList">
+                                    {% for f in filter_users %}
+                                    <option>{{ f }}</option>
+                                    {% endfor %}
+                                </datalist>
+                                <input type="button" class="col-sm-2 btn btn-primary" id="add" onclick="add('pay_search', 'pay_users')"
+                                    value="Add &#xf067">
+                            </div>
+                        </div>
                         <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
                             <ul class="ml-4 form-inline" id='pay_users'></ul>
                         </div>
@@ -45,25 +63,25 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">$</span>
                                 </div>
-                                <input name="pay_amount" type="number" class="form-control" id="pay_amount"
-                                    name="pay_amount" required>
+                                <input name="pay_amount" type="number" class="form-control" id="pay_amount" name="pay_amount"
+                                    min="0" step=".01" required>
                             </div>
                         </div>
                         <div class="row form-group mb-5">
                             <label class="col-sm-2 col-form-label" for="pay_date">Date</label>
                             <div class="form-inline col-sm-10">
-                                <input type=date class="form-control col-sm-4" role="input" id="pay_date" name="pay_date" onload="today()"
-                                    required>
+                                <input type=date class="form-control col-sm-4" role="input" id="pay_date" name="pay_date"
+                                    onload="today()" required>
                                 <div class="text-center col-sm-5">
                                     <div class="btn-group  pl-5" id="pay_freq">
-                                        <input type="radio" name="pay_freq" id="pay_once" value="0" required><label
-                                            for="pay_once" class="btn">Once</label>
-                                        <input type="radio" name="pay_freq" id="pay_weekly" value="7"><label
-                                            for="pay_weekly" class="btn">Weekly</label>
-                                        <input type="radio" name="pay_freq" id="pay_monthly" value="30"><label
-                                            for="pay_monthly" class="btn ">Monthly</label>
-                                        <input type="radio" name="pay_freq" id="pay_yearly" value="365"><label
-                                            for="pay_yearly" class="btn ">Yearly</label>
+                                        <input type="radio" name="pay_freq" id="pay_once" value="0" required><label for="pay_once"
+                                            class="btn">Once</label>
+                                        <input type="radio" name="pay_freq" id="pay_weekly" value="7"><label for="pay_weekly"
+                                            class="btn">Weekly</label>
+                                        <input type="radio" name="pay_freq" id="pay_monthly" value="30"><label for="pay_monthly"
+                                            class="btn ">Monthly</label>
+                                        <input type="radio" name="pay_freq" id="pay_yearly" value="365"><label for="pay_yearly"
+                                            class="btn ">Yearly</label>
                                     </div>
                                 </div>
                             </div>
@@ -79,7 +97,7 @@
                             <button class="btn btn-lg btn-primary" type="submit">TricklePay
                                 <i class="fa fa-credit-card px-2"></i></button>
                         </div>
-                        <br/>
+                        <br />
                     </form>
                 </div>
             </div>
@@ -93,7 +111,7 @@
     var f_users = "{{filter_users}}";
     checkError("{{error}}");
     document.getElementById('pay_date').valueAsDate = new Date();
-    
+
 </script>
 
 {% endblock %}
