@@ -224,6 +224,7 @@ def pay(request):
     }
     if request.method == "POST":
         try:
+            from_acc = user.account       # TODO Lynn change to user or group
             payees = collect_recipients(request, 'pay_users')
             if not payees:
                 raise Exception("Invalid Payees")
@@ -234,15 +235,17 @@ def pay(request):
             amount = request.POST.get('pay_amount')
 
             for p in payees:
-                receiver = User.objects.get(username=p).accounts
+                receiver = User.objects.get(username=p).account
+                if not receiver:
+                    receiver = GroupAccount.objects.get(name=p).account
                 # Check for valid data.
-                if not receiver or (receiver is user.account):
-                    raise Exception("Invalid User.")
+                if not receiver or (receiver is from_acc):
+                    raise Exception("Invalid TricklePay ID.")
                 if not subj:
                     raise Exception("Empty Payment Description")
                 if not amount or float(amount) < 0:
                     raise Exception("Invalid Payment Amount")
-                if float(amount) > user.account.balance:
+                if float(amount) > from_acc.balance:
                     raise Exception("Insufficient Funds")
                 if recurr is None or int(recurr) < 0:
                     raise Exception("Invalid Payment Recurrence")
@@ -257,7 +260,8 @@ def pay(request):
                 if deadline < today:
                     raise Exception("Invalid Past Payment Date")
 
-                transfer = user.account._create_transfer(receiver, subj, float(amount), int(recurr), deadline, False)
+                transfer = from_acc._create_transfer(receiver, subj, \
+                                    float(amount), int(recurr), deadline, False)
                 context['error'] = "Success"
         except Exception as e:
             print (e)
@@ -282,6 +286,7 @@ def request(request):
     }
     if request.method == "POST":
         try:
+            from_acc = user.account         # TODO lynn change to group
             requests = collect_recipients(request, 'req_users')
             if not requests:
                 raise Exception("Invalid Request User")
@@ -292,11 +297,13 @@ def request(request):
 
             for r in requests:
                 receiver = User.objects.get(username=r).account
+                if not receiver:
+                    receiver = GroupAccount.objects.get(name=r).account
                 amount = request.POST.get(r)
 
                 # Check for valid data.
-                if not receiver or (receiver is user.account):
-                    raise Exception("Invalid User.")
+                if not receiver or (receiver is from_acc):
+                    raise Exception("Invalid TricklePay ID")
                 if not subj:
                     raise Exception("Empty Payment Description")
                 if not amount or float(amount) < 0:
@@ -313,7 +320,8 @@ def request(request):
                 if deadline < today:
                     raise Exception("Invalid Past Payment Date")
 
-                transfer = user.account._create_transfer(receiver, subj, float(amount), int(recurr), deadline, True)
+                transfer = from_acc._create_transfer(receiver, subj, \
+                                    float(amount), int(recurr), deadline, True)
                 context['error'] = "Success"
         except Exception as e:
             print (e)

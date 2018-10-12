@@ -76,8 +76,7 @@ class Account(models.Model):
             t.start()
 
             # Reminders for low balance.
-            w = transfer.tx_from
-            if (w.account.balance < 10):
+            if (transfer.tx_from.account.balance < 10):
                 tR = threading.Thread(target=w.notify,\
                     args=("Warning: Low Waterfall Balance",\
                             "email/reminder-balance.html",))
@@ -118,7 +117,7 @@ class Account(models.Model):
         return "Success"
 
     def _create_transaction(self, value, title, type, is_pending):
-        print("Created transaction " + type + " to " + self.user.username)
+        print("Created transaction " + type)
         tz = pytz.timezone('Australia/Sydney')
         now = None if is_pending else tz.localize(datetime.now())
         tx = Transaction.objects.create(
@@ -178,8 +177,7 @@ class Account(models.Model):
     def __str__(self):
         if self.user:
             return '@{}'.format(self.user.username)
-        else:
-            return '{} (Group)'.format(self.groupaccount.name)
+        return '{} (Group)'.format(self.groupaccount.name)
 
     @property
     def balance(self):
@@ -194,7 +192,7 @@ class Account(models.Model):
         payments = Transfer.objects.filter(is_deleted=False,\
                                             confirmed_at__isnull=False)
         for p in payments:
-            if p.tx_from.account == self.user.account:
+            if p.tx_from.account == self:
                 num_payments += 1
         return num_payments
 
@@ -204,7 +202,7 @@ class Account(models.Model):
         requests = Transfer.objects.filter(is_deleted=False, is_request=True,\
                                     confirmed_at__isnull=False)
         for r in requests:
-            if r.tx_to.account == self.user.account:
+            if r.tx_to.account == self:
                 num_requests += 1
         return num_requests
 
