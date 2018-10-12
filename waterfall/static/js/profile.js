@@ -53,7 +53,6 @@ function disableProfileForm() {
     form[i].setAttribute('readonly', true);
   }
   // Disable profile settings edit.
-  // document.getElementById("upload-pic").style.display = "none"
   document.getElementById("change-settings").style.display = "none"
 }
 
