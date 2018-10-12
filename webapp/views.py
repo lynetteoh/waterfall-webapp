@@ -260,7 +260,7 @@ def pay(request):
                 if deadline < today:
                     raise Exception("Invalid Past Payment Date")
 
-                transfer = from_acc._create_transfer(receiver, subj, \
+                from_acc._create_transfer(receiver, subj, \
                                     float(amount), int(recurr), deadline, False)
                 context['error'] = "Success"
         except Exception as e:
@@ -361,7 +361,6 @@ def group_management(request):
     }
     return render(request, 'group_management.html', context)
 
-
 ### HELPER FUNCTIONS ###
 
 def collect_dash_transfers(user):
@@ -397,7 +396,12 @@ def collect_dash_transfers(user):
         else:
             outgoing.append(t)
 
-    past.reverse()
+    incoming.sort(key=lambda x: x.deadline)
+    outgoing.sort(key=lambda x: x.deadline)
+    past.sort(key=lambda x: x.confirmed_at, reverse=True)
+    requests.sort(key=lambda x: x.deadline)
+    user_requests.sort(key=lambda x: x.deadline)
+
     return (incoming, outgoing, past, requests, user_requests)
 
 # Collects payees for multi pay and multi requests.
