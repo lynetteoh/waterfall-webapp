@@ -44,14 +44,13 @@ def viewMoreOp(request):
         "user1": user,
         "key": "op",
     }
-
     return render(request, 'view_more.html', context)
 
 def viewMoreIp(request):
     title = "Incoming Payments"
     user = str(request.user)
     incoming = []
-    
+
     transfers = Transfer.objects.all()
     for t in transfers:
         # Remove time from the date.
@@ -61,14 +60,12 @@ def viewMoreIp(request):
             t.deadline = t.deadline.date()
             incoming.append(t)
 
-
     context ={
         "title": title,
         "incoming": incoming,
         "user1": user,
         "key": "ip",
     }
-
     return render(request, 'view_more.html', context)
 
 def viewMoreH(request):
@@ -88,9 +85,7 @@ def viewMoreH(request):
         "user1": user,
         "key": "th",
     }
-
     return render(request, 'view_more.html', context)
-
 
 
 @login_required
@@ -106,12 +101,6 @@ def dashboard(request):
         "user_requests": user_requests,
     }
 
-    #if len(incoming) == 0:
-     #   context['incoming'] = None
-        
-    print("outgoing is:", context['outgoing'])
-            
-
     if request.method == "POST":
         transfer = request.POST.get('transfer')
         try:
@@ -124,7 +113,6 @@ def dashboard(request):
         finally:
             incoming, outgoing, past, requests, user_requests =\
                                             collect_dash_transfers(request.user)
-            
             context['incoming'] = incoming
             context['outgoing'] = outgoing
             context['past'] = past
@@ -133,7 +121,7 @@ def dashboard(request):
 
             if len(outgoing) == 0:
                 context['outgoing'] = None
-            
+
             return render(request, 'dashboard.html', context)
     return render(request, 'dashboard.html', context)
 
@@ -141,8 +129,8 @@ def dashboard(request):
 def profile(request):
     if request.method == "POST":
         user = request.user
+        # Update profile picture.
         if request.FILES:
-            # get the posted form
             form = AvatarForm(request.POST, request.FILES)
             if form.is_valid():
                 profile = user.profile
@@ -150,13 +138,12 @@ def profile(request):
                 profile.save()
             else:
                 context = {
-                    "error": "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
-
+                    "error": "The file you uploaded was either not an image or a corrupted image."
                 }
                 return render(request, 'profile.html', context)
 
-
-        elif request.POST.get('first_name'):
+        # Update profile details.
+        if request.POST.get('first_name'):
             # Editing profile fields.
             user.first_name = request.POST.get('first_name')
             user.last_name = request.POST.get('last_name')
@@ -170,7 +157,6 @@ def profile(request):
                 user.save()
     else:
         form = AvatarForm()
-
     return render(request, 'profile.html')
 
 @login_required
@@ -183,23 +169,22 @@ def balance(request):
         add_amount = request.POST.get('add_amount')
         minus_amount = request.POST.get('minus_amount')
         try:
+            tx = None
             if add_amount and float(add_amount) > 0:
-                tx = user.account.register_deposit("Deposit", float(add_amount))
+                tx = user.account.deposit(float(add_amount))
+            elif minus_amount and float(minus_amount) > 0:
+                tx = user.account.withdraw(float(minus_amount))
+
+            if not tx:
+                context['error'] = "Insufficient Funds"
+            else:
                 tx.save()
                 context['error'] = "Success"
-            elif minus_amount and float(minus_amount) > 0:
-                tx = user.account.register_withdrawal("Withdrawal", float(minus_amount))
-                if not tx:
-                    context['error'] = "Insufficient Funds"
-                else:
-                    tx.save()
-                    context['error'] = "Success"
         except Exception as e:
             print(e)
             context['error'] = "Invalid Value"
         finally:
             return render(request, 'balance.html', context)
-
     return render(request, 'balance.html', context)
 
 @ensure_csrf_cookie
@@ -243,6 +228,7 @@ def pay(request):
     }
     if request.method == "POST":
         try:
+            from_acc = user.account       # TODO Lynn change to user or group
             payees = collect_recipients(request, 'pay_users')
             if not payees:
                 raise Exception("Invalid Payees")
@@ -254,14 +240,16 @@ def pay(request):
 
             for p in payees:
                 receiver = User.objects.get(username=p).account
+                if not receiver:
+                    receiver = GroupAccount.objects.get(name=p).account
                 # Check for valid data.
-                if not receiver or (receiver is user.account):
-                    raise Exception("Invalid User.")
+                if not receiver or (receiver is from_acc):
+                    raise Exception("Invalid TricklePay ID.")
                 if not subj:
                     raise Exception("Empty Payment Description")
                 if not amount or float(amount) < 0:
                     raise Exception("Invalid Payment Amount")
-                if float(amount) > user.account.balance:
+                if float(amount) > from_acc.balance:
                     raise Exception("Insufficient Funds")
                 if recurr is None or int(recurr) < 0:
                     raise Exception("Invalid Payment Recurrence")
@@ -272,11 +260,12 @@ def pay(request):
                 today = timezone.localize(datetime.today()).date()
                 deadline = \
                     timezone.localize(datetime.strptime(date, "%Y-%m-%d")).date() # yyyy-mm-dd
-    
+
                 if deadline < today:
                     raise Exception("Invalid Past Payment Date")
 
-                user.account._create_transfer(receiver, subj, float(amount), int(recurr), deadline, False)
+                from_acc._create_transfer(receiver, subj, \
+                                    float(amount), int(recurr), deadline, False)
                 context['error'] = "Success"
         except Exception as e:
             print (e)
@@ -307,6 +296,7 @@ def request(request):
     }
     if request.method == "POST":
         try:
+            from_acc = user.account         # TODO lynn change to group
             requests = collect_recipients(request, 'req_users')
             if not requests:
                 raise Exception("Invalid Request User")
@@ -317,11 +307,13 @@ def request(request):
 
             for r in requests:
                 receiver = User.objects.get(username=r).account
+                if not receiver:
+                    receiver = GroupAccount.objects.get(name=r).account
                 amount = request.POST.get(r)
 
                 # Check for valid data.
-                if not receiver or (receiver is user.account):
-                    raise Exception("Invalid User.")
+                if not receiver or (receiver is from_acc):
+                    raise Exception("Invalid TricklePay ID")
                 if not subj:
                     raise Exception("Empty Payment Description")
                 if not amount or float(amount) < 0:
@@ -338,7 +330,8 @@ def request(request):
                 if deadline < today:
                     raise Exception("Invalid Past Payment Date")
 
-                transfer = user.account._create_transfer(receiver, subj, float(amount), int(recurr), deadline, True)
+                transfer = from_acc._create_transfer(receiver, subj, \
+                                    float(amount), int(recurr), deadline, True)
                 context['error'] = "Success"
         except Exception as e:
             print (e)
@@ -379,6 +372,8 @@ def group_management(request):
         "group_members": '',
     }
     return render(request, 'group_management.html', context)
+
+### HELPER FUNCTIONS ###
 
 def collect_dash_transfers(user):
     incoming = []

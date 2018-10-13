@@ -13,6 +13,41 @@ input[type="text"] {
 }
 input[type="text"][readonly] {
   border: 2px solid rgba(0,0,0,0);
+  background-color:white;
+}
+
+#img-container {
+  position: relative;
+  border-radius: 50%;
+}
+
+.overlay {
+  position: absolute;
+  border-radius: 50%;
+  top: 0;
+  bottom: 0;
+  left: 11%;
+  right: 0;
+  height: 180px;
+  width: 180px;
+  transition: .5s ease;
+}
+
+#img-container:hover .overlay {
+  opacity: 0.5;
+  background-color: black;
+}
+
+.text {
+  color: white;
+  font-size: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  text-align: center;
 }
 
 </style>
@@ -23,11 +58,11 @@ input[type="text"][readonly] {
 <div class="container bootstrap snippet">
     <div class="row profile">
   		<div class="col-sm-10">
-        <h1>Account Profile &nbsp;&nbsp;
-          <button class="btn" type="button" value="Edit" onclick="editProfile()" style="font-size:20px;">
+        <h2>Account Profile &nbsp;&nbsp;
+          <button class="btn" type="button" value="Edit" onclick="editProfile()" style="font-size:16px;">
             <i class="fas fa-edit"></i>&nbsp;Edit
           </button>
-        </h1>
+        </h2>
       </div>
     </div>
     </br>
@@ -35,14 +70,18 @@ input[type="text"][readonly] {
   		<div class="col-sm-3" style="min-width:230px;"><!--left col-->
 
         <div class="text-center">
-        {% if user.profile.avatar %}
-          <img id="prof-pic" src="{{ user.profile.avatar.url }}" class="avatar img-circle img-thumbnail" alt="avatar">
-        {% else %}
-          <img id="prof-pic" src="{% static "images/anon-user.svg" %}" class="avatar img-circle img-thumbnail" alt="avatar">
-        {% endif %}
-        </br></br>
-          <h4>@{{ user.username }}</h4>
-          </br>
+          <div class="container" id="img-container">
+            {% if user.profile.avatar %}
+              <img id="prof-pic" src="{{ user.profile.avatar.url }}" class="avatar img-circle img-thumbnail" alt="avatar">
+            {% else %}
+              <img id="prof-pic" src="{% static "images/anon-user.svg" %}" class="avatar img-circle img-thumbnail" alt="avatar">
+            {% endif %}
+              <div class="overlay" onclick="editAvatar()" >
+                <h5 id="avatar-text" class="text">Change Avatar</h5>
+              </div>
+          </div>
+
+          </br></br>
           <div id="upload-pic" style="display:none;">
             <h6>Upload New Profile Picture</h6>
 
@@ -53,12 +92,16 @@ input[type="text"][readonly] {
               {% endif %}
               <input name="avatar" id="avatar" type="file" class="file-upload">
               </br></br>
-              <button class="btn btn-xs"  type="submit">
+              <button class="btn btn-xs" type="submit">
                 <i class="fas fa-check"></i> &nbsp;Upload
               </button>
               </hr></br></br>
             </form>
           </div>
+
+          <h3>@{{ user.username }}</h3>
+          </br>
+
         </div>
 
         <ul class="list-group">

@@ -53,7 +53,6 @@ function disableProfileForm() {
     form[i].setAttribute('readonly', true);
   }
   // Disable profile settings edit.
-  document.getElementById("upload-pic").style.display = "none"
   document.getElementById("change-settings").style.display = "none"
 }
 
@@ -64,6 +63,16 @@ function enableProfileForm() {
     form[i].removeAttribute('readonly');
   }
   // Enable profile settings editds.
-  document.getElementById("upload-pic").style.display = "block"
   document.getElementById("change-settings").style.display = "block"
+}
+
+/* Enables and disables profile editing on clicks. */
+function editAvatar() {
+  if (document.getElementById("upload-pic").style.display === "none") {
+    document.getElementById("avatar-text").innerText = "Keep Avatar"
+    document.getElementById("upload-pic").style.display = "block"
+  } else {
+    document.getElementById("avatar-text").innerText = "Change Avatar"
+    document.getElementById("upload-pic").style.display = "none"
+  }
 }
