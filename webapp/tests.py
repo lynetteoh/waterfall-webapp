@@ -1,7 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth import authenticate
 from .models import User, Profile, Account, Transfer, Transaction
-from datetime import datetime
+from datetime import datetime, timedelta, tzinfo
+import pytz
+
 class ProfileModelTest(TestCase):
     name = "test-user"
     pw = "test"
@@ -32,7 +34,7 @@ class TransferModelTest(TestCase):
         self.assertTrue(transfer.tx_to.is_deleted)
         self.assertTrue(transfer.is_deleted)
 
-    def test_confirm_norecurr(self):
+    def test_confirm_not_recurr(self):
         today = datetime.today()
         transfer = Transfer.objects.get(id="1")
         transfer.confirm(today)
@@ -42,7 +44,7 @@ class TransferModelTest(TestCase):
         self.assertFalse(transfer.tx_from.is_pending)
         self.assertFalse(transfer.tx_to.is_pending)
         # Check that no copy has been made.
-        self.assertIsNone(Transfer.objects.get(id="2"))
+        self.assertTrue(len(Transfer.objects.all()) < 2)
 
     def test_confirm_recurr(self):
         today = datetime.today()
@@ -56,4 +58,42 @@ class TransferModelTest(TestCase):
         self.assertFalse(transfer.tx_from.is_pending)
         self.assertFalse(transfer.tx_to.is_pending)
         # Check that no copy has been made.
-        self.assertIsNotNone(obj, msg)Transfer.objects.get(id="2"))
+        self.assertIsNotNone(Transfer.objects.get(id="2"))
+
+    def test_recurring_copy(self):
+        tz = pytz.timezone("Australia/Sydney")
+        today = tz.localize(datetime.now())
+        new_deadline = today + timedelta(days=7)
+        transfer = Transfer.objects.get(id="1")
+        transfer.recurrence_days = 7
+        transfer.save()
+        transfer.create_recurring_copy(today)
+
+        recurr = Transfer.objects.get(id="2")
+        self.assertIsNotNone(recurr)
+        # TODO steph
+        utc_delta = datetime.utcnow() - datetime.now()
+        utc_date = new_deadline + utc_delta
+        utc_date = utc_date.replace(tzinfo=pytz.UTC)
+        self.assertEqual(recurr.deadline.date(), utc_date.date())
+        self.assertEqual(recurr.recurrence_days, 7)
+        self.assertEqual(recurr.is_request, transfer.is_request)
+
+        self.assertEqual(recurr.tx_from.account, transfer.tx_from.account)
+        self.assertEqual(recurr.tx_from.value, transfer.tx_from.value)
+        self.assertEqual(recurr.tx_from.title, transfer.tx_from.title)
+        self.assertEqual(recurr.tx_from.transaction_type, 'w')
+        self.assertEqual(recurr.tx_from.modified_at, today)
+        self.assertIsNone(recurr.tx_from.confirmed_at)
+
+        self.assertEqual(recurr.tx_to.account, transfer.tx_to.account)
+        self.assertEqual(recurr.tx_to.value, transfer.tx_to.value)
+        self.assertEqual(recurr.tx_to.title, transfer.tx_to.title)
+        self.assertEqual(recurr.tx_to.transaction_type, 'd')
+        self.assertEqual(recurr.tx_to.modified_at, today)
+        self.assertIsNone(recurr.tx_to.confirmed_at)
+
+
+    def test_notify(self):
+        # TODO test email notification
+        return True
