@@ -61,7 +61,7 @@
     "pk": 1,
     "fields": {
       "account": 3,
-      "name": "Spotify Fam"
+      "name": "spotify_fam"
     }
   },
   {
@@ -259,4 +259,3 @@
     }
   }
   ]
-  

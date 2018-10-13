@@ -197,11 +197,8 @@ def register_new(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             profile = Profile(user=user, avatar=None)
-            # profile.user = user
-            # profile.avatar = None
             profile.save()
-            account = Account()
-            account.user = user
+            account = Account(user=user)
             account.save()
             login(request, user)
             return redirect('/dashboard')
