@@ -77,12 +77,15 @@ function add(search, user, amnt) {
     list.setAttribute('class', 'pr-5');
 
     var result = 0;
-    result = exist(search, user, text);
+    result = exist(user, text);
     if (result == 0) {
         document.getElementById(user).appendChild(list);
         if (user == 'req_users') {
             update_payee(user, text, amnt);
         }
+    }else {
+        swal("You have chosen the same payee !");
+        return;
     }
 
     //add remove button
@@ -145,9 +148,24 @@ function validateForm(ul, amnt, d, form) {
         return "Please only input positive numeric amounts."
     }
 
+    // check from_acc != payee
+    if (form == 'req-form') {
+        var from_acc = document.getElementById('req_from').value;
+        var result = exist('req_users',from_acc)
+        if(result == 1) {
+            return "You are requesting from yourself !"
+        }
+    } else {
+        var from_acc = document.getElementById('pay_from').value;
+        var result = exist('pay_users',from_acc)
+        if(result == 1) {
+            return "You are paying from yourself !"
+        }
+    }
+
     // Checks split amounts for a request form.
     if (form == 'req-form') {
-        result = check_split(amount, ul);
+        var result = check_split(amount, ul);
         if (result == 1) {
             return "Split amounts do not sum up to requested amount."
         }
@@ -179,8 +197,8 @@ function update_value(users_list, amnt) {
             console.log(extra)
         }
 
-    }else {
-        var payee_amount = amount/ul_len;
+    } else {
+        var payee_amount = amount / ul_len;
     }
 
 
@@ -192,11 +210,11 @@ function update_value(users_list, amnt) {
             var text = input.attributes[3].value;
             var input = document.getElementById(text);
             if (i < extra) {
-                payee_amount = Math.floor(payee_amount*100) / 100;
+                payee_amount = Math.floor(payee_amount * 100) / 100;
                 var pay_amount = payee_amount + 0.01
                 input.setAttribute('value', pay_amount.toFixed(2));
             } else {
-                var pay_amount = Math.floor(payee_amount*100) / 100;
+                var pay_amount = Math.floor(payee_amount * 100) / 100;
                 input.setAttribute('value', payee_amount.toFixed(2));
             }
         }
@@ -255,40 +273,19 @@ function check_split(amount, users_list) {
     return (sum != amount) ? 1 : 0;
 }
 
-function exist(search, user, text) {
+function exist(user, text) {
     result = 0
     // make sure same payee is not chosen
-    if (search == 'req_search') {
-        var ul = document.getElementById(user);
-        for (var i = 0; i < ul.childNodes.length; i++) {
-            if (ul.childNodes[i].nodeName == "LI") {
-                //get the input html element
-                var input = ul.childNodes[i].getElementsByTagName("INPUT")[0]
-                console.log(input)
-                //get the html element value
-                var x = input.attributes[3].value;
-                console.log(x)
-                if (x == text) {
-                    swal("You have chosen the same payee !");
-                    result = 1
-                    break
-                }
-            }
-        }
-
-    } else {
-        var ul = document.getElementById(user)
-        for (var i = 0; i < ul.childNodes.length; i++) {
-            if (ul.childNodes[i].nodeName == "LI") {
-                var input = ul.childNodes[i].getElementsByTagName("INPUT")[0]
-                console.log(input);
-                var x = input.attributes[3].value;
-                console.log(x);
-                if (x == text) {
-                    swal("You have chosen the same payee !");
-                    result = 1
-                    break
-                }
+    var ul = document.getElementById(user)
+    for (var i = 0; i < ul.childNodes.length; i++) {
+        if (ul.childNodes[i].nodeName == "LI") {
+            var input = ul.childNodes[i].getElementsByTagName("INPUT")[0]
+            console.log(input);
+            var x = input.attributes[3].value;
+            console.log(x);
+            if (x == text) {
+                result = 1
+                break
             }
         }
     }
