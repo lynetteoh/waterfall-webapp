@@ -388,7 +388,8 @@ def group_management(request, context=None):
     user_groups = []
     for g in user.profile.GroupAccount.all():
         user_groups.append(g.name)
-
+    
+    group = user.profile.GroupAccount.all()[0]
     group_members = []
     for p in group.members.all():
         if p.user != user:
@@ -398,6 +399,7 @@ def group_management(request, context=None):
         "filter_members": filter_users,
         "user_groups:": user_groups,
         "group_members": group_members,
+        "group_id": group.name,
     }
     return render(request, 'group_management.html', context)
 
