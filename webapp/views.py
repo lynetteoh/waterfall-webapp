@@ -213,6 +213,13 @@ def register_new(request):
 def pay(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
+    from_users = []
+    from_users.append(user.username)
+    user_groups = user.profile.GroupAccount.all()
+
+    for g in user_groups:
+        from_users.append(g.name)
+    
     pay_users = []
     for u in all_users:
         if (u != user.username):
@@ -221,10 +228,11 @@ def pay(request):
         "pay_page": "active",
         "user" : user,
         "filter_users": pay_users,
+        "from_users": from_users,
     }
     if request.method == "POST":
         try:
-            from_acc = user.account       # TODO Lynn change to user or group
+            from_acc = request.POST.get('pay_from')    
             payees = collect_recipients(request, 'pay_users')
             if not payees:
                 raise Exception("Invalid Payees")
@@ -275,6 +283,13 @@ def pay(request):
 def request(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
+    from_users = []
+    from_users.append(user.username)
+    user_groups = user.profile.GroupAccount.all()
+
+    for g in user_groups:
+        from_users.append(g.name)
+    
     req_users = []
     for u in all_users:
         if(u != user.username):
@@ -283,10 +298,11 @@ def request(request):
         "request_page": "active",
         "user" : user,
         "filter_users": req_users,
+        "from_users": from_users,
     }
     if request.method == "POST":
         try:
-            from_acc = user.account         # TODO lynn change to group
+            from_acc= request.POST.get('pay_from')        
             requests = collect_recipients(request, 'req_users')
             if not requests:
                 raise Exception("Invalid Request User")
@@ -335,6 +351,7 @@ def request(request):
 def create_group(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
+    
     create_members = []
     for u in all_users:
         if(u != user.username):
@@ -342,6 +359,7 @@ def create_group(request):
     context ={
         "user" : user,
         "filter_members": create_members,
+        
     }
     return render(request, 'create_group.html', context)
 
@@ -349,15 +367,16 @@ def create_group(request):
 def group_management(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
-    manage_members = []
+    group_members = []
+    GroupAccount.get(name=name).profile.all()
     for u in all_users:
         if(u != user.username):
-            manage_members.append(u.username)
+            group_members.append(u.username)
     context ={
         "user" : user,
-        "filter_members": manage_members,
-        "group_id": '1',
-        "group_members": manage_members,
+        "filter_members": group_members,
+        "group_id": '',
+        "group_members": '',
     }
     return render(request, 'group_management.html', context)
 
