@@ -14,7 +14,7 @@
 {% block content %}
 <div class="container bootstrap snippet">
     <h2 class="py-4">Group Management</h2>
-    <form role="form" id="group-management-form" onsubmit="event.preventDefault();popup('members','group-create-form')"
+    <form role="form" id="group-management-form" onsubmit="event.preventDefault();popup('members','group-management-form')"
         method="POST">
         {% csrf_token %}
         <div class="row form-group mb-5">
@@ -26,8 +26,7 @@
         <h5>Members</h5>
         <div class="row form-group mt-5">
             <div class="col-sm-12 mb-3 form-inline">
-                <input class="col-sm-10 form-control" placeholder="Search" id="member_search" list="member_list"
-                    required>
+                <input class="col-sm-10 form-control" placeholder="Search" id="member_search" list="member_list">
                 <datalist id="member_list">
                     {% for m in filter_members %}
                     <option>{{ m }}</option>
@@ -55,6 +54,7 @@
 <script>
     var f_members = "{{filter_members}}";
     var g_members = "{{group_members}}";
+    var group_list = "{% url 'group_dashboard' %}";  //TODO change to the correct url to groups list
     add_all_members('members');
 </script>
 {% endblock %}

@@ -83,6 +83,7 @@ function popup(members, form) {
             }).then((confirmed) => {
                 if (confirmed) {
                     document.getElementById(form).submit();
+                    window.location.replace(group_list); 
                 } else {
                     swal({
                         title: "Cancelled",
@@ -191,6 +192,7 @@ function add(user, members) {
 }
 
 function leave_group(form) {
+    
     swal({
         text: "Leave Group ?",
         icon: "warning",
@@ -199,6 +201,7 @@ function leave_group(form) {
     }).then((confirmed) => {
         if (confirmed) {
             document.getElementById(form).submit();
+            window.location.replace(group_list);     
         } else {
             swal({
                 title: "Cancelled",
