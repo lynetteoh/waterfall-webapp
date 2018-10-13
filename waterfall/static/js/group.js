@@ -74,22 +74,42 @@ function check_member(user) {
 function popup(members, form) {
     var error = validateForm(members);
     if (!error) {
-        swal({
-            text: "Create Group ?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((confirmed) => {
-            if (confirmed) {
-                document.getElementById(form).submit();
-            } else {
-                swal({
-                    title: "Cancelled",
-                    text: "Group creation has been cancelled",
-                    icon: "warning",
-                });
-            }
-        });
+        if(form == 'group-creation-form') {
+            swal({
+                text: "Create Group ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((confirmed) => {
+                if (confirmed) {
+                    document.getElementById(form).submit();
+                } else {
+                    swal({
+                        title: "Cancelled",
+                        text: "Group creation has been cancelled",
+                        icon: "warning",
+                    });
+                }
+            });
+        } else {
+            swal({
+                text: "Save Changes ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((confirmed) => {
+                if (confirmed) {
+                    document.getElementById(form).submit();
+                } else {
+                    swal({
+                        title: "Cancelled",
+                        text: "Changes not saved",
+                        icon: "warning",
+                    });
+                }
+            });
+        }
+            
     } else {
         swal({
             title: "Process Failed",

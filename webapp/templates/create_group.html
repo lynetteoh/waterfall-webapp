@@ -14,7 +14,7 @@
 {% block content %}
 <div class="container bootstrap snippet ">
     <h2 class="py-4">Create Group</h2>
-    <form role="form" id="group-create-form" onsubmit="event.preventDefault();popup('members','group-create-form')"
+    <form role="form" id="group-creation-form" onsubmit="event.preventDefault();popup('members','group-create-form')"
         method="POST">
         {% csrf_token %}
         <div class="row form-group mb-5">
