@@ -281,7 +281,7 @@ class Transaction(models.Model):
         if not self.account.user:
             return
 
-        print("Notifying..."))
+        print("Notifying...")
         amount = self.value if self.value > 0 else self.value*(-1)
         txt = "deposit" if self.transaction_type == 'd' else "withdraw"
         context = {
