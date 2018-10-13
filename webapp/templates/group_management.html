@@ -12,23 +12,22 @@
 {% endblock %}
 
 {% block content %}
-<div class="container bootstrap snippet pt-3 pl-5 ml-5">
+<div class="container bootstrap snippet">
     <h2 class="py-4">Group Management</h2>
     <form role="form" id="group-management-form" onsubmit="event.preventDefault();popup('members','group-create-form')"
         method="POST">
         {% csrf_token %}
         <div class="row form-group mb-5">
             <label for="pay_amount" class="col-sm-2 col-form-label">Group ID</label>
-            <div class="input-group col-sm-8">
+            <div class="input-group col-sm-10">
                 <input name="group_id" type="text" class="form-control" id="group_id" value="{{group_id}}" disabled>
             </div>
         </div>
         <h5>Members</h5>
         <div class="row form-group mt-5">
-            <div class="col-sm-10 mb-3 form-inline">
+            <div class="col-sm-12 mb-3 form-inline">
                 <input class="col-sm-10 form-control" placeholder="Search" id="member_search" list="member_list"
                     required>
-                <!-- autocomplete type="search" -->
                 <datalist id="member_list">
                     {% for m in filter_members %}
                     <option>{{ m }}</option>
@@ -37,7 +36,7 @@
                 <input type="button" class="fa fa-plus col-sm-2 btn btn-primary font-weight-bold" id="add" onclick="add_member('member_search', 'members')"
                     value="Add &#xf067">
             </div>
-            <div class="col-sm-10">
+            <div class="col-sm-12">
                 <ul class="ul_style ml-4 mx-3" id='members'></ul>
             </div>
         </div>

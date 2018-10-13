@@ -13,31 +13,12 @@ function add_member(search, users) {
         });
         return;
     }
-    var list = document.createElement("li");
-    var textnode = document.createTextNode(text);
-    var ul_len = document.getElementById(users).childNodes.length;
-
-    // create input element
-    var input = document.createElement("input");
-    input.setAttribute("type", "hidden");
-    input.setAttribute("name", users + ul_len);
-    input.setAttribute("id", users + ul_len);
-    input.setAttribute("value", text);
-    list.appendChild(input);
-    list.appendChild(textnode);
-    list.setAttribute('class', 'pr-5');
 
     var result = 0;
     result = exist(search, users, text);
-    if (result == 0) {
-        document.getElementById(users).appendChild(list);
-    }
 
-    // add remove button
-    remove = removeBtn();
-    list.appendChild(remove);
-    remove.onclick = function () {
-        document.getElementById(users).removeChild(list);
+    if (result == 0) {
+        add(text, users);
     }
 }
 
@@ -138,7 +119,7 @@ function add_creator(members, user) {
     input.setAttribute("type", "hidden");
     input.setAttribute("name", members + length);
     input.setAttribute("id", members + length);
-    input.setAttribute("value", '{{user}}');
+    input.setAttribute("value", user);
 
     //add input to list
     list.appendChild(input);
@@ -158,31 +139,35 @@ function add_all_members(members) {
         if (users[i].match(",")) users.splice(i, 1);
     }
 
-    for (i = 0; i < users.length; i++) {
-        var list = document.createElement("li");
-        var textnode = document.createTextNode(users[i]);
-        var ul_len = document.getElementById(members).childNodes.length;
-
-        // create input element
-        var input = document.createElement("input");
-        input.setAttribute("type", "hidden");
-        input.setAttribute("name", members + ul_len);
-        input.setAttribute("id", members + ul_len);
-        input.setAttribute("value", users[i]);
-        list.appendChild(input);
-        list.appendChild(textnode);
-        list.setAttribute('class', 'pr-5');
-        document.getElementById(members).appendChild(list);
-
-        // add remove button
-        remove = removeBtn();
-        list.appendChild(remove);
-        remove.onclick = function () {
-            document.getElementById(members).removeChild(list);
-        }
-
+    for (var i = 0; i < users.length; i++) {
+        add(users[i], members)
     }
 
+}
+
+function add(user, members) {
+    var list = document.createElement("li");
+    var textnode = document.createTextNode(user);
+    var ul_len = document.getElementById(members).childNodes.length;
+
+    // create input element
+    var input = document.createElement("input");
+    input.setAttribute("type", "hidden");
+    input.setAttribute("name", members + ul_len);
+    input.setAttribute("id", members + ul_len);
+    input.setAttribute("value", user);
+    list.appendChild(input);
+    list.appendChild(textnode);
+    list.setAttribute('class', 'pr-5');
+
+    // add remove button
+    var remove = removeBtn();
+    list.appendChild(remove);
+    document.getElementById(members).appendChild(list);
+    remove.onclick = function () {
+        console.log(list);
+        document.getElementById(members).removeChild(list);
+    }
 }
 
 function leave_group(form) {

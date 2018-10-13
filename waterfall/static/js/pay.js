@@ -86,7 +86,7 @@ function add(search, user, amnt) {
     }
 
     //add remove button
-    remove = removeBtn();
+    var remove = removeBtn();
     list.appendChild(remove);
     remove.onclick = function () {
         document.getElementById(user).removeChild(list);

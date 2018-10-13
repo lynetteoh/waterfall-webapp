@@ -368,13 +368,14 @@ def group_management(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
     group_members = []
+    GroupAccount.get(name=name).profile.all()
     for u in all_users:
         if(u != user.username):
             group_members.append(u.username)
     context ={
         "user" : user,
         "filter_members": group_members,
-        "group_id": '1',
+        "group_id": '',
         "group_members": '',
     }
     return render(request, 'group_management.html', context)
