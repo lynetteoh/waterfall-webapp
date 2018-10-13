@@ -1,0 +1,53 @@
+{% load static %}
+
+/* Enables and disables the form. */
+input[type="text"] {
+  font-size: 16px;
+}
+input[type="text"][readonly] {
+  border: 2px solid rgba(0,0,0,0);
+  background-color:white;
+}
+
+#img-container {
+  position: relative;
+  border-radius: 50%;
+}
+
+.overlay {
+  position: absolute;
+  display:inline-block;
+  border-radius: 50%;
+  top: 0;
+  bottom: 0;
+  left: 11%;
+  right: 0;
+  height: 180px;
+  width: 180px;
+  transition: .5s ease;
+}
+
+#img-container:hover .overlay {
+  opacity: 0.5;
+  position: absolute;
+  background-color: black;
+  display:block;
+}
+
+#img-container:hover #avatar-text {
+  display:block;
+}
+
+#avatar-text {
+  color: white;
+  font-size: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  text-align: center;
+  opacity: 0.7;
+  display: none;
+}

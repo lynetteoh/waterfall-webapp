@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
 
 from django.contrib.auth.models import User
-from .models import Profile, Account, Transaction, Transfer
+from .models import Profile, Account, Transaction, Transfer, GroupAccount
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.template import RequestContext
 
@@ -213,26 +213,33 @@ def register_new(request):
 def pay(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
-    from_users = []
-    from_users.append(user.username)
-    user_groups = user.profile.GroupAccount.all()
-
+    from_users = [user.username]
+    user_groups = [g.name for g in user.profile.GroupAccount.all()]
     for g in user_groups:
-        from_users.append(g.name)
-    
-    pay_users = []
+        if g != user.username:
+            from_users.append(g)
+
+    pay_users = [g.name for g in GroupAccount.objects.all()]
     for u in all_users:
         if (u != user.username):
             pay_users.append(u.username)
     context = {
         "pay_page": "active",
         "user" : user,
+        "user_groups": user_groups,
         "filter_users": pay_users,
         "from_users": from_users,
     }
     if request.method == "POST":
         try:
-            from_acc = request.POST.get('pay_from')    
+            from_acc = request.POST.get('pay_from')
+            try:
+                from_acc = User.objects.get(username=from_acc).account
+            except:
+                from_acc = GroupAccount.objects.get(name=from_acc).account
+            if not from_acc:
+                raise Exception("Invalid Transfer Account")
+
             payees = collect_recipients(request, 'pay_users')
             if not payees:
                 raise Exception("Invalid Payees")
@@ -243,8 +250,9 @@ def pay(request):
             amount = request.POST.get('pay_amount')
 
             for p in payees:
-                receiver = User.objects.get(username=p).account
-                if not receiver:
+                try:
+                    receiver = User.objects.get(username=p).account
+                except:
                     receiver = GroupAccount.objects.get(name=p).account
                 # Check for valid data.
                 if not receiver or (receiver is from_acc):
@@ -264,7 +272,6 @@ def pay(request):
                 today = timezone.localize(datetime.today()).date()
                 deadline = \
                     timezone.localize(datetime.strptime(date, "%Y-%m-%d")).date() # yyyy-mm-dd
-
                 if deadline < today:
                     raise Exception("Invalid Past Payment Date")
 
@@ -283,26 +290,34 @@ def pay(request):
 def request(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
-    from_users = []
-    from_users.append(user.username)
-    user_groups = user.profile.GroupAccount.all()
 
+    from_users = [user.username]
+    user_groups = [g.name for g in user.profile.GroupAccount.all()]
     for g in user_groups:
-        from_users.append(g.name)
-    
-    req_users = []
+        if g != user.username:
+            from_users.append(g)
+
+    req_users = [g.name for g in GroupAccount.objects.all()]
     for u in all_users:
-        if(u != user.username):
+        if (u != user.username):
             req_users.append(u.username)
-    context ={
+    context = {
         "request_page": "active",
         "user" : user,
+        "user_groups": user_groups,
         "filter_users": req_users,
         "from_users": from_users,
     }
     if request.method == "POST":
         try:
-            from_acc= request.POST.get('pay_from')        
+            from_acc = request.POST.get('req_from')
+            try:
+                from_acc = User.objects.get(username=from_acc).account
+            except:
+                from_acc = GroupAccount.objects.get(name=from_acc).account
+            if not from_acc:
+                raise Exception("Invalid Request Account")
+
             requests = collect_recipients(request, 'req_users')
             if not requests:
                 raise Exception("Invalid Request User")
@@ -312,10 +327,13 @@ def request(request):
             date = request.POST.get('req_date')
 
             for r in requests:
-                receiver = User.objects.get(username=r).account
-                if not receiver:
-                    receiver = GroupAccount.objects.get(name=r).account
                 amount = request.POST.get(r)
+                try:
+                    receiver = User.objects.get(username=r).account
+                except:
+                    print(r)
+                    receiver = GroupAccount.objects.get(name=r).account
+                    print("here")
 
                 # Check for valid data.
                 if not receiver or (receiver is from_acc):
@@ -351,27 +369,23 @@ def request(request):
 def create_group(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
-    
     create_members = []
     for u in all_users:
-        if(u != user.username):
+        if (u != user.username):
             create_members.append(u.username)
     context ={
         "user" : user,
         "filter_members": create_members,
-        
     }
     return render(request, 'create_group.html', context)
 
 @login_required
 def group_management(request):
     user = request.user
-    all_users = User.objects.all().exclude(username=request.user.username)
     group_members = []
-    GroupAccount.get(name=name).profile.all()
-    for u in all_users:
-        if(u != user.username):
-            group_members.append(u.username)
+    for p in GroupAccount.objects.get(name=name).profile.all():
+        if p.user != user:
+            group_members.append(p.user.username)
     context ={
         "user" : user,
         "filter_members": group_members,

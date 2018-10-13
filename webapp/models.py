@@ -258,7 +258,9 @@ class Transaction(models.Model):
     confirmed_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return '{} | @{} | ${}'.format(self.created_at, self.account.user.username, self.value)
+        if self.account.user:
+            return '{} | @{} | ${}'.format(self.created_at, self.account.user.username, self.value)
+        return '{} | @{} | ${}'.format(self.created_at, self.account.groupaccount.name, self.value)
 
     def _copy(self):
         return Transaction.objects.create(
@@ -275,6 +277,10 @@ class Transaction(models.Model):
     # Sends email notification about a transac
     @transaction.atomic
     def notify(self, subj, template):
+        # NOTE: Does not send notifications for groups.
+        if not self.account.user:
+            return
+
         print("Notifying...")
         amount = self.value if self.value > 0 else self.value*(-1)
         txt = "deposit" if self.transaction_type == 'd' else "withdraw"
@@ -309,7 +315,13 @@ class Transfer(models.Model):
     confirmed_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return '{}-- ${} -->{}'.format(self.tx_from.account.user.username, self.tx_to.value, self.tx_to.account.user.username)
+        from_id = self.tx_from.account.user.username \
+                if self.tx_from.account.user \
+                else self.tx_from.account.groupaccount.name
+        to_id = self.tx_to.account.user.username \
+                if self.tx_to.account.user \
+                else self.tx_to.account.groupaccount.name
+        return '{}-- ${} -->{}'.format(from_id, self.tx_to.value, to_id)
 
     @transaction.atomic
     def delete(self):
@@ -363,6 +375,10 @@ class Transfer(models.Model):
     # Sends email notification about transfer.
     @transaction.atomic
     def notify(self, subj, template):
+        # Note: If one of the payments goes to a group, no notification is sent.
+        if not tx_from.account.user or not tx_to.account.user:
+            return
+
         print("Notifying...")
         # Ensure that tx_from is the payer and tx_to the payee.
         tx_from = self.tx_from
