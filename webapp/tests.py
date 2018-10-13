@@ -62,7 +62,8 @@ class TransferModelTest(TestCase):
 
     def test_recurring_copy(self):
         tz = pytz.timezone("Australia/Sydney")
-        today = tz.localize(datetime.now())
+        now = datetime.now()
+        today = tz.localize(now)
         new_deadline = today + timedelta(days=7)
         transfer = Transfer.objects.get(id="1")
         transfer.recurrence_days = 7
@@ -71,26 +72,29 @@ class TransferModelTest(TestCase):
 
         recurr = Transfer.objects.get(id="2")
         self.assertIsNotNone(recurr)
-        # TODO steph
-        utc_delta = datetime.utcnow() - datetime.now()
-        utc_date = new_deadline + utc_delta
-        utc_date = utc_date.replace(tzinfo=pytz.UTC)
-        self.assertEqual(recurr.deadline.date(), utc_date.date())
         self.assertEqual(recurr.recurrence_days, 7)
         self.assertEqual(recurr.is_request, transfer.is_request)
+
+        utc_delta = datetime.utcnow() - datetime.now()
+        utc_date = new_deadline + utc_delta
+        utc_date = utc_date.strftime("%Y-%m-%d")
+        self.assertEqual(recurr.deadline.strftime("%Y-%m-%d"), utc_date)
 
         self.assertEqual(recurr.tx_from.account, transfer.tx_from.account)
         self.assertEqual(recurr.tx_from.value, transfer.tx_from.value)
         self.assertEqual(recurr.tx_from.title, transfer.tx_from.title)
         self.assertEqual(recurr.tx_from.transaction_type, 'w')
-        self.assertEqual(recurr.tx_from.modified_at, today)
+
+        utc_date = today + utc_delta
+        utc_date = utc_date.strftime("%Y-%m-%d")
+        self.assertEqual(recurr.tx_from.modified_at.strftime("%Y-%m-%d"), utc_date)
         self.assertIsNone(recurr.tx_from.confirmed_at)
 
         self.assertEqual(recurr.tx_to.account, transfer.tx_to.account)
         self.assertEqual(recurr.tx_to.value, transfer.tx_to.value)
         self.assertEqual(recurr.tx_to.title, transfer.tx_to.title)
         self.assertEqual(recurr.tx_to.transaction_type, 'd')
-        self.assertEqual(recurr.tx_to.modified_at, today)
+        self.assertEqual(recurr.tx_to.modified_at.strftime("%Y-%m-%d"), utc_date)
         self.assertIsNone(recurr.tx_to.confirmed_at)
 
 
