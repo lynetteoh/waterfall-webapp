@@ -212,7 +212,8 @@ def register_new(request):
 @login_required
 def pay(request):
     user = request.user
-    all_users = User.objects.all().exclude(username=request.user.username)
+    # all_users = User.objects.all().exclude(username=request.user.username)
+    all_users = User.objects.all()
     from_users = []
     from_users.append(user.username)
     user_groups = user.profile.GroupAccount.all()
@@ -282,7 +283,8 @@ def pay(request):
 @login_required
 def request(request):
     user = request.user
-    all_users = User.objects.all().exclude(username=request.user.username)
+    # all_users = User.objects.all().exclude(username=request.user.username)
+    all_users = User.objects.all()
     from_users = []
     from_users.append(user.username)
     user_groups = user.profile.GroupAccount.all()
@@ -302,7 +304,7 @@ def request(request):
     }
     if request.method == "POST":
         try:
-            from_acc= request.POST.get('pay_from')        
+            from_acc= request.POST.get('req_from')        
             requests = collect_recipients(request, 'req_users')
             if not requests:
                 raise Exception("Invalid Request User")
