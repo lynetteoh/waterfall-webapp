@@ -11,31 +11,42 @@
 {% endblock %}
 
 {% block content %}
-<div class="container bootstrap snippet pt-3 pl-5 ml-5">
+<div class="container bootstrap snippet">
     <div class="row">
         {% include 'navtabs.html' %}
         <div class="panel-body">
             <div class="tab-content">
                 <div class="tab-pane container active" id="request">
-                    <div class="row form-group mt-5">
-                        <label class="col-sm-2 col-form-label" for="search">TricklePay ID</label>
-                        <div class="col-sm-10 mb-3 form-inline">
-                            <input class="col-sm-10 form-control autocomplete" type="req_search" placeholder="Search"
-                                id="req_search" list="req_userList" required>
-                            <datalist id="req_userList">
-                                {% for f in filter_users %}
-                                <option>{{f}}</option>
-                                {% endfor %}
-                            </datalist>
-                            <button class="col-sm-2 btn btn-primary" id="req_add" onclick="add('req_search', 'req_users', 'req_amount'); update_value('req_users','req_amount')">Add
-                                <i class="fa fa-plus"></i></button>
-                        </div>
-                    </div>
                     <form role="form" id="req-form" onsubmit="event.preventDefault();popup('req_users','req-form','req_amount', 'req_date')"
                         method="POST">
                         {% csrf_token %}
-                        <div class="col-sm-10  ml-5 pl-5 mb-3">
-                            <ul class="pt-2 form-inline" id="req_users"></ul>
+                        <div class="row form-group mt-5 mb-5">
+                            <label class="col-sm-2 col-form-label" for="req_from">From</label>
+                            <div class=" col-sm-10">
+                                <select class="form-control" name="req_from">
+                                    {% for f in from_users %}
+                                    <option value="{{f}}">{{ f }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-2 col-form-label" for="search">TricklePay ID</label>
+                            <div class="col-sm-10 mb-3 form-inline">
+                                <input class="col-sm-10 form-control autocomplete" type="req_search" placeholder="Search"
+                                    id="req_search" list="req_userList" required>
+                                <datalist id="req_userList">
+                                    {% for f in filter_users %}
+                                    <option>{{f}}</option>
+                                    {% endfor %}
+                                </datalist>
+                                <input type="button" class="fa fa-plus col-sm-2 btn btn-primary font-weight-bold" id="req_add"
+                                    onclick="add('req_search', 'req_users', 'req_amount'); update_value('req_users','req_amount')"
+                                    value="Add &#xf067">
+                            </div>
+                        </div>
+                        <div class="col-sm-10  ml-5 pl-5 mb-3 form-inline">
+                            <ul class="ml-4" id="req_users"></ul>
                         </div>
                         <div class="row form-group mb-5">
                             <label for="req_amount" class="col-sm-2 col-form-label">Amount</label>
@@ -44,7 +55,7 @@
                                     <span class="input-group-text">$</span>
                                 </div>
                                 <input type="number" class="form-control" id="req_amount" name="req_amount" onchange="update_total('req_amount', 'summary_total'); update_value('req_users','req_amount')"
-                                    required>
+                                    min="0" step=".01" required>
                             </div>
                         </div>
                         <div class="row form-group mb-5">
@@ -54,8 +65,8 @@
                                     required>
                                 <div class="text-center col-sm-5">
                                     <div class="btn-group  pl-5" id="req_freq">
-                                        <input type="radio" name="req_freq" id="req_once" value="0" required><label
-                                            for="req_once" class="btn">Once</label>
+                                        <input type="radio" name="req_freq" id="req_once" value="0" required><label for="req_once"
+                                            class="btn">Once</label>
                                         <input type="radio" name="req_freq" id="req_weekly" value="7"><label for="req_weekly"
                                             class="btn">Weekly</label>
                                         <input type="radio" name="req_freq" id="req_monthly" value="30"><label for="req_monthly"
@@ -97,7 +108,7 @@
                             <button class="btn btn-lg btn-primary" type="submit">Request
                                 <i class="fa fa-paper-plane px-2"></i></button>
                         </div>
-                        <br/>
+                        <br />
                     </form>
                 </div>
             </div>
