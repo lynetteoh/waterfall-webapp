@@ -215,7 +215,11 @@ def pay(request):
     all_users = User.objects.all().exclude(username=request.user.username)
     from_users = []
     from_users.append(user.username)
-    from_users.append(user.profile.GroupAccount.name)
+    user_groups = user.profile.GroupAccount.all()
+
+    for g in user_groups:
+        from_users.append(g.name)
+    
     pay_users = []
     for u in all_users:
         if (u != user.username):
@@ -228,7 +232,7 @@ def pay(request):
     }
     if request.method == "POST":
         try:
-            from_acc = user.account       # TODO Lynn change to user or group
+            from_acc = request.POST.get('pay_from')    
             payees = collect_recipients(request, 'pay_users')
             if not payees:
                 raise Exception("Invalid Payees")
@@ -281,8 +285,10 @@ def request(request):
     all_users = User.objects.all().exclude(username=request.user.username)
     from_users = []
     from_users.append(user.username)
-    from_users.append(user.profile.GroupAccount.name)
-    print(user.profile.GroupAccount.name)
+    user_groups = user.profile.GroupAccount.all()
+
+    for g in user_groups:
+        from_users.append(g.name)
     
     req_users = []
     for u in all_users:
@@ -296,7 +302,7 @@ def request(request):
     }
     if request.method == "POST":
         try:
-            from_acc = user.account         # TODO lynn change to group
+            from_acc= request.POST.get('pay_from')        
             requests = collect_recipients(request, 'req_users')
             if not requests:
                 raise Exception("Invalid Request User")
@@ -361,13 +367,13 @@ def create_group(request):
 def group_management(request):
     user = request.user
     all_users = User.objects.all().exclude(username=request.user.username)
-    manage_members = []
+    group_members = []
     for u in all_users:
         if(u != user.username):
-            manage_members.append(u.username)
+            group_members.append(u.username)
     context ={
         "user" : user,
-        "filter_members": manage_members,
+        "filter_members": group_members,
         "group_id": '1',
         "group_members": '',
     }
