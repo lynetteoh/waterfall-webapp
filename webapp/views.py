@@ -196,9 +196,9 @@ def register_new(request):
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
-            profile = Profile()
-            profile.user = user
-            profile.avatar = None
+            profile = Profile(user=user, avatar=None)
+            # profile.user = user
+            # profile.avatar = None
             profile.save()
             account = Account()
             account.user = user
