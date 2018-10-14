@@ -14,7 +14,7 @@
 {% block content %}
 <div class="container bootstrap snippet ">
     <h2 class="py-4">Create Group</h2>
-    <form role="form" id="group-create-form" onsubmit="event.preventDefault();popup('members','group-create-form')"
+    <form role="form" id="group-creation-form" onsubmit="event.preventDefault();popup('members','group-create-form')"
         method="POST">
         {% csrf_token %}
         <div class="row form-group mb-5">
@@ -26,8 +26,7 @@
         <h5>Members</h5>
         <div class="row form-group mt-5">
             <div class="col-sm-12 mb-3 form-inline">
-                <input class="col-sm-10 form-control" placeholder="Search" id="member_search" list="member_list"
-                    required>
+                <input class="col-sm-10 form-control" placeholder="Search" id="member_search" list="member_list">
                 <datalist id="member_list">
                     {% for m in filter_members %}
                     <option>{{ m }}</option>

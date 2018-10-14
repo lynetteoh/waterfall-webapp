@@ -197,11 +197,8 @@ def register_new(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             profile = Profile(user=user, avatar=None)
-            # profile.user = user
-            # profile.avatar = None
             profile.save()
-            account = Account()
-            account.user = user
+            account = Account(user=user)
             account.save()
             login(request, user)
             return redirect('/dashboard')
@@ -289,7 +286,11 @@ def pay(request):
 @login_required
 def request(request):
     user = request.user
-    all_users = User.objects.all().exclude(username=request.user.username)
+    # all_users = User.objects.all().exclude(username=request.user.username)
+    all_users = User.objects.all()
+    from_users = []
+    from_users.append(user.username)
+    user_groups = user.profile.GroupAccount.all()
 
     from_users = [user.username]
     user_groups = [g.name for g in user.profile.GroupAccount.all()]
@@ -368,7 +369,7 @@ def request(request):
 @login_required
 def create_group(request):
     user = request.user
-    all_users = User.objects.all().exclude(username=request.user.username)
+    all_users = User.objects.all().exclude(username=user.username)
     create_members = []
     for u in all_users:
         if (u != user.username):
@@ -380,17 +381,25 @@ def create_group(request):
     return render(request, 'create_group.html', context)
 
 @login_required
-def group_management(request):
+def group_management(request, context=None):
     user = request.user
+    filter_users = [u.username for u in User.objects.all().exclude(username=user.username)]
+
+    user_groups = []
+    for g in user.profile.GroupAccount.all():
+        user_groups.append(g.name)
+    
+    group = user.profile.GroupAccount.all()[0]
     group_members = []
-    for p in GroupAccount.objects.get(name=name).profile.all():
+    for p in group.members.all():
         if p.user != user:
             group_members.append(p.user.username)
-    context ={
+    context = {
         "user" : user,
-        "filter_members": group_members,
-        "group_id": '',
-        "group_members": '',
+        "filter_members": filter_users,
+        "user_groups:": user_groups,
+        "group_members": group_members,
+        "group_id": group.name,
     }
     return render(request, 'group_management.html', context)
 

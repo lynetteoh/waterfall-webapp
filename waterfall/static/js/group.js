@@ -74,22 +74,43 @@ function check_member(user) {
 function popup(members, form) {
     var error = validateForm(members);
     if (!error) {
-        swal({
-            text: "Create Group ?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((confirmed) => {
-            if (confirmed) {
-                document.getElementById(form).submit();
-            } else {
-                swal({
-                    title: "Cancelled",
-                    text: "Group creation has been cancelled",
-                    icon: "warning",
-                });
-            }
-        });
+        if(form == 'group-creation-form') {
+            swal({
+                text: "Create Group ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((confirmed) => {
+                if (confirmed) {
+                    document.getElementById(form).submit();
+                    window.location.replace(group_list); 
+                } else {
+                    swal({
+                        title: "Cancelled",
+                        text: "Group creation has been cancelled",
+                        icon: "warning",
+                    });
+                }
+            });
+        } else {
+            swal({
+                text: "Save Changes ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((confirmed) => {
+                if (confirmed) {
+                    document.getElementById(form).submit();
+                } else {
+                    swal({
+                        title: "Cancelled",
+                        text: "Changes not saved",
+                        icon: "warning",
+                    });
+                }
+            });
+        }
+            
     } else {
         swal({
             title: "Process Failed",
@@ -171,6 +192,7 @@ function add(user, members) {
 }
 
 function leave_group(form) {
+    
     swal({
         text: "Leave Group ?",
         icon: "warning",
@@ -179,6 +201,7 @@ function leave_group(form) {
     }).then((confirmed) => {
         if (confirmed) {
             document.getElementById(form).submit();
+            window.location.replace(group_list);     
         } else {
             swal({
                 title: "Cancelled",
