@@ -73,7 +73,6 @@ def viewMoreH(request):
     user = str(request.user)
     past = []
 
-    transfers = Transfer.objects.all()
     for t in transfers:
         if t.tx_from.confirmed_at:
             t.confirmed_at = t.confirmed_at.date()
@@ -100,6 +99,11 @@ def dashboard(request):
         "requests": requests,
         "user_requests": user_requests,
     }
+
+    if request.method == "GET":
+        query = request.GET.get('query')
+        print("We got the query:", query)
+
 
     if request.method == "POST":
         transfer = request.POST.get('transfer')
