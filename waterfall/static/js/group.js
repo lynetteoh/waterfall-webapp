@@ -1,9 +1,9 @@
 //add member to group
 function add_member(search, users) {
-    //get text from search bar
+    // Get text from search bar
     var text = document.getElementById(search).value;
     var valid_user = 0;
-    //check if member is a valid user
+    // Check if member is a valid user
     valid_user = check_member(text);
     if (valid_user == 0) {
         swal({
@@ -33,7 +33,11 @@ function exist(search, user, text) {
             var x = input.attributes[3].value;
             console.log(x);
             if (x == text) {
-                swal("You have chosen the same payee !");
+                swal({
+                    title: "Invalid Selection",
+                    text: "You have selected the same user twice.",
+                    icon: "warning",
+                });
                 result = 1
                 break
             }
@@ -76,25 +80,27 @@ function popup(members, form) {
     if (!error) {
         if(form == 'group-creation-form') {
             swal({
-                text: "Create Group ?",
+                title: "Creating New Group",
+                text: "Are you sure?",
                 icon: "warning",
                 buttons: true,
                 dangerMode: true,
             }).then((confirmed) => {
                 if (confirmed) {
                     document.getElementById(form).submit();
-                    window.location.replace(group_list); 
+                    window.location.replace(group_list);
                 } else {
                     swal({
                         title: "Cancelled",
-                        text: "Group creation has been cancelled",
+                        text: "Group creation cancelled",
                         icon: "warning",
                     });
                 }
             });
         } else {
             swal({
-                text: "Save Changes ?",
+                title: "Are you sure?",
+                text: "Once changes have been saved, they cannot be undone.",
                 icon: "warning",
                 buttons: true,
                 dangerMode: true,
@@ -104,13 +110,13 @@ function popup(members, form) {
                 } else {
                     swal({
                         title: "Cancelled",
-                        text: "Changes not saved",
+                        text: "Your changes have not been saved.",
                         icon: "warning",
                     });
                 }
             });
         }
-            
+
     } else {
         swal({
             title: "Process Failed",
@@ -192,22 +198,36 @@ function add(user, members) {
 }
 
 function leave_group(form) {
-    
     swal({
-        text: "Leave Group ?",
+        title: "Leaving Group",
+        text: "Are you sure?",
         icon: "warning",
         buttons: true,
         dangerMode: true,
     }).then((confirmed) => {
         if (confirmed) {
             document.getElementById(form).submit();
-            window.location.replace(group_list);     
+            window.location.replace(group_list);
         } else {
             swal({
                 title: "Cancelled",
-                text: "Action cancelled",
+                text: "You have not left the group.",
                 icon: "warning",
             });
+        }
+    });
+}
+
+function cancel_changes(link) {
+    swal({
+        title: "Cancel Changes?",
+        text: "Your changes have not been saved.",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    }).then((confirmed) => {
+        if (confirmed) {
+            window.location.replace(link);
         }
     });
 }

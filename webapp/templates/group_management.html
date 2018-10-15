@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-<title>Waterfall - TricklePay</title>
+<title>Waterfall - Edit Group</title>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="{% static 'js/group.js' %}"></script>
 <link rel="stylesheet" href="{% static 'css/awesomplete.css' %}" type="text/css">
@@ -13,48 +13,55 @@
 
 {% block content %}
 <div class="container bootstrap snippet">
-    <h2 class="py-4">Group Management</h2>
-    <form role="form" id="group-management-form" onsubmit="event.preventDefault();popup('members','group-management-form')"
-        method="POST">
-        {% csrf_token %}
-        <div class="row form-group mb-5">
-            <label for="pay_amount" class="col-sm-2 col-form-label">Group ID</label>
-            <div class="input-group col-sm-10">
-                <input name="group_id" type="text" class="form-control" id="group_id" value="{{group_id}}" disabled>
-            </div>
-        </div>
-        <h5>Members</h5>
-        <div class="row form-group mt-5">
-            <div class="col-sm-12 mb-3 form-inline">
-                <input class="col-sm-10 form-control" placeholder="Search" id="member_search" list="member_list">
-                <datalist id="member_list">
-                    {% for m in filter_members %}
-                    <option>{{ m }}</option>
-                    {% endfor %}
-                </datalist>
-                <input type="button" class="fa fa-plus col-sm-2 btn btn-primary font-weight-bold" id="add" onclick="add_member('member_search', 'members')"
-                    value="Add &#xf067">
-            </div>
-            <div class="col-sm-12">
-                <ul class="ul_style ml-4 mx-3" id='members'></ul>
-            </div>
-        </div>
-        <div class="text-center font-inline p-4">
-            <button class="btn btn-lg btn-primary" type="submit">Save</button>
-            <input type="button" class="btn btn-lg btn-primary" value="Leave Group" onclick="leave_group('leave_group')">
-            <a class="btn btn-lg btn-primary" href="{% url 'dashboard' %}">Cancel</a>
-        </div>
-    </form>
-    <form role="form" id="leave_group" method="POST">
-        {% csrf_token %}
-        <input id="hidden_field" name="hidden_field" type="hidden" value="User leave group" />
-    </form>
+    <h2 class="py-4">Edit Group</h2>
+    {% if not group %}
+      <p>No group has been selected for management. Please try again.</p>
+    {% else %}
+      <form role="form" id="group-management-form" onsubmit="event.preventDefault();popup('members','group-management-form')"
+          method="POST">
+          {% csrf_token %}
+          <div class="row form-group mb-5">
+              <label for="pay_amount" class="col-sm-2 col-form-label">Group ID</label>
+              <div class="input-group col-sm-10">
+                  <input name="group_id" type="text" class="form-control" id="group_id" value="{{ group.name }}" disabled>
+              </div>
+          </div>
+          <h5>Members</h5>
+          <div class="row form-group mt-5">
+              <div class="col-sm-12 mb-3 form-inline">
+                  <input class="col-sm-10 form-control" placeholder="Search" id="member_search" list="member_list">
+                  <datalist id="member_list">
+                      {% for m in filter_members %}
+                      <option>{{ m }}</option>
+                      {% endfor %}
+                  </datalist>
+                  <input type="button" class="fa fa-plus col-sm-2 btn btn-primary font-weight-bold" id="add" onclick="add_member('member_search', 'members')"
+                      value="Add &#xf067">
+              </div>
+              <div class="col-sm-12">
+                  <ul class="ul_style ml-4 mx-3" id='members'></ul>
+              </div>
+          </div>
+          </t>
+          <div class="text-center font-inline p-4">
+              <button class="btn btn-lg btn-primary" type="submit">Save</button>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <input type="button" class="btn btn-lg btn-primary" value="Leave Group" onclick="leave_group('leave_group')">
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <input type="button" class="btn btn-lg btn-primary" value="Cancel" onclick="cancel_changes('{% url 'all_groups' %}')"">
+          </div>
+      </form>
+      <form role="form" id="leave_group" method="POST">
+          {% csrf_token %}
+          <input id="hidden_field" name="hidden_field" type="hidden" value="User leave group" />
+      </form>
+    {% endif %}
 </div>
 
 <script>
     var f_members = "{{filter_members}}";
     var g_members = "{{group_members}}";
-    var group_list = "{% url 'group_dashboard' %}";  //TODO change to the correct url to groups list
+    var group_list = "{% url 'all_groups' %}";
     add_all_members('members');
 </script>
 {% endblock %}

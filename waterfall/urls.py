@@ -39,6 +39,7 @@ urlpatterns = [
     path('dashboard/view-more-ip/', views.viewMoreIp, name='viewMoreIp'),
     path('dashboard/view-more-h/', views.viewMoreH, name='viewMoreH'),
     path('create-group', views.create_group, name='create_group'),
+    path('all-groups', views.all_groups, name='all_groups'),
     path('group-management', views.group_management, name='group_management'),
 ]
 
