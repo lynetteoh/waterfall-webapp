@@ -399,6 +399,9 @@ def request(request):
 def create_group(request):
     user = request.user
     all_users = User.objects.all().exclude(username=user.username)
+    groups = []
+    for g in user.profile.GroupAccount.all():
+        groups.append(g.name)
     create_members = []
     for u in all_users:
         if (u != user.username):
@@ -406,6 +409,7 @@ def create_group(request):
     context ={
         "user" : user,
         "filter_members": create_members,
+        "all_groups" :groups,
     }
     return render(request, 'create_group.html', context)
 

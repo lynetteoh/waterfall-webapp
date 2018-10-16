@@ -48,7 +48,7 @@
               &nbsp;&nbsp;&nbsp;&nbsp;
               <input type="button" class="btn btn-lg btn-primary" value="Leave Group" onclick="leave_group('leave_group')">
               &nbsp;&nbsp;&nbsp;&nbsp;
-              <input type="button" class="btn btn-lg btn-primary" value="Cancel" onclick="cancel_changes('{% url 'all_groups' %}')"">
+              <input type="button" class="btn btn-lg btn-primary" value="Cancel" onclick="cancel_changes('{% url 'all_groups' %}')">
           </div>
       </form>
       <form role="form" id="leave_group" method="POST">
@@ -63,5 +63,6 @@
     var g_members = "{{group_members}}";
     var group_list = "{% url 'all_groups' %}";
     add_all_members('members');
+    checkError("{{error}}");
 </script>
 {% endblock %}
