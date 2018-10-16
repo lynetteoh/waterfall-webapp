@@ -282,7 +282,7 @@ class Transaction(models.Model):
             return
 
         print("Notifying...")
-        amount = self.value if self.value > 0 else self.value*(-1)
+        amount = float(self.value) if float(self.value) > 0 else float(self.value)*(-1)
         txt = "deposit" if self.transaction_type == 'd' else "withdraw"
         context = {
             "bal" : self.account.balance,
@@ -376,7 +376,7 @@ class Transfer(models.Model):
     @transaction.atomic
     def notify(self, subj, template):
         # Note: If one of the payments goes to a group, no notification is sent.
-        if not tx_from.account.user or not tx_to.account.user:
+        if not self.tx_from.account.user or not self.tx_to.account.user:
             return
 
         print("Notifying...")

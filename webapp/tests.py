@@ -1,8 +1,12 @@
 from django.test import TestCase
 from django.contrib.auth import authenticate
-from .models import User, Profile, Account, Transfer, Transaction
+from django.core import mail
+from .models import User, Profile, Account, Transfer, Transaction, GroupAccount
 from datetime import datetime, timedelta, tzinfo
 import pytz
+
+# TODO test for groups
+
 #
 # class AccountTest(TestCase):
 #     tz = pytz.timezone("Australia/Sydney")
@@ -70,6 +74,8 @@ import pytz
 #         # TODO
 #         return True
 
+
+
 class GroupAccountTest(TestCase):
     def test_str(self):
         # TODO
@@ -89,38 +95,58 @@ class TransactionModelTest(TestCase):
     today = tz.localize(datetime.today())
 
     def setUp(self):
-        usr_from = User.objects.create(username="from", password="test")
+        usr_from = User.objects.create(username="from", password="test", email="from@waterfall.com")
         usr_to = User.objects.create(username="to", password="test")
+
+        group = GroupAccount.objects.create(name="group", account=Account.objects.create())
         acc_from = Account.objects.create(user=usr_from)
         acc_to = Account.objects.create(user=usr_to)
 
-        tx_from = Transaction.objects.create(transaction_type='w', title="testfrom", account=acc_from, value="-10.50", created_at=self.today, modified_at=self.today)
-        tx_to = Transaction.objects.create(transaction_type='d', title="testto", account=acc_to, value="10.50", created_at=self.today, modified_at=self.today)
+        self.tx_from = Transaction.objects.create(transaction_type='w', title="testfrom", account=acc_from, value="-10.50", created_at=self.today, modified_at=self.today)
+        self.tx_to = Transaction.objects.create(transaction_type='d', title="testto", account=acc_to, value="10.50", created_at=self.today, modified_at=self.today)
+
+        self.tx_tog = Transaction.objects.create(transaction_type='w', title="test group", account=acc_to, value="-25.70", created_at=self.today, modified_at=self.today, confirmed_at=self.today)
+        self.tx_fromg = Transaction.objects.create(transaction_type='d', title="test group", account=group.account, value="25.70", created_at=self.today, modified_at=self.today, confirmed_at=self.today)
 
     def test_str(self):
-        # TODO
-        return True
+        user_str = '{} | @{} | ${}'.format(self.tx_from.created_at, self.tx_from.account.user.username, self.tx_from.value)
+        group_str = '{} | @{} | ${}'.format(self.tx_fromg.created_at, self.tx_fromg.account.groupaccount.name, self.tx_fromg.value)
+        self.assertEqual(str(self.tx_from), user_str)
+        self.assertEqual(str(self.tx_fromg), group_str)
 
     def test_copy(self):
-        # TODO
-        return True
+        copy = self.tx_from._copy()
+        self.assertEqual(self.tx_from.account, copy.account)
+        self.assertEqual(self.tx_from.title, copy.title)
+        self.assertEqual(self.tx_from.value, copy.value)
+        self.assertEqual(self.tx_from.transaction_type, copy.transaction_type)
+        self.assertEqual(self.tx_from.is_pending, copy.is_pending)
+        self.assertEqual(self.tx_from.created_at.strftime("%Y-%m-%d"), copy.created_at.strftime("%Y-%m-%d"))
+        self.assertEqual(self.tx_from.modified_at.strftime("%Y-%m-%d"), copy.modified_at.strftime("%Y-%m-%d"))
+        self.assertEqual(self.tx_from.confirmed_at, copy.confirmed_at)
+        # Group copies
+        copy = self.tx_fromg._copy()
+        self.assertEqual(self.tx_fromg.account, copy.account)
+        self.assertEqual(self.tx_fromg.confirmed_at.strftime("%Y-%m-%d"), copy.confirmed_at.strftime("%Y-%m-%d"))
 
     def test_notify(self):
-        # TODO
-        return True
+        template = "email/reminder-balance.html"
+        self.tx_from.notify("Test Email", template)
+        self.tx_fromg.notify("Test Group", template)
 
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, "Test Email")
+        self.assertEqual(mail.outbox[0].from_email, "waterfallpay@gmail.com")
+        self.assertEqual(mail.outbox[0].to, ["from@waterfall.com"])
 
-    def test_notify(self):
-        # TODO
-        return True
 
 class TransferModelTest(TestCase):
     tz = pytz.timezone("Australia/Sydney")
     today = tz.localize(datetime.today())
 
     def setUp(self):
-        usr_from = User.objects.create(username="from", password="test")
-        usr_to = User.objects.create(username="to", password="test")
+        usr_from = User.objects.create(username="from", password="test", email="from@waterfall.com")
+        usr_to = User.objects.create(username="to", password="test", email="to@waterfall.com")
         acc_from = Account.objects.create(user=usr_from)
         acc_to = Account.objects.create(user=usr_to)
 
@@ -195,7 +221,16 @@ class TransferModelTest(TestCase):
         self.assertEqual(recurr.tx_to.modified_at.strftime("%Y-%m-%d"), today.strftime("%Y-%m-%d"))
         self.assertIsNone(recurr.tx_to.confirmed_at)
 
-
     def test_notify(self):
-        # TODO test email notification
-        return True
+        transfer = Transfer.objects.get(id="1")
+        template = "email/delete-outgoing.html"
+        transfer.notify("Test Email", template)
+
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[0].subject, "Test Email")
+        self.assertEqual(mail.outbox[0].from_email, "waterfallpay@gmail.com")
+        self.assertEqual(mail.outbox[0].to, ["from@waterfall.com"])
+
+        self.assertEqual(mail.outbox[1].subject, "Test Email")
+        self.assertEqual(mail.outbox[1].from_email, "waterfallpay@gmail.com")
+        self.assertEqual(mail.outbox[1].to, ["to@waterfall.com"])
