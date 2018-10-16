@@ -114,6 +114,12 @@ def viewMoreH(request):
     return render(request, 'view_more.html', context)
 
 @login_required
+def group_dash(request, name):
+    print("the name we got:", name)
+    context = {"groupName": name}
+    return render(request, 'group_dash.html', context)
+
+@login_required
 def dashboard(request):
     user_str = str(request.user)
     query = None if not request.GET.get('query') else request.GET.get('query')

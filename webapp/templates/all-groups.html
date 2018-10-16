@@ -58,7 +58,7 @@
                     <tbody>
                         {% for g in groups %}
                         <tr>
-                            <td style="text-align:center;">{{ g.name }}</td>
+                            <td style="text-align:center;"><a href="/group/{{ g.name }}">{{ g.name }}</a></td>
                             <td>
                               {% for m in g.members.all %}
                                 {{ m }}&nbsp;&nbsp;

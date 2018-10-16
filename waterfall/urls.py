@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from webapp import views
@@ -41,6 +41,7 @@ urlpatterns = [
     path('create-group', views.create_group, name='create_group'),
     path('all-groups', views.all_groups, name='all_groups'),
     path('group-management', views.group_management, name='group_management'),
+    re_path(r'^group/(?P<name>[\w|\W]+)/$', views.group_dash, name="group_dash")
 ]
 
 if settings.DEBUG:
