@@ -5,42 +5,46 @@ from .models import User, Profile, Account, Transfer, Transaction, GroupAccount
 from datetime import datetime, timedelta, tzinfo
 import pytz
 
-# TODO test for groups
 
-#
-# class AccountTest(TestCase):
-#     tz = pytz.timezone("Australia/Sydney")
-#     today = tz.localize(datetime.today())
-#
-#     user = User.objects.create(username="testuser", password="testA")
-#     usr_from = User.objects.create(username="fromuser", password="testB")
-#     usr_to = User.objects.create(username="touser", password="testC")
-#
-#     acc = Account.objects.create(user=self.user)
-#     acc_from = Account.objects.create(user=self.usr_from)
-#     acc_to = Account.objects.create(user=self.usr_to)
-#
-#     tx_from = Transaction.objects.create(transaction_type='w', title="transaction1", account=self.acc_from, value="-10.50", created_at=self.today, modified_at=self.today, confirmed_at=self.today)
-#     tx_to = Transaction.objects.create(transaction_type='d', title="transaction1", account=self.acc_to, value="10.50", created_at=self.today, modified_at=self.today, confirmed_at=self.today)
-#
-#     def setUp(self):
-#         # Make basic payment.
-#         Transfer.objects.create(tx_from=self.tx_from, tx_to=self.tx_to, deadline=self.today)
-#
-#         # Make basic request.
-#         Transfer.objects.create(tx_from=self.tx_from._copy(), tx_to=self.tx_to._copy(), deadline=self.today, is_request=True)
-#
-#     def test_balance(self):
-#         self.assertEqual(self.acc.balance, 0)
-#         self.assertEqual(self.usr_to.balance, 10.5000)
-#
-#     def test_num_payments(self):
-#         self.assertEqual(self.acc.num_payments, 0)
-#         self.assertEqual(self.acc_from.num_payments, 1)
-#
-#     def test_num_requests(self):
-#         # TODO
-#         return True
+class AccountTest(TestCase):
+    tz = pytz.timezone("Australia/Sydney")
+    today = tz.localize(datetime.today())
+
+    def setUp(self):
+        self.user = User.objects.create(username="testuser", password="testA")
+        self.usr_from = User.objects.create(username="fromuser", password="testB")
+        self.usr_to = User.objects.create(username="touser", password="testC")
+
+        self.acc = Account.objects.create(user=self.user)
+        self.acc_from = Account.objects.create(user=self.usr_from)
+        self.acc_to = Account.objects.create(user=self.usr_to)
+
+        self.tx_from = Transaction.objects.create(transaction_type='w', title="transaction1", account=self.acc_from, value="-10.50", created_at=self.today, modified_at=self.today, confirmed_at=self.today)
+        self.tx_to = Transaction.objects.create(transaction_type='d', title="transaction1", account=self.acc_to, value="10.50", created_at=self.today, modified_at=self.today, confirmed_at=self.today)
+
+        # Make basic payment.
+        self.pay = Transfer.objects.create(tx_from=self.tx_from, tx_to=self.tx_to, deadline=self.today, confirmed_at=self.today)
+
+        # Make basic request.
+        tx_from_copy = self.tx_from._copy()
+        tx_to_copy   = self.tx_to._copy()
+        tx_from_copy.confirmed_at = None
+        tx_to_copy.confirmed_at = None
+        tx_from_copy.save()
+        tx_to_copy.save()
+        self.req = Transfer.objects.create(tx_from=tx_from_copy, tx_to=tx_to_copy, deadline=self.today, is_request=True)
+
+    def test_balance(self):
+        self.assertEqual(self.acc.balance, 0)
+        self.assertEqual(self.usr_to.account.balance, 10.5000)
+
+    def test_num_payments(self):
+        self.assertEqual(self.acc.num_payments, 0)
+        self.assertEqual(self.acc_from.num_payments, 1)
+
+    def test_num_requests(self):
+        self.assertEqual(self.acc.num_requests, 0)
+        self.assertEqual(self.acc_from.num_requests, 1)
 #
 #     def test_num_groups(self):
 #         # TODO
