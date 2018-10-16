@@ -230,7 +230,7 @@ class Profile(models.Model):
     GroupAccount = models.ManyToManyField(GroupAccount,blank=True,related_name='members')
 
     def __str__(self):
-        return str(self.user) if self.user else "@" + self.GroupAccount.name + " (Group)"
+        return '@{}'.format(self.user.username)
 
 class Transaction(models.Model):
     TRANSACTION_TYPES = {
@@ -282,7 +282,7 @@ class Transaction(models.Model):
             return
 
         print("Notifying...")
-        amount = float(self.value) if float(self.value) > 0 else float(self.value)*(-1)
+        amount = self.value if float(self.value) > 0 else float(self.value)*(-1)
         txt = "deposit" if self.transaction_type == 'd' else "withdraw"
         context = {
             "bal" : self.account.balance,

@@ -78,17 +78,14 @@ import pytz
 
 class GroupAccountTest(TestCase):
     def test_str(self):
-        # TODO
-        return True
+        group = GroupAccount.objects.create(name="hello", account=Account.objects.create())
+        self.assertEqual(str(group), "hello: ")
 
 class ProfileModelTest(TestCase):
     def test_str(self):
         user = User.objects.create(username="testusr", password="test")
         p = Profile.objects.create(user=user, avatar=None)
         self.assertEqual(str(p), "@testusr")
-        group = GroupAccount.objects.create(name="group", password="pw")
-        p = Profile.objects.create(GroupAccount=group, avatar=None)
-        self.assertEqual(str(p), "@group (Group)")
 
 class TransactionModelTest(TestCase):
     tz = pytz.timezone("Australia/Sydney")
@@ -147,17 +144,21 @@ class TransferModelTest(TestCase):
     def setUp(self):
         usr_from = User.objects.create(username="from", password="test", email="from@waterfall.com")
         usr_to = User.objects.create(username="to", password="test", email="to@waterfall.com")
+        group = GroupAccount.objects.create(name="group", account=Account.objects.create())
         acc_from = Account.objects.create(user=usr_from)
         acc_to = Account.objects.create(user=usr_to)
 
-        tx_from = Transaction.objects.create(transaction_type='w', title="testfrom", account=acc_from, value="-10.50", created_at=self.today, modified_at=self.today)
-        tx_to = Transaction.objects.create(transaction_type='d', title="testto", account=acc_to, value="10.50", created_at=self.today, modified_at=self.today)
+        tx_from = Transaction.objects.create(transaction_type='w', title="testfrom", account=acc_from, value=-10.50, created_at=self.today, modified_at=self.today)
+        tx_to = Transaction.objects.create(transaction_type='d', title="testto", account=acc_to, value=10.50, created_at=self.today, modified_at=self.today)
+        self.tx = Transfer.objects.create(tx_from=tx_from, tx_to=tx_to, deadline=self.today)
 
-        Transfer.objects.create(tx_from=tx_from, tx_to=tx_to, deadline=self.today)
+        tx_fromg = Transaction.objects.create(transaction_type='w', title="test group", account=acc_from, value=-72.55, created_at=self.today, modified_at=self.today)
+        tx_tog = Transaction.objects.create(transaction_type='d', title="test group", account=group.account, value=72.55, created_at=self.today, modified_at=self.today)
+        self.txg = Transfer.objects.create(tx_from=tx_fromg, tx_to=tx_tog, deadline=self.today)
 
     def test_str(self):
-        transfer = Transfer.objects.get(id="1")
-        self.assertEqual(str(transfer), "from-- $10.5000 -->to")
+        self.assertEqual(str(self.tx), "from-- $10.5 -->to")
+        self.assertEqual(str(self.txg), "from-- $72.55 -->group")
 
     def test_delete(self):
         transfer = Transfer.objects.get(id="1")
@@ -175,7 +176,7 @@ class TransferModelTest(TestCase):
         self.assertFalse(transfer.tx_from.is_pending)
         self.assertFalse(transfer.tx_to.is_pending)
         # Check that no copy has been made.
-        self.assertTrue(len(Transfer.objects.all()) < 2)
+        self.assertTrue(len(Transfer.objects.all()) == 2)
 
     def test_confirm_recurr(self):
         today = datetime.today()
@@ -192,16 +193,13 @@ class TransferModelTest(TestCase):
         self.assertIsNotNone(Transfer.objects.get(id="2"))
 
     def test_recurring_copy(self):
-        tz = pytz.timezone("Australia/Sydney")
-        now = datetime.now()
-        today = tz.localize(now)
-        new_deadline = today + timedelta(days=7)
-        transfer = Transfer.objects.get(id="1")
+        new_deadline = self.today + timedelta(days=7)
+        transfer = self.tx
         transfer.recurrence_days = 7
         transfer.save()
-        transfer.create_recurring_copy(today)
+        transfer.create_recurring_copy(self.today)
 
-        recurr = Transfer.objects.get(id="2")
+        recurr = Transfer.objects.get(id="3")
         self.assertIsNotNone(recurr)
         self.assertEqual(recurr.recurrence_days, 7)
         self.assertEqual(recurr.is_request, transfer.is_request)
@@ -211,20 +209,20 @@ class TransferModelTest(TestCase):
         self.assertEqual(recurr.tx_from.value, transfer.tx_from.value)
         self.assertEqual(recurr.tx_from.title, transfer.tx_from.title)
         self.assertEqual(recurr.tx_from.transaction_type, 'w')
-        self.assertEqual(recurr.tx_from.modified_at.strftime("%Y-%m-%d"), today.strftime("%Y-%m-%d"))
+        self.assertEqual(recurr.tx_from.modified_at.strftime("%Y-%m-%d"), self.today.strftime("%Y-%m-%d"))
         self.assertIsNone(recurr.tx_from.confirmed_at)
 
         self.assertEqual(recurr.tx_to.account, transfer.tx_to.account)
         self.assertEqual(recurr.tx_to.value, transfer.tx_to.value)
         self.assertEqual(recurr.tx_to.title, transfer.tx_to.title)
         self.assertEqual(recurr.tx_to.transaction_type, 'd')
-        self.assertEqual(recurr.tx_to.modified_at.strftime("%Y-%m-%d"), today.strftime("%Y-%m-%d"))
+        self.assertEqual(recurr.tx_to.modified_at.strftime("%Y-%m-%d"), self.today.strftime("%Y-%m-%d"))
         self.assertIsNone(recurr.tx_to.confirmed_at)
 
     def test_notify(self):
-        transfer = Transfer.objects.get(id="1")
         template = "email/delete-outgoing.html"
-        transfer.notify("Test Email", template)
+        self.tx.notify("Test Email", template)
+        self.txg.notify("Test Group", template)
 
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(mail.outbox[0].subject, "Test Email")
