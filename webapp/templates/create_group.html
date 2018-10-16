@@ -14,11 +14,11 @@
 {% block content %}
 <div class="container bootstrap snippet ">
     <h2 class="py-4">Create Group</h2>
-    <form role="form" id="group-creation-form" onsubmit="event.preventDefault();popup('members','group-create-form')"
+    <form role="form" id="group-creation-form" onsubmit="event.preventDefault();popup('members','group-creation-form')"
         method="POST">
         {% csrf_token %}
         <div class="row form-group mb-5">
-            <label for="pay_amount" class="col-sm-2 col-form-label">Group ID</label>
+            <label for="group_name" class="col-sm-2 col-form-label">Group Name</label>
             <div class="input-group col-sm-10">
                 <input name="group_name" type="text" class="form-control" id="group_name" required>
             </div>
@@ -48,6 +48,8 @@
 
 <script>
     var f_members = "{{filter_members}}";
+    var all_groups = "{{all_groups}}";
     add_creator('members', '{{user}}');
+    checkError("{{error}}");
 </script>
 {% endblock %}

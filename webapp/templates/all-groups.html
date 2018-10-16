@@ -30,15 +30,18 @@
     <br/>
 
     <div class="row dash_heading">
-        <div class="col">
+        <div class="col ">
             {% if search %}
               <h3>Search Results for "{{ search }}"</h3>
             {% else %}
               <h3>Your Groups</h3>
             {% endif %}
         </div>
-        <div  class="col">
-        </div>
+        <div class="col">
+            <div class="float-right">
+                <a class="btn search_btn btn-outline-success" style="width: 100%;" href="{% url 'create_group' %}">Create Group</a>
+            </div>
+        </div>       
     </div>
     <br/>
     {% if groups %}
