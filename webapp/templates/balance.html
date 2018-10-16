@@ -6,7 +6,6 @@
 <link href="{% static "css/balance.css" %}" rel="stylesheet" type="text/css">
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="{% static "js/balance.js" %}" type="text/javascript"></script>
-
 {% endblock %}
 
 {% block content %}
@@ -25,7 +24,7 @@
             <form class="form-inline" role="form" id="deposit" onsubmit="event.preventDefault(); balancePopup(false)" method="POST">
               {% csrf_token %}
               <div class="deposit_inner">
-              
+
               <input type="text" style="display: inline-block;" class="text-center form-control" name="add_amount" placeholder="0.00" value="0.00" id="add-amount">
                 <button style="display: inline-block !important;" class="btn btn-lg btn-success text-center" type="submit" value="Add" id="plus-button">
                   Deposit

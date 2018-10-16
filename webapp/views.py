@@ -22,6 +22,7 @@ def team(request):
 def product(request):
     return render(request, 'product.html')
 
+@login_required
 def viewMoreOp(request):
     title = "Outgoing Payments"
     user = str(request.user)
@@ -52,6 +53,7 @@ def viewMoreOp(request):
     }
     return render(request, 'view_more.html', context)
 
+@login_required
 def viewMoreIp(request):
     title = "Incoming Payments"
     user = str(request.user)
@@ -82,6 +84,7 @@ def viewMoreIp(request):
     }
     return render(request, 'view_more.html', context)
 
+@login_required
 def viewMoreH(request):
     title = "Transaction History"
     user = str(request.user)
@@ -94,7 +97,7 @@ def viewMoreH(request):
         context["user1"] = user
         context["key"] = "th"
         return render(request, 'view_more.html', context)
-    
+
     transfers = Transfer.objects.all()
 
     for t in transfers:
@@ -110,11 +113,13 @@ def viewMoreH(request):
     }
     return render(request, 'view_more.html', context)
 
-
 @login_required
 def dashboard(request):
     user_str = str(request.user)
-    incoming, outgoing, past, requests, user_requests = collect_dash_transfers(request.user, Transfer.objects.all())
+    query = None if not request.GET.get('query') else request.GET.get('query')
+
+    incoming, outgoing, past, requests, user_requests =\
+        collect_dash_transfers(request.user, Transfer.objects.all(), query)
     context = {
         "past": past,
         "incoming" : incoming,
@@ -123,11 +128,8 @@ def dashboard(request):
         "requests": requests,
         "user_requests": user_requests,
     }
-
-    if request.GET.get('query'):
-        query = request.GET.get('query')
-        context = collect_search_results(request.user, query)
-            
+    if query:
+        context["search"] = query
         return render(request, 'dashboard.html', context)
 
     if request.method == "POST":
@@ -439,7 +441,6 @@ def all_groups(request):
                 return redirect('/group-management?g=' + edit_group)
     return render(request, 'all-groups.html', context)
 
-
 @login_required
 def group_management(request):
     user = request.user
@@ -470,19 +471,28 @@ def group_management(request):
 
 ### HELPER FUNCTIONS ###
 
-def collect_search_results(user, query):
-    context = {}
-    objects = Transfer.objects.filter(tx_to__title__contains=query, tx_from__title__contains=query)
-    incoming, outgoing, past, requests, user_requests =\
-                                    collect_dash_transfers(user, objects)
-    context['incoming'] = incoming
-    context['outgoing'] = outgoing
-    context['past'] = past
-    context['requests'] = requests
-    context['user_requests'] = user_requests
-    return context
+def transfer_has_query(t, query):
+    if not query:
+        return True
+    q = query.lower()
 
-def collect_dash_transfers(user, transfer_objects):
+    # Check user names for query.
+    if (q in t.tx_from.title.lower()) or (q in t.tx_to.title.lower()):
+        return True
+    if t.tx_from.account.user and (q in t.tx_from.account.user.username.lower()):
+        return True
+    if t.tx_to.account.user and (q in t.tx_to.account.user.username.lower()):
+        return True
+    # Check group names for query.
+    if not t.tx_from.account.user and (q in t.tx_from.account.groupaccount.name.lower()):
+        return True
+    if not t.tx_to.account.user and (q in t.tx_to.account.groupaccount.name.lower()):
+        return True
+
+    return False
+
+
+def collect_dash_transfers(user, transfer_objects, query=None):
     incoming = []
     outgoing = []
     past = []
@@ -490,7 +500,12 @@ def collect_dash_transfers(user, transfer_objects):
     user_requests = []
 
     for t in transfer_objects:
+        # Check its a valid existing transfer relevant to current user.
         if t.is_deleted or not (t.tx_from.account == user.account or t.tx_to.account == user.account):
+            continue
+
+        # Check for search results.
+        if not transfer_has_query(t, query):
             continue
 
         # Remove time from the date.
