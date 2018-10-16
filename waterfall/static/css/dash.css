@@ -20,6 +20,10 @@
     color: grey;
 }
 
+table {
+    margin-bottom: 0px !important;
+}
+
 .view-more-link:hover {
     color: grey;
 }
