@@ -27,22 +27,15 @@ def viewMoreOp(request):
     title = "Outgoing Payments"
     user = str(request.user)
     outgoing = []
-
-    if request.GET.get('query'):
-        query = request.GET.get('query')
-        context = collect_search_results(request.user, query)
-        context["title"] = title
-        context["user1"] = user
-        context["key"] = "op"
-        return render(request, 'view_more.html', context)
+    query = None if not request.GET.get('query') else request.GET.get('query')
 
     transfers = Transfer.objects.all()
     for t in transfers:
-        # Remove time from the date.
-        # Outgoing or Incoming payments.
+        if not transfer_has_query(t, query):
+            continue
         tx_to = str(t.tx_to.account).strip("@")
         if tx_to != user and not t.is_request and not t.tx_from.confirmed_at:
-            t.deadline = t.deadline.date()
+            t.deadline = t.deadline.date()          # Get the date
             outgoing.append(t)
 
     context ={
@@ -51,6 +44,9 @@ def viewMoreOp(request):
         "user1": user,
         "key": "op",
     }
+    if query:
+        context["search"] = query
+        return render(request, 'view_more.html', context)
     return render(request, 'view_more.html', context)
 
 @login_required
@@ -58,30 +54,24 @@ def viewMoreIp(request):
     title = "Incoming Payments"
     user = str(request.user)
     incoming = []
-
-    if request.GET.get('query'):
-        query = request.GET.get('query')
-        context = collect_search_results(request.user, query)
-        context["title"] = title
-        context["user1"] = user
-        context["key"] = "ip"
-        return render(request, 'view_more.html', context)
-
+    query = None if not request.GET.get('query') else request.GET.get('query')
     transfers = Transfer.objects.all()
     for t in transfers:
-        # Remove time from the date.
-        # Outgoing or Incoming payments.
+        if not transfer_has_query(t, query):
+            continue
         tx_to = str(t.tx_to.account).strip("@")
         if tx_to == user and not t.is_request and not t.tx_from.confirmed_at:
             t.deadline = t.deadline.date()
             incoming.append(t)
-
-    context ={
+    context = {
         "title": title,
         "incoming": incoming,
         "user1": user,
         "key": "ip",
     }
+    if query:
+        context["search"] = query
+        return render(request, 'view_more.html', context)
     return render(request, 'view_more.html', context)
 
 @login_required
@@ -89,35 +79,23 @@ def viewMoreH(request):
     title = "Transaction History"
     user = str(request.user)
     past = []
-
-    if request.GET.get('query'):
-        query = request.GET.get('query')
-        context = collect_search_results(request.user, query)
-        context["title"] = title
-        context["user1"] = user
-        context["key"] = "th"
-        return render(request, 'view_more.html', context)
-
-    transfers = Transfer.objects.all()
-
-    for t in transfers:
+    query = None if not request.GET.get('query') else request.GET.get('query')
+    for t in Transfer.objects.all():
+        if not transfer_has_query(t, query):
+            continue
         if t.tx_from.confirmed_at:
             t.confirmed_at = t.confirmed_at.date()
             past.append(t)
-
-    context ={
+    context = {
         "title": title,
         "past": past,
         "user1": user,
         "key": "th",
     }
+    if query:
+        context["search"] = query
+        return render(request, 'view_more.html', context)
     return render(request, 'view_more.html', context)
-
-@login_required
-def group_dash(request, name):
-    print("the name we got:", name)
-    context = {"groupName": name}
-    return render(request, 'group_dash.html', context)
 
 @login_required
 def dashboard(request):
@@ -450,6 +428,12 @@ def all_groups(request):
             if GroupAccount.objects.get(name=edit_group):
                 return redirect('/group-management?g=' + edit_group)
     return render(request, 'all-groups.html', context)
+
+@login_required
+def group_dash(request, name):
+    print("the name we got:", name)
+    context = {"groupName": name}
+    return render(request, 'group_dash.html', context)
 
 @login_required
 def group_management(request):

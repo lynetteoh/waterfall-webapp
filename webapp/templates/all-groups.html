@@ -52,8 +52,10 @@
             <tbody>
                 {% for g in groups %}
                 <tr>
-                  <td style="text-align:center;"><a href="/group/{{ g.name }}">{{ g.name }}</a></td>
-                  <td>
+                  <td style="text-align:center; color:black;">
+                    <a style="color:black; text-decoration:none;" href="/group/{{ g.name }}">{{ g.name }}</a>
+                  </td>
+                  <td style="text-align:center;">
                     {% for m in g.members.all %}
                       {{ m }}&nbsp;&nbsp;
                     {% endfor %}
@@ -62,14 +64,16 @@
                     ${{ g.account.balance | floatformat:"2" }}
                   </td>
                   <td style="text-align:center;">
-                    <form style="float:right;" id="delete-req-form" method="POST">
+                    <a class="btn btn-outline" style="width: 20%; height: 43px; font-size: 18px; text-align:center;background-color: rgb(136, 206, 188); color:white !important" href="/group/{{ g.name }}"><i class="fas fa-view"></a>
+
+                    <form style="float:right;" id="edit-form" method="POST">
                       {% csrf_token %}
-                        <input type="hidden" name="edit-group" id="edit-group" value="{{ g.name }}">
-                        <div class="request_btn">
-                          <button type="submit" value="delete-req" class="btn  btn-outline" style="outline:none;">
-                            <i class="fas fa-edit"></i>
-                          </button>
-                        </div>
+                      <input type="hidden" name="edit-group" id="edit-group" value="{{ g.name }}">
+                      <div class="request_btn">
+                        <button type="submit" class="btn btn-outline" style="outline:none;">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                      </div>
                     </form>
                   </td>
                 </tr>

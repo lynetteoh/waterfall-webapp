@@ -13,92 +13,93 @@
 
 
 {% block content %}
-<div class="dash_back">
-    <div class="dash_form">
-        <form class="form">
-            <div class="form-row">
-                <form method="GET" action="/dashboard" >
-                    {% csrf_token %}
-                    <div style="padding: 0px !important;" class="col-md-10 form-group">
-                        <input type="text" style="width: 100%;" class="form-control" placeholder="Search by Description..." name="query" id="usr">
-                    </div>
-                    <div class="col">
-                            <button type="submit" class="btn search_btn btn-outline-success">Search</button>
-                    
-                    </div>
-                </form>
-            </div>
-        </form>
-    </div>
-    <br/><br/>
-
+<div class="dash_back" style="padding:14px; margin-top:-12px;">
     <div class="row dash_heading">
         <div class="col">
-            <h3>{{ title }}</h3>
+          {% if not search %}
+            <h3 style="color:black;">{{ title }}</h3>
+          {% else %}
+            <h3 style="color:black;">{{ title }} with "{{ search }}"</h3>
+          {% endif %}
         </div>
         <div  class="col">
         </div>
     </div>
     <br/>
+    <div class="dash_form">
+        <form class="form">
+            <div class="form-row">
+              <form method="GET" action="/dashboard" >
+                {% csrf_token %}
+                <div style="padding: 0px !important;" class="col-md-10 form-group">
+                    <input type="text" style="width: 100%;" class="form-control" placeholder="Search" name="query" id="usr">
+                </div>
+                <div class="col">
+                        <button type="submit" class="btn search_btn btn-outline-success">Search</button>
+                </div>
+              </form>
+            </div>
+        </form>
+    </div>
+    <br/>
     <div class="income_table">
-            <table class="table">
-                    <thead>
-                        <tr class="income_header_row">
-                            <th style="width:20%; text-align:center;" scope="col">Date</th>
-                            {% if key == "op" %}
-                                <th style="width:20%;" scope="col">Transferring To</th>
-                            {% elif key == "ip" %}
-                                <th style="width:20%;" scope="col">Receiving From</th>
-                            {% else %}
-                                <th style="width:20%;" scope="col">Name</th>
-                            {% endif %}
-                            <th style="width:25%;" scope="col">Description</th>
-                            <th style="width:25%; text-align:center;" scope="col">Amount</th>
-                            <th style="width:10%; text-align:center;" scope="col"></th>
+      <table class="table">
+        <thead>
+            <tr class="income_header_row">
+                <th style="width:20%; text-align:center;" scope="col">Date</th>
+                {% if key == "op" %}
+                    <th style="width:20%;" scope="col">Transferring To</th>
+                {% elif key == "ip" %}
+                    <th style="width:20%;" scope="col">Receiving From</th>
+                {% else %}
+                    <th style="width:20%;" scope="col">Name</th>
+                {% endif %}
+                <th style="width:25%;" scope="col">Description</th>
+                <th style="width:25%; text-align:center;" scope="col">Amount</th>
+                <th style="width:10%; text-align:center;" scope="col"></th>
 
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if key == "op" %}
-                            {% for tx in outgoing %}
-                            <tr>
-                                <td>{{ tx.deadline }}</td>
-                                <td>{{ tx.tx_to.account }}</td>
-                                <td>{{ tx.tx_to.title | truncatechars:30 }}</td>
-                                <td style="text-align:center;">{{ tx.tx_from.value | floatformat:"2" }}</td>
-                            </tr>
-                            {% endfor %}
-                        {% elif key == "ip" %}
-                            {% for tx in incoming %}
-                            <tr>
-                                <td>{{ tx.deadline }}</td>
-                                <td>{{ tx.tx_from.account }}</td>
-                                <td>{{ tx.tx_from.title | truncatechars:30 }}</td>
-                                <td style="text-align:center;">${{ tx.tx_to.value | floatformat:"2" }}</td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            {% for tx in past %}
-                                {% if tx.tx_from.account|slugify == user1 %}
-                                <tr>
-                                    <td>{{ tx.confirmed_at }}</td>
-                                    <td>{{ tx.tx_to.account }}</td>
-                                    <td>{{ tx.tx_to.title | truncatechars:30 }}</td>
-                                    <td style="text-align:center; color:rgb(223, 65, 65);">${{ tx.tx_from.value | floatformat:"2" }}</td>
-                                </tr>
-                                {% else %}
-                                <tr>
-                                    <td>{{ tx.confirmed_at }}</td>
-                                    <td>{{ tx.tx_from.account }}</td>
-                                    <td>{{ tx.tx_from.title | truncatechars:30 }}</td>
-                                    <td style="text-align:center; color:rgb(37, 165, 37);">${{ tx.tx_to.value | floatformat:"2" }}</td>
-                                </tr>
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    </tbody>
-                  </table>
-
+            </tr>
+        </thead>
+        <tbody>
+            {% if key == "op" %}
+                {% for tx in outgoing %}
+                <tr>
+                    <td>{{ tx.deadline }}</td>
+                    <td>{{ tx.tx_to.account }}</td>
+                    <td>{{ tx.tx_to.title | truncatechars:30 }}</td>
+                    <td style="text-align:center;">{{ tx.tx_from.value | floatformat:"2" }}</td>
+                </tr>
+                {% endfor %}
+            {% elif key == "ip" %}
+                {% for tx in incoming %}
+                <tr>
+                    <td>{{ tx.deadline }}</td>
+                    <td>{{ tx.tx_from.account }}</td>
+                    <td>{{ tx.tx_from.title | truncatechars:30 }}</td>
+                    <td style="text-align:center;">${{ tx.tx_to.value | floatformat:"2" }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                {% for tx in past %}
+                    {% if tx.tx_from.account|slugify == user1 %}
+                    <tr>
+                        <td>{{ tx.confirmed_at }}</td>
+                        <td>{{ tx.tx_to.account }}</td>
+                        <td>{{ tx.tx_to.title | truncatechars:30 }}</td>
+                        <td style="text-align:center; color:rgb(223, 65, 65);">${{ tx.tx_from.value | floatformat:"2" }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td>{{ tx.confirmed_at }}</td>
+                        <td>{{ tx.tx_from.account }}</td>
+                        <td>{{ tx.tx_from.title | truncatechars:30 }}</td>
+                        <td style="text-align:center; color:rgb(37, 165, 37);">${{ tx.tx_to.value | floatformat:"2" }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </tbody>
+      </table>
     </div>
     <br/><br/>
 
