@@ -15,6 +15,11 @@ class AccountTest(TestCase):
         self.usr_from = User.objects.create(username="fromuser", password="testB")
         self.usr_to = User.objects.create(username="touser", password="testC")
 
+        self.group = GroupAccount.objects.create(name="group", account=Account.objects.create())
+        self.user.profile = Profile.objects.create(user=self.user)
+        self.usr_from.profile = Profile.objects.create(user=self.usr_from)
+        self.group.members.add(self.usr_from.profile)
+
         self.acc = Account.objects.create(user=self.user)
         self.acc_from = Account.objects.create(user=self.usr_from)
         self.acc_to = Account.objects.create(user=self.usr_to)
@@ -44,19 +49,23 @@ class AccountTest(TestCase):
 
     def test_num_requests(self):
         self.assertEqual(self.acc.num_requests, 0)
-        self.assertEqual(self.acc_from.num_requests, 1)
-#
-#     def test_num_groups(self):
-#         # TODO
-#         return True
-#
-#     def test_deposit(self):
-#         # TODO
-#         return True
-#
-#     def test_withdraw(self):
-#         # TODO
-#         return True
+        self.assertEqual(self.acc_to.num_requests, 1)
+
+    def test_num_groups(self):
+        self.assertEqual(self.user.account.num_groups, 0)
+        self.assertEqual(self.usr_from.account.num_groups, 1)
+
+    def test_deposit(self):
+        self.user.account.deposit(20.70)
+        self.assertEqual('{0:.2f}'.format(self.user.account.balance), "20.70")
+        self.group.account.deposit(10.70, self.user.account)
+        self.assertEqual('{0:.2f}'.format(self.group.account.balance), "10.70")
+        self.assertEqual('{0:.2f}'.format(self.user.account.balance), "10.00")
+
+    def test_withdraw(self):
+        self.user.account.deposit(10.70)
+        self.user.account.withdraw(10.00)
+        self.assertEqual('{0:.2f}'.format(self.user.account.balance), "0.70")
 #
 #     def test_approve_req(self):
 #         # TODO

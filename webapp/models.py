@@ -10,6 +10,8 @@ from django.utils.html import strip_tags
 from datetime import datetime, timedelta
 import os, pytz, threading
 
+tz = pytz.timezone("Australia/Sydney")
+
 def user_directory_path(instance, filename):
     # File will be uploaded to MEDIA_ROOT/avatars/user_<id>/<filename>
     return 'avatars/{0}/{1}'.format(instance.user.id, filename)
@@ -199,8 +201,7 @@ class Account(models.Model):
     @property
     def num_requests(self):
         num_requests = 0
-        requests = Transfer.objects.filter(is_deleted=False, is_request=True,\
-                                    confirmed_at__isnull=False)
+        requests = Transfer.objects.filter(is_deleted=False, is_request=True)
         for r in requests:
             if r.tx_to.account == self:
                 num_requests += 1
