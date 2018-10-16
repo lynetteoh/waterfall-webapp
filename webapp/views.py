@@ -1,16 +1,14 @@
 from django.http import HttpResponse
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
-
-from django.contrib.auth.models import User
-from .models import Profile, Account, Transaction, Transfer, GroupAccount
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.template import RequestContext
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
-from .forms import SignUpForm, AvatarForm
-
 from django.core.files.storage import FileSystemStorage
+
+from .forms import SignUpForm, AvatarForm
+from django.contrib.auth.models import User
+from .models import Profile, Account, Transaction, Transfer, GroupAccount
 
 from datetime import datetime
 import pytz
@@ -412,25 +410,61 @@ def create_group(request):
     return render(request, 'create_group.html', context)
 
 @login_required
-def group_management(request, context=None):
+def all_groups(request):
+    user = request.user
+    groups = [g for g in user.profile.GroupAccount.all()]
+    context = {
+        "user": user,
+        "groups": groups,
+    }
+    if request.method == "POST":
+        # Search requests.
+        if request.POST.get("search-txt"):
+            search = request.POST.get("search-txt")
+            filtered_groups = []
+            for g in groups:
+                if search.lower() in g.name.lower():
+                    filtered_groups.append(g)
+                    continue
+                for m in g.members.all():
+                    if search.lower() in m.user.username.lower():
+                        filtered_groups.append(g)
+            context["search"] = search
+            context["groups"] = filtered_groups
+
+        # Manage group management.
+        if request.POST.get("edit-group"):
+            edit_group = request.POST.get("edit-group")
+            if GroupAccount.objects.get(name=edit_group):
+                return redirect('/group-management?g=' + edit_group)
+    return render(request, 'all-groups.html', context)
+
+
+@login_required
+def group_management(request):
     user = request.user
     filter_users = [u.username for u in User.objects.all().exclude(username=user.username)]
 
     user_groups = []
     for g in user.profile.GroupAccount.all():
         user_groups.append(g.name)
-    
-    group = user.profile.GroupAccount.all()[0]
+
+    group = None
+    if request.method == "GET" and request.GET.get("g"):
+        edit_group = request.GET.get("g")
+        group = GroupAccount.objects.get(name=edit_group)
+
     group_members = []
-    for p in group.members.all():
-        if p.user != user:
-            group_members.append(p.user.username)
+    if group:
+        for p in group.members.all():
+            if p.user != user:
+                group_members.append(p.user.username)
     context = {
         "user" : user,
+        "group" : group,
         "filter_members": filter_users,
         "user_groups:": user_groups,
         "group_members": group_members,
-        "group_id": group.name,
     }
     return render(request, 'group_management.html', context)
 
