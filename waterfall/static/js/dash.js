@@ -23,7 +23,8 @@ function confirmPopup(form_id) {
     buttons: true,
   }).then((confirmed) => {
     if (confirmed) {
-      document.getElementById(form_id).submit();
+      console.log("hello")
+      // document.getElementById(form_id).submit();
     }
   });
 }

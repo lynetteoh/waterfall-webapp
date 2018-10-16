@@ -376,7 +376,7 @@ class Transfer(models.Model):
     @transaction.atomic
     def notify(self, subj, template):
         # Note: If one of the payments goes to a group, no notification is sent.
-        if not tx_from.account.user or not tx_to.account.user:
+        if not self.tx_from.account.user or not self.tx_to.account.user:
             return
 
         print("Notifying...")
