@@ -82,13 +82,13 @@ class GroupAccountTest(TestCase):
         return True
 
 class ProfileModelTest(TestCase):
-    name = "test-user"
-    pw = "test"
-
     def test_str(self):
-        user = User.objects.create(username=self.name, password=self.pw)
+        user = User.objects.create(username="testusr", password="test")
         p = Profile.objects.create(user=user, avatar=None)
-        self.assertEqual(str(p), "@"+self.name)
+        self.assertEqual(str(p), "@testusr")
+        group = GroupAccount.objects.create(name="group", password="pw")
+        p = Profile.objects.create(GroupAccount=group, avatar=None)
+        self.assertEqual(str(p), "@group (Group)")
 
 class TransactionModelTest(TestCase):
     tz = pytz.timezone("Australia/Sydney")

@@ -230,7 +230,7 @@ class Profile(models.Model):
     GroupAccount = models.ManyToManyField(GroupAccount,blank=True,related_name='members')
 
     def __str__(self):
-        return '@{}'.format(self.user.username)
+        return str(self.user) if self.user else "@" + self.GroupAccount.name + " (Group)"
 
 class Transaction(models.Model):
     TRANSACTION_TYPES = {
