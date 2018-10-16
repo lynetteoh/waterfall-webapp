@@ -100,9 +100,6 @@ class TransactionModelTest(TestCase):
         acc_to = Account.objects.create(user=usr_to)
 
         self.tx_from = Transaction.objects.create(transaction_type='w', title="testfrom", account=acc_from, value="-10.50", created_at=self.today, modified_at=self.today)
-        self.tx_to = Transaction.objects.create(transaction_type='d', title="testto", account=acc_to, value="10.50", created_at=self.today, modified_at=self.today)
-
-        self.tx_tog = Transaction.objects.create(transaction_type='w', title="test group", account=acc_to, value="-25.70", created_at=self.today, modified_at=self.today, confirmed_at=self.today)
         self.tx_fromg = Transaction.objects.create(transaction_type='d', title="test group", account=group.account, value="25.70", created_at=self.today, modified_at=self.today, confirmed_at=self.today)
 
     def test_str(self):
