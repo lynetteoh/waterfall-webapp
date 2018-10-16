@@ -20,10 +20,10 @@
       <form role="form" id="group-management-form" onsubmit="event.preventDefault();popup('members','group-management-form')"
           method="POST">
           {% csrf_token %}
-          <div class="row form-group mb-5">
-              <label for="pay_amount" class="col-sm-2 col-form-label">Group ID</label>
-              <div class="input-group col-sm-10">
-                  <input name="group_id" type="text" class="form-control" id="group_id" value="{{ group.name }}" disabled>
+          <div class="row form-group mb-5" style="font-size:18px;">
+              <label for="pay_amount" class="col-sm-3 col-form-label">Group Name</label>
+              <div class="input-group col-sm-5">
+                  <input style="background-color:white; border: 2px solid rgba(0,0,0,0); font-weight:bold; font-size:18px;" name="group_id" type="text" class="form-control" id="group_id" value="{{ group.name }}" disabled>
               </div>
           </div>
           <h5>Members</h5>
