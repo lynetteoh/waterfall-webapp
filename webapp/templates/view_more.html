@@ -17,12 +17,16 @@
     <div class="dash_form">
         <form class="form">
             <div class="form-row">
-                <div style="padding: 0px !important;" class="col-md-10 form-group">
-                    <input type="text" style="width: 100%;" class="form-control" placeholder="Search" id="usr">
-                </div>
-                <div class="col">
-                    <button type="submit" class="btn search_btn btn-outline-success">Search</button>
-                </div>
+                <form method="GET" action="/dashboard" >
+                    {% csrf_token %}
+                    <div style="padding: 0px !important;" class="col-md-10 form-group">
+                        <input type="text" style="width: 100%;" class="form-control" placeholder="Search by Description..." name="query" id="usr">
+                    </div>
+                    <div class="col">
+                            <button type="submit" class="btn search_btn btn-outline-success">Search</button>
+                    
+                    </div>
+                </form>
             </div>
         </form>
     </div>

@@ -29,6 +29,14 @@ def viewMoreOp(request):
     user = str(request.user)
     outgoing = []
 
+    if request.GET.get('query'):
+        query = request.GET.get('query')
+        context = collect_search_results(request.user, query)
+        context["title"] = title
+        context["user1"] = user
+        context["key"] = "op"
+        return render(request, 'view_more.html', context)
+
     transfers = Transfer.objects.all()
     for t in transfers:
         # Remove time from the date.
@@ -50,6 +58,14 @@ def viewMoreIp(request):
     title = "Incoming Payments"
     user = str(request.user)
     incoming = []
+
+    if request.GET.get('query'):
+        query = request.GET.get('query')
+        context = collect_search_results(request.user, query)
+        context["title"] = title
+        context["user1"] = user
+        context["key"] = "ip"
+        return render(request, 'view_more.html', context)
 
     transfers = Transfer.objects.all()
     for t in transfers:
@@ -73,6 +89,16 @@ def viewMoreH(request):
     user = str(request.user)
     past = []
 
+    if request.GET.get('query'):
+        query = request.GET.get('query')
+        context = collect_search_results(request.user, query)
+        context["title"] = title
+        context["user1"] = user
+        context["key"] = "th"
+        return render(request, 'view_more.html', context)
+    
+    transfers = Transfer.objects.all()
+
     for t in transfers:
         if t.tx_from.confirmed_at:
             t.confirmed_at = t.confirmed_at.date()
@@ -90,7 +116,7 @@ def viewMoreH(request):
 @login_required
 def dashboard(request):
     user_str = str(request.user)
-    incoming, outgoing, past, requests, user_requests = collect_dash_transfers(request.user)
+    incoming, outgoing, past, requests, user_requests = collect_dash_transfers(request.user, Transfer.objects.all())
     context = {
         "past": past,
         "incoming" : incoming,
@@ -100,10 +126,11 @@ def dashboard(request):
         "user_requests": user_requests,
     }
 
-    if request.method == "GET":
+    if request.GET.get('query'):
         query = request.GET.get('query')
-        print("We got the query:", query)
-
+        context = collect_search_results(request.user, query)
+            
+        return render(request, 'dashboard.html', context)
 
     if request.method == "POST":
         transfer = request.POST.get('transfer')
@@ -116,7 +143,7 @@ def dashboard(request):
             context['error'] = str(e)
         finally:
             incoming, outgoing, past, requests, user_requests =\
-                                            collect_dash_transfers(request.user)
+                                            collect_dash_transfers(request.user, Transfer.objects.all())
             context['incoming'] = incoming
             context['outgoing'] = outgoing
             context['past'] = past
@@ -409,14 +436,26 @@ def group_management(request, context=None):
 
 ### HELPER FUNCTIONS ###
 
-def collect_dash_transfers(user):
+def collect_search_results(user, query):
+    context = {}
+    objects = Transfer.objects.filter(tx_to__title__contains=query, tx_from__title__contains=query)
+    incoming, outgoing, past, requests, user_requests =\
+                                    collect_dash_transfers(user, objects)
+    context['incoming'] = incoming
+    context['outgoing'] = outgoing
+    context['past'] = past
+    context['requests'] = requests
+    context['user_requests'] = user_requests
+    return context
+
+def collect_dash_transfers(user, transfer_objects):
     incoming = []
     outgoing = []
     past = []
     requests = []
     user_requests = []
 
-    for t in Transfer.objects.all():
+    for t in transfer_objects:
         if t.is_deleted or not (t.tx_from.account == user.account or t.tx_to.account == user.account):
             continue
 

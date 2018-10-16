@@ -20,7 +20,7 @@
                 <form method="GET" action="/dashboard" >
                     {% csrf_token %}
                     <div style="padding: 0px !important;" class="col-md-10 form-group">
-                        <input type="text" style="width: 100%;" class="form-control" placeholder="Search" name="query" id="usr">
+                        <input type="text" style="width: 100%;" class="form-control" placeholder="Search by Description..." name="query" id="usr">
                     </div>
                     <div class="col">
                             <button type="submit" class="btn search_btn btn-outline-success">Search</button>
@@ -150,13 +150,7 @@
         <div class="col">
             <h3>Incoming Payments</h3>
         </div>
-        <div  class="col">
-            {% if incoming %}
-            <p style="float:right;">
-                <a class="view-more-link" href="/dashboard/view-more-ip">View More</a>
-            {% endif %}
-            </p>
-        </div>
+        
     </div>
     <br/>
     <div class="income_table">
@@ -188,16 +182,19 @@
                     <p>You currently have no incoming payments</p>
             {% endif %}
     </div>
+    <div  class="col">
+            <p style="float:right;">
+            {% if incoming %}
+                <a class="view-more-link" href="/dashboard/view-more-ip">View More</a>
+            {% endif %}
+            </p>
+        </div>
     <br/><br/>
     <div class="row dash_heading">
             <div class="col">
                 <h3>Outgoing Payments</h3>
             </div>
-            <div  class="col">
-                <p style="float:right;">
-                  <a class="view-more-link" href="/dashboard/view-more-op">View More</a>
-                </p>
-            </div>
+            
         </div>
         <br/>
         <div class="income_table">
@@ -241,16 +238,19 @@
                     <p>You currently have no outgoing payments</p>
               {% endif %}
         </div>
+        <div  class="col">
+                <p style="float:right;">
+                    {% if outgoing %}
+                        <a class="view-more-link" href="/dashboard/view-more-op">View More</a>
+                    {% endif %}
+                </p>
+            </div>
         <br/><br/>
     <div class="row dash_heading">
             <div class="col">
                 <h3>Transaction History</h3>
             </div>
-            <div  class="col">
-                <p style="float:right;">
-                    <a class="view-more-link" href="/dashboard/view-more-h">View More</a>
-                  </p>
-            </div>
+            
         </div>
         <br/>
         <div class="income_table">
@@ -290,6 +290,13 @@
                       <p>You currently have no transaction history</p>
                 {% endif %}
         </div>
+        <div  class="col">
+                <p style="float:right;">
+                    {% if past %}
+                    <a class="view-more-link" href="/dashboard/view-more-h">View More</a>
+                    {% endif %}
+                  </p>
+            </div>
 </div>
 <br/><br/>
 
