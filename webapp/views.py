@@ -45,78 +45,48 @@ def register_new(request):
         form = SignUpForm()
     return render(request, 'index.html', {'form': form})
 
-# Outgoing Payments View more selection for dashboard.
-@login_required
-def viewMoreOp(request):
-    title = "Outgoing Payments"
-    user = str(request.user)
-    outgoing = []
-    query = None if not request.GET.get('query') else request.GET.get('query')
-
-    transfers = Transfer.objects.all()
-    for t in transfers:
-        if not transfer_has_query(t, query):
-            continue
-        tx_to = str(t.tx_to.account).strip("@")
-        if tx_to != user and not t.is_request and not t.tx_from.confirmed_at:
-            t.deadline = t.deadline.date()          # Get the date
-            outgoing.append(t)
-
-    context ={
-        "title": title,
-        "outgoing": outgoing,
-        "user1": user,
-        "key": "op",
-    }
-    if query:
-        context["search"] = query
-        return render(request, 'view_more.html', context)
-    return render(request, 'view_more.html', context)
-
 # Incoming Payments View more selection for dashboard.
 @login_required
-def viewMoreIp(request):
-    title = "Incoming Payments"
-    user = str(request.user)
-    incoming = []
+def view_more_current(request):
+    user = request.user
+    current = []
     query = None if not request.GET.get('query') else request.GET.get('query')
-    transfers = Transfer.objects.all()
-    for t in transfers:
-        if not transfer_has_query(t, query):
-            continue
-        tx_to = str(t.tx_to.account).strip("@")
-        if tx_to == user and not t.is_request and not t.tx_from.confirmed_at:
-            t.deadline = t.deadline.date()
-            incoming.append(t)
+    (current, past) = collect_transfers(user.account, Transfer.objects.all(), query)
     context = {
-        "title": title,
-        "incoming": incoming,
-        "user1": user,
-        "key": "ip",
+        "title": "Pending Transactions",
+        "current": current,
+        "user": user,
     }
+    # Search requests.
     if query:
         context["search"] = query
-        return render(request, 'view_more.html', context)
+        return render(request, 'dashboard.html', context)
+    # User request on outgoing transactions or incoming requests.
+    if request.method == "POST":
+        transfer = request.POST.get('transfer')
+        try:
+            if request.POST.get('req') == "approve-req":
+                context['error'] = user.account.approve_req(transfer)
+            if request.POST.get('req') == "delete-req":
+                context['error'] = user.account.delete_transfer(transfer)
+        except Exception as e:
+            context['error'] = str(e)
+        finally:
+            current, past = collect_transfers(user.account, Transfer.objects.all(), query)
+            context['current'] = current
+            return render(request, 'view_more.html', context)
     return render(request, 'view_more.html', context)
 
-# Historical Transactions View more selection for dashboard.
+# Historical Transactions complete selection for dashboard.
 @login_required
-def viewMoreH(request):
-    title = "Transaction History"
-    user = str(request.user)
-    past = []
+def view_more_history(request):
+    user = request.user
     query = None if not request.GET.get('query') else request.GET.get('query')
-    for t in Transfer.objects.all():
-        if not transfer_has_query(t, query):
-            continue
-        if t.tx_from.confirmed_at:
-            t.confirmed_at = t.confirmed_at.date()
-            past.append(t)
+    (current, past) = collect_transfers(user.account, Transfer.objects.all(), query)
     context = {
-        "title": title,
+        "title": "Transaction History",
         "past": past,
-        "user1": user,
-        "key": "th",
+        "user": user,
     }
     if query:
         context["search"] = query
@@ -130,8 +100,8 @@ def dashboard(request):
     query = None if not request.GET.get('query') else request.GET.get('query')
     current, past = collect_transfers(user.account, Transfer.objects.all(), query)
     context = {
-        "current" : current,
-        "past": past,
+        "current" : current[:10],
+        "past": past[:10],
         "user": user,
     }
     if query:
@@ -149,8 +119,8 @@ def dashboard(request):
             context['error'] = str(e)
         finally:
             current, past = collect_transfers(user.account, Transfer.objects.all(), query)
-            context['current'] = current
-            context['past'] = past
+            context['current'] = current[:10]
+            context['past'] = past[:10]
             return render(request, 'dashboard.html', context)
     return render(request, 'dashboard.html', context)
 
@@ -455,8 +425,8 @@ def group_dash(request, name):
             if p.user != user:
                 group_members.append(p.user.username)
         current, past = collect_transfers(group.account, Transfer.objects.all())
-        context["current"] = current
-        context["past"] = past
+        context["current"] = current[:10]
+        context["past"] = past[:10]
         context["group_members"] = group_members
 
     if request.method == "POST":
@@ -478,8 +448,8 @@ def group_dash(request, name):
                 context['error'] = str(e)
             finally:
                 current, past = collect_transfers(group.account, Transfer.objects.all())
-                context['current'] = current
-                context['past'] = past
+                context['current'] = current[:10]
+                context['past'] = past[:10]
                 return render(request, 'group_dash.html', context)
 
         # Balance management request.
@@ -529,12 +499,23 @@ def edit_group(request):
 
 ### HELPER FUNCTIONS ###
 
+# Collects payees for multi pay and multi requests.
+def collect_recipients(request, user_type):
+    # Collect all payees.
+    payees = []
+    i = 0
+    r = request.POST.get(user_type + '0')
+    while r:
+        payees.append(r)
+        i += 1
+        r = request.POST.get(user_type + str(i))
+    return payees
+
 # Checks if a particular transfer has query term in its name, description or involved users.
 def transfer_has_query(t, query):
     if not query:
         return True
     q = query.lower()
-
     # Check user names for query.
     if (q in t.tx_from.title.lower()) or (q in t.tx_to.title.lower()):
         return True
@@ -547,7 +528,6 @@ def transfer_has_query(t, query):
         return True
     if not t.tx_to.account.user and (q in t.tx_to.account.groupaccount.name.lower()):
         return True
-
     return False
 
 # Collects group transfers based on categories.
@@ -574,6 +554,7 @@ def collect_transfers(acc, transfer_objects, query=None):
     past.sort(key=lambda x: x.confirmed_at, reverse=True)
     return (current, past)
 
+### DEPRECATED ###
 # Collects transfers based on categories and given search query.
 def collect_dash_transfers(acc, transfer_objects, query=None):
     incoming = []
@@ -586,14 +567,11 @@ def collect_dash_transfers(acc, transfer_objects, query=None):
         # Check its a valid existing transfer relevant to current user.
         if t.is_deleted or not (t.tx_from.account == acc or t.tx_to.account == acc):
             continue
-
         # Check for search results.
         if not transfer_has_query(t, query):
             continue
-
         # Remove time from the date.
         t.deadline = t.deadline.date()
-
         # Past transactions.
         if t.confirmed_at:
             t.confirmed_at = t.confirmed_at.date()
@@ -619,15 +597,3 @@ def collect_dash_transfers(acc, transfer_objects, query=None):
     requests.sort(key=lambda x: x.deadline)
     user_requests.sort(key=lambda x: x.deadline)
     return (incoming, outgoing, past, requests, user_requests)
-
-# Collects payees for multi pay and multi requests.
-def collect_recipients(request, user_type):
-    # Collect all payees.
-    payees = []
-    i = 0
-    r = request.POST.get(user_type + '0')
-    while r:
-        payees.append(r)
-        i += 1
-        r = request.POST.get(user_type + str(i))
-    return payees
