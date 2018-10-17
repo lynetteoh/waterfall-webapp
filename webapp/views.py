@@ -458,16 +458,28 @@ def group_dash(request, name):
     except:
         group = None
     group_members = []
-    if group:
-        for p in group.members.all():
-            if p.user != user:
-                group_members.append(p.user.username)
     context = {
         "user" : user,
         "group" : group,
         "group_members": group_members,
     }
+    if group:
+        for p in group.members.all():
+            if p.user != user:
+                group_members.append(p.user.username)
+        current, past = collect_group_transfers(group, Transfer.objects.all())
+        context["current"] = current
+        context["past"] = past
+        context["group_members"] = group_members
+
     if request.method == "POST":
+        # Edit group request.
+        if request.POST.get("edit-group"):
+            edit_group = request.POST.get("edit-group")
+            if GroupAccount.objects.get(name=edit_group):
+                return redirect('/edit-group?g=' + edit_group)
+
+        # Balance management request.
         add_amount = request.POST.get('add_amount')
         minus_amount = request.POST.get('minus_amount')
         try:
@@ -535,6 +547,28 @@ def transfer_has_query(t, query):
 
     return False
 
+
+# Collects group transfers based on categories.
+def collect_group_transfers(group, transfer_objects, query=None):
+    current = []
+    past = []
+    for t in transfer_objects:
+        # Check its a valid existing transfer relevant to current user.
+        if t.is_deleted or not (t.tx_from.account == group.account \
+                                or t.tx_to.account == group.account):
+            continue
+        # Past transactions.
+        if t.confirmed_at:
+            t.confirmed_at = t.confirmed_at.date()
+            past.append(t)
+            continue
+        # Remove time from the date.
+        t.deadline = t.deadline.date()
+        current.append(t)
+    current.sort(key=lambda x: x.deadline)
+    past.sort(key=lambda x: x.confirmed_at, reverse=True)
+    return (current, past)
+
 # Collects transfers based on categories and given search query.
 def collect_dash_transfers(user, transfer_objects, query=None):
     incoming = []
@@ -579,7 +613,6 @@ def collect_dash_transfers(user, transfer_objects, query=None):
     past.sort(key=lambda x: x.confirmed_at, reverse=True)
     requests.sort(key=lambda x: x.deadline)
     user_requests.sort(key=lambda x: x.deadline)
-
     return (incoming, outgoing, past, requests, user_requests)
 
 # Collects payees for multi pay and multi requests.

@@ -17,11 +17,17 @@
 {% if group %}
   <br/>
   <div class="row">
-    <h3>Group Dashboard - {{ group.name }}&nbsp;<h3>
+    <h3>Group Dashboard - {{ group.name }}<h3>
     <div class="col">
-      <button class="btn" type="button" value="Edit" onclick="editProfile()" style="font-size:16px;">
-        <i class="fas fa-edit"></i>&nbsp;Edit
-      </button>
+      <form style="float:right;" id="edit-form" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="edit-group" id="edit-group" value="{{ group.name }}">
+        <div class="request_btn">
+          <button class="btn" type="submit" id="edit" type="button" style="font-size:14px;">
+            <i class="fas fa-edit"></i>&nbsp;Edit
+          </button>
+        </div>
+      </form>
     </div>
   </div>
   <div class="">
@@ -59,83 +65,143 @@
     </div>
   </div><!-- end of buttons -->
   <br/><br/>
-  <table class="table">
+  <div class="row dash_heading">
+    <div class="col">
+        <h4>Pending Transactions</h4>
+    </div>
+  </div>
+  <br/>
+  <div class="income_table">
+    {% if current %}
+    <table class="table">
       <thead>
         <tr class="income_header_row">
-          <th style="width:25%; text-align:center;" scope="col">Name</th>
-          <th style="width:35%;" scope="col">Description</th>
+          <th style="width:15%; text-align:center;" scope="col">Date</th>
+          <th style="width:15%; text-align:center;" scope="col">Name</th>
+          <th style="width:30%; text-align:center;" scope="col">Description</th>
           <th style="width:10%; text-align:center;" scope="col">Amount</th>
-          <th style="width:25%; text-align:center;" scope="col"></th>
+          <th style="width:20%; text-align:center;" scope="col"></th>
         </tr>
       </thead>
       <tbody>
-          {% for tx in requests %}
-          <tr>
-              <td>{{ tx.deadline }}</td>
-              <td>{{ tx.tx_to.account }}</td>
-              <td>{{ tx.tx_to.title | truncatechars:30 }}</td>
-              <td style="text-align:center;">${{ tx.tx_from.value | floatformat:"2"}}</td>
-              <td style="text-align:center;">
+      {% for tx in current %}
+        <tr>
+          <td>{{ tx.deadline }}</td>
+          {% if not tx.tx_from.account.user and group.account == tx.tx_from.account %}
+            <td class="text-center">{{ tx.tx_to.account }}</td>
+            <td class="text-center">{{ tx.tx_to.title | truncatechars:30 }}</td>
+            <td style="text-align:center; color:rgb(223, 65, 65);">${{ tx.tx_from.value | floatformat:"2" }}</td>
+          {% else %}
+            <td>{{ tx.deadline }}</td>
+            <td class="text-center">{{ tx.tx_from.account }}</td>
+            <td class="text-center">{{ tx.tx_from.title | truncatechars:30 }}</td>
+            <td style="text-align:center; color:rgb(37, 165, 37);">${{ tx.tx_to.value | floatformat:"2" }}</td>
+          {% endif %}
+
+          <td style="text-align:center;">
+            <!-- Approve/Deny Group's Requests  -->
+            {% if tx.is_request %}
+              {% if not tx.tx_from.account.user and group.account == tx.tx_from.account %}
                 <form style="float:right;" id="delete-req-form" onsubmit="event.preventDefault(); confirmPopup("delete-req-form")" method="POST">
-                      {% csrf_token %}
-                        <input type="hidden" name="req" id="delete-req" value="delete-req">
-                        <input type="hidden" name="transfer" value={{tx.id}}>
-                        <div class="request_btn">
-                            <button type="submit" value="delete-req" class="btn reject_btn btn-outline-success" style="outline:none;">
-                              <i class="fas fa-times"></i>
-                            </button>
-                        </div>
+                  {% csrf_token %}
+                    <input type="hidden" name="req" id="delete-req" value="delete-req">
+                    <input type="hidden" name="transfer" value={{tx.id}}>
+                    <div class="request_btn">
+                        <button type="submit" value="delete-req" class="btn reject_btn btn-outline-success" style="outline:none;">
+                          <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </form>
-
                 <form style="float:right;" id="approve-req-form" onsubmit="event.preventDefault(); confirmPopup("approve-req-form")" method="POST">
-                      {% csrf_token %}
-                        <input type="hidden" name="req" id="approve-req" value="approve-req">
-                        <input type="hidden" name="transfer" value={{tx.id}}>
-                        <div class="request_btn">
-                            <button type="submit" value="approve-req" class="btn accept_btn btn-outline-success" style="outline:none;">
-                              <i class="fas fa-check"></i>
-                            </button>
-                        </div>
-                  </form>
-
-              </form>
-              </td>
-
-          </tr>
-          {% endfor %}
-          <tr>
-              <td style="text-align:center;" >Johnny</td>
-              <td>Some stuff</td>
-              <td style="text-align:center;">$399</td>
-              <td style="text-align:center;">
-                  <form style="float:right;" id="delete-req-form" onsubmit="event.preventDefault(); confirmPopup("delete-req-form")" method="POST">
-                      {% csrf_token %}
-                          <input type="hidden" name="req" id="delete-req" value="delete-req">
-                          <input type="hidden" name="transfer" value={{tx.id}}>
-                          <div class="request_btn">
-                              <button type="submit" value="delete-req" class="btn reject_btn btn-outline-success" style="outline:none;">
-                              <i class="fas fa-times"></i>
-                              </button>
-                          </div>
-                  </form>
-
-                  <form style="float:right;" id="approve-req-form" onsubmit="event.preventDefault(); confirmPopup("approve-req-form")" method="POST">
-                      {% csrf_token %}
-                      <input type="hidden" name="req" id="approve-req" value="approve-req">
-                      <input type="hidden" name="transfer" value={{tx.id}}>
-                      <div class="request_btn">
-                          <button type="submit" value="approve-req" class="btn accept_btn btn-outline-success" style="outline:none;">
+                  {% csrf_token %}
+                    <input type="hidden" name="req" id="approve-req" value="approve-req">
+                    <input type="hidden" name="transfer" value={{tx.id}}>
+                    <div class="request_btn">
+                        <button type="submit" value="approve-req" class="btn accept_btn btn-outline-success" style="outline:none;">
                           <i class="fas fa-check"></i>
-                          </button>
-                      </div>
-                  </form>
-
+                        </button>
+                    </div>
+                </form>
+              <!-- Deny Received Requests  -->
+              {% else %}
+              <form style="float:right;" id="delete-outreq-form" onsubmit="event.preventDefault(); confirmPopup("delete-outreq-form")" method="POST">
+                {% csrf_token %}
+                  <input type="hidden" name="req" id="delete-req" value="delete-req">
+                  <input type="hidden" name="transfer" value={{tx.id}}>
+                  <div class="request_btn">
+                      <button value="delete-req" class="btn reject_btn btn-outline-success" style="outline:none;">
+                        <i class="fas fa-times"></i>
+                      </button>
+                  </div>
               </form>
-              </td>
+            {% endif %}
 
-          </tr>
+          {% elif tx.tx_to.account.user or not group.account == tx.tx_to.account %} <!-- Can cancel outgoing payments.-->
+            <form style="float:right;" id="delete-form" onsubmit="event.preventDefault(); confirmPopup("delete-form")" method="POST">
+              {% csrf_token %}
+              <input type="hidden" name="req" id="delete-req" value="delete-req">
+              <input type="hidden" name="transfer" value={{tx.id}}>
+              <div class="request_btn">
+                  <button value="delete-req" class="btn reject_btn btn-outline-success" style="outline:none;">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+            </form>
+          {% endif %}
+        </td>
+        </tr>
+      {% endfor %}
       </tbody>
-  </table>
+    </table>
+    <br/>
+    {% else %}
+      <p>This group currently has no pending transactions.</p>
+    {% endif %}
+  </div>
+  <br/>
+  <div class="row dash_heading">
+    <div class="col">
+        <h4>Transaction History</h4>
+    </div>
+  </div>
+  <br/>
+  <div class="income_table">
+    {% if past %}
+    <table class="table">
+      <thead>
+        <tr class="income_header_row">
+          <th style="width:20%; text-align:center;" scope="col">Date</th>
+          <th style="width:20%;" scope="col">Name</th>
+          <th style="width:25%;" scope="col">Description</th>
+          <th style="width:25%; text-align:center;" scope="col">Amount</th>
+          <th style="width:10%; text-align:center;" scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for tx in past %}
+            {% if not tx.tx_from.account.user %}
+            <tr>
+                <td>{{ tx.confirmed_at }}</td>
+                <td>{{ tx.tx_to.account }}</td>
+                <td>{{ tx.tx_to.title | truncatechars:30 }}</td>
+                <td style="text-align:center; color:rgb(223, 65, 65);">${{ tx.tx_from.value | floatformat:"2" }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td>{{ tx.confirmed_at }}</td>
+                <td>{{ tx.tx_from.account }}</td>
+                <td>{{ tx.tx_from.title | truncatechars:30 }}</td>
+                <td style="text-align:center; color:rgb(37, 165, 37);">${{ tx.tx_to.value | floatformat:"2" }}</td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+      </tbody>
+    </table>
+    <br/>
+    {% else %}
+      <p>This group currently has no past transactions.</p>
+    {% endif %}
+  </div>
 {% else %}
 </br>
   <h4>Sorry, the page you requested could not be found.</h4>
