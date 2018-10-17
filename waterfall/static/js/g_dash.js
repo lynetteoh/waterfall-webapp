@@ -15,6 +15,20 @@ function checkError(error) {
   }
 }
 
+/* Produces a popup confirmation for request approvals and rejections. */
+function confirmPopup(form_id) {
+  swal({
+    title: "Are you sure?",
+    text:  "Once processed, this action cannot be undone.",
+    icon:  "warning",
+    buttons: true,
+  }).then((confirmed) => {
+    if (confirmed) {
+      document.getElementById(form_id).submit();
+    }
+  });
+}
+
 /* Produces a popup confirmation for withdrawals and deposits. */
 function balancePopup(isWithdraw) {
   var id = isWithdraw ? "minus-amount" : "add-amount";

@@ -92,7 +92,6 @@
             <td class="text-center">{{ tx.tx_to.title | truncatechars:30 }}</td>
             <td style="text-align:center; color:rgb(223, 65, 65);">${{ tx.tx_from.value | floatformat:"2" }}</td>
           {% else %}
-            <td>{{ tx.deadline }}</td>
             <td class="text-center">{{ tx.tx_from.account }}</td>
             <td class="text-center">{{ tx.tx_from.title | truncatechars:30 }}</td>
             <td style="text-align:center; color:rgb(37, 165, 37);">${{ tx.tx_to.value | floatformat:"2" }}</td>
@@ -102,7 +101,7 @@
             <!-- Approve/Deny Group's Requests  -->
             {% if tx.is_request %}
               {% if not tx.tx_from.account.user and group.account == tx.tx_from.account %}
-                <form style="float:right;" id="delete-req-form" onsubmit="event.preventDefault(); confirmPopup("delete-req-form")" method="POST">
+                <form style="float:right;" id="delete-req-form" onsubmit="event.preventDefault(); confirmPopup('delete-req-form');" method="POST">
                   {% csrf_token %}
                     <input type="hidden" name="req" id="delete-req" value="delete-req">
                     <input type="hidden" name="transfer" value={{tx.id}}>
@@ -112,7 +111,7 @@
                         </button>
                     </div>
                 </form>
-                <form style="float:right;" id="approve-req-form" onsubmit="event.preventDefault(); confirmPopup("approve-req-form")" method="POST">
+                <form style="float:right;" id="approve-req-form" onsubmit="event.preventDefault(); confirmPopup('approve-req-form');" method="POST">
                   {% csrf_token %}
                     <input type="hidden" name="req" id="approve-req" value="approve-req">
                     <input type="hidden" name="transfer" value={{tx.id}}>
@@ -124,10 +123,10 @@
                 </form>
               <!-- Deny Received Requests  -->
               {% else %}
-              <form style="float:right;" id="delete-outreq-form" onsubmit="event.preventDefault(); confirmPopup("delete-outreq-form")" method="POST">
+              <form style="float:right;" id="delete-outreq-form" onsubmit="event.preventDefault(); confirmPopup('delete-outreq-form')" method="POST">
                 {% csrf_token %}
                   <input type="hidden" name="req" id="delete-req" value="delete-req">
-                  <input type="hidden" name="transfer" value={{tx.id}}>
+                  <input type="hidden" name="transfer" value={{ tx.id }}>
                   <div class="request_btn">
                       <button value="delete-req" class="btn reject_btn btn-outline-success" style="outline:none;">
                         <i class="fas fa-times"></i>
@@ -137,7 +136,7 @@
             {% endif %}
 
           {% elif tx.tx_to.account.user or not group.account == tx.tx_to.account %} <!-- Can cancel outgoing payments.-->
-            <form style="float:right;" id="delete-form" onsubmit="event.preventDefault(); confirmPopup("delete-form")" method="POST">
+            <form style="float:right;" id="delete-form" onsubmit="event.preventDefault(); confirmPopup('delete-form');" method="POST">
               {% csrf_token %}
               <input type="hidden" name="req" id="delete-req" value="delete-req">
               <input type="hidden" name="transfer" value={{tx.id}}>
@@ -148,7 +147,7 @@
                 </div>
             </form>
           {% endif %}
-        </td>
+          </td>
         </tr>
       {% endfor %}
       </tbody>

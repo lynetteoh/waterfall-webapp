@@ -163,7 +163,6 @@ def dashboard(request):
 
             if len(outgoing) == 0:
                 context['outgoing'] = None
-
             return render(request, 'dashboard.html', context)
     return render(request, 'dashboard.html', context)
 
@@ -479,6 +478,22 @@ def group_dash(request, name):
             if GroupAccount.objects.get(name=edit_group):
                 return redirect('/edit-group?g=' + edit_group)
 
+        # Edit transfers request.
+        if request.POST.get('transfer') and group:
+            transfer = request.POST.get('transfer')
+            try:
+                if request.POST.get('req') == "approve-req":
+                    context['error'] = group.account.approve_req(transfer)
+                if request.POST.get('req') == "delete-req":
+                    context['error'] = group.account.delete_transfer(transfer)
+            except Exception as e:
+                context['error'] = str(e)
+            finally:
+                current, past = collect_group_transfers(group, Transfer.objects.all())
+                context['current'] = current
+                context['past'] = past
+                return render(request, 'group_dash.html', context)
+
         # Balance management request.
         add_amount = request.POST.get('add_amount')
         minus_amount = request.POST.get('minus_amount')
@@ -546,7 +561,6 @@ def transfer_has_query(t, query):
         return True
 
     return False
-
 
 # Collects group transfers based on categories.
 def collect_group_transfers(group, transfer_objects, query=None):
