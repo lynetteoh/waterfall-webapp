@@ -238,7 +238,7 @@ def register_new(request):
 @login_required
 def pay(request):
     user = request.user
-    all_users = User.objects.all().exclude(username=request.user.username)
+    all_users = User.objects.all()
     from_users = [user.username]
     user_groups = [g.name for g in user.profile.GroupAccount.all()]
     for g in user_groups:
