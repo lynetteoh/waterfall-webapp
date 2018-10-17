@@ -98,7 +98,7 @@
           {% endif %}
 
           <td style="text-align:center;">
-            <!-- Approve/Deny Group's Requests  -->
+            <!-- Approve/Deny Received Requests  -->
             {% if tx.is_request %}
               {% if not tx.tx_from.account.user and group.account == tx.tx_from.account %}
                 <form style="float:right;" id="delete-req-form" onsubmit="event.preventDefault(); confirmPopup('delete-req-form');" method="POST">
@@ -121,7 +121,7 @@
                         </button>
                     </div>
                 </form>
-              <!-- Deny Received Requests  -->
+              <!-- Deny Outgoing Requests  -->
               {% else %}
               <form style="float:right;" id="delete-outreq-form" onsubmit="event.preventDefault(); confirmPopup('delete-outreq-form')" method="POST">
                 {% csrf_token %}

@@ -126,18 +126,13 @@ def viewMoreH(request):
 # User dashboard & landing page after login.
 @login_required
 def dashboard(request):
-    user_str = str(request.user)
+    user = request.user
     query = None if not request.GET.get('query') else request.GET.get('query')
-
-    incoming, outgoing, past, requests, user_requests =\
-        collect_dash_transfers(request.user, Transfer.objects.all(), query)
+    current, past = collect_transfers(user.account, Transfer.objects.all(), query)
     context = {
+        "current" : current,
         "past": past,
-        "incoming" : incoming,
-        "outgoing": outgoing,
-        "user1": user_str,
-        "requests": requests,
-        "user_requests": user_requests,
+        "user": user,
     }
     if query:
         context["search"] = query
@@ -147,22 +142,15 @@ def dashboard(request):
         transfer = request.POST.get('transfer')
         try:
             if request.POST.get('req') == "approve-req":
-                context['error'] = request.user.account.approve_req(transfer)
+                context['error'] = user.account.approve_req(transfer)
             if request.POST.get('req') == "delete-req":
-                context['error'] = request.user.account.delete_transfer(transfer)
+                context['error'] = user.account.delete_transfer(transfer)
         except Exception as e:
             context['error'] = str(e)
         finally:
-            incoming, outgoing, past, requests, user_requests =\
-                                            collect_dash_transfers(request.user, Transfer.objects.all())
-            context['incoming'] = incoming
-            context['outgoing'] = outgoing
+            current, past = collect_transfers(user.account, Transfer.objects.all(), query)
+            context['current'] = current
             context['past'] = past
-            context['requests'] = requests
-            context['user_requests'] = user_requests
-
-            if len(outgoing) == 0:
-                context['outgoing'] = None
             return render(request, 'dashboard.html', context)
     return render(request, 'dashboard.html', context)
 
@@ -466,7 +454,7 @@ def group_dash(request, name):
         for p in group.members.all():
             if p.user != user:
                 group_members.append(p.user.username)
-        current, past = collect_group_transfers(group, Transfer.objects.all())
+        current, past = collect_transfers(group.account, Transfer.objects.all())
         context["current"] = current
         context["past"] = past
         context["group_members"] = group_members
@@ -489,7 +477,7 @@ def group_dash(request, name):
             except Exception as e:
                 context['error'] = str(e)
             finally:
-                current, past = collect_group_transfers(group, Transfer.objects.all())
+                current, past = collect_transfers(group.account, Transfer.objects.all())
                 context['current'] = current
                 context['past'] = past
                 return render(request, 'group_dash.html', context)
@@ -563,13 +551,16 @@ def transfer_has_query(t, query):
     return False
 
 # Collects group transfers based on categories.
-def collect_group_transfers(group, transfer_objects, query=None):
+def collect_transfers(acc, transfer_objects, query=None):
     current = []
     past = []
     for t in transfer_objects:
         # Check its a valid existing transfer relevant to current user.
-        if t.is_deleted or not (t.tx_from.account == group.account \
-                                or t.tx_to.account == group.account):
+        if t.is_deleted or not (t.tx_from.account == acc \
+                                or t.tx_to.account == acc):
+            continue
+        # Check for search results.
+        if not transfer_has_query(t, query):
             continue
         # Past transactions.
         if t.confirmed_at:
@@ -584,7 +575,7 @@ def collect_group_transfers(group, transfer_objects, query=None):
     return (current, past)
 
 # Collects transfers based on categories and given search query.
-def collect_dash_transfers(user, transfer_objects, query=None):
+def collect_dash_transfers(acc, transfer_objects, query=None):
     incoming = []
     outgoing = []
     past = []
@@ -593,7 +584,7 @@ def collect_dash_transfers(user, transfer_objects, query=None):
 
     for t in transfer_objects:
         # Check its a valid existing transfer relevant to current user.
-        if t.is_deleted or not (t.tx_from.account == user.account or t.tx_to.account == user.account):
+        if t.is_deleted or not (t.tx_from.account == acc or t.tx_to.account == acc):
             continue
 
         # Check for search results.
@@ -611,13 +602,13 @@ def collect_dash_transfers(user, transfer_objects, query=None):
         # Pending or outgoing requests.
         if t.is_request:
             # Pending requests waiting for approval from user to transfer someone else.
-            if t.tx_from.account == user.account:
+            if t.tx_from.account == acc:
                 requests.append(t)
             else:
                 user_requests.append(t)
             continue
         # Outgoing or Incoming payments.
-        if t.tx_to.account == user.account:
+        if t.tx_to.account == acc:
             incoming.append(t)
         else:
             outgoing.append(t)
