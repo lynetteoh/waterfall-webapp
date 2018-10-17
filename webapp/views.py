@@ -13,15 +13,39 @@ from .models import Profile, Account, Transaction, Transfer, GroupAccount
 from datetime import datetime
 import pytz
 
+# Home landing page.
 def index(request):
     return render(request, 'index.html')
 
+# Team description page.
 def team(request):
     return render(request, 'team.html')
 
+# Product description page.
 def product(request):
     return render(request, 'product.html')
 
+# New user registration page.
+@ensure_csrf_cookie
+def register_new(request):
+    if request.POST:
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            profile = Profile(user=user, avatar=None)
+            profile.save()
+            account = Account(user=user)
+            account.save()
+            login(request, user)
+            return redirect('/dashboard')
+    else:
+        form = SignUpForm()
+    return render(request, 'index.html', {'form': form})
+
+# Outgoing Payments View more selection for dashboard.
 @login_required
 def viewMoreOp(request):
     title = "Outgoing Payments"
@@ -49,6 +73,7 @@ def viewMoreOp(request):
         return render(request, 'view_more.html', context)
     return render(request, 'view_more.html', context)
 
+# Incoming Payments View more selection for dashboard.
 @login_required
 def viewMoreIp(request):
     title = "Incoming Payments"
@@ -74,6 +99,7 @@ def viewMoreIp(request):
         return render(request, 'view_more.html', context)
     return render(request, 'view_more.html', context)
 
+# Historical Transactions View more selection for dashboard.
 @login_required
 def viewMoreH(request):
     title = "Transaction History"
@@ -97,6 +123,7 @@ def viewMoreH(request):
         return render(request, 'view_more.html', context)
     return render(request, 'view_more.html', context)
 
+# User dashboard & landing page after login.
 @login_required
 def dashboard(request):
     user_str = str(request.user)
@@ -140,6 +167,7 @@ def dashboard(request):
             return render(request, 'dashboard.html', context)
     return render(request, 'dashboard.html', context)
 
+# Profile settings page.
 @login_required
 def profile(request):
     if request.method == "POST":
@@ -174,6 +202,7 @@ def profile(request):
         form = AvatarForm()
     return render(request, 'profile.html')
 
+# Balance management page.
 @login_required
 def balance(request):
     user = request.user
@@ -202,25 +231,7 @@ def balance(request):
             return render(request, 'balance.html', context)
     return render(request, 'balance.html', context)
 
-@ensure_csrf_cookie
-def register_new(request):
-    if request.POST:
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            profile = Profile(user=user, avatar=None)
-            profile.save()
-            account = Account(user=user)
-            account.save()
-            login(request, user)
-            return redirect('/dashboard')
-    else:
-        form = SignUpForm()
-    return render(request, 'index.html', {'form': form})
-
+# Payment page.
 @login_required
 def pay(request):
     user = request.user
@@ -298,6 +309,7 @@ def pay(request):
     # Regular pay view.
     return render(request, 'pay.html', context)
 
+# Request page.
 @login_required
 def request(request):
     user = request.user
@@ -381,24 +393,7 @@ def request(request):
     # Regular request view.
     return render(request, 'request.html', context)
 
-@login_required
-def create_group(request):
-    user = request.user
-    all_users = User.objects.all().exclude(username=user.username)
-    groups = []
-    for g in user.profile.GroupAccount.all():
-        groups.append(g.name)
-    create_members = []
-    for u in all_users:
-        if (u != user.username):
-            create_members.append(u.username)
-    context ={
-        "user" : user,
-        "filter_members": create_members,
-        "all_groups" :groups,
-    }
-    return render(request, 'create_group.html', context)
-
+# Groups page.
 @login_required
 def all_groups(request):
     user = request.user
@@ -422,21 +417,75 @@ def all_groups(request):
             context["search"] = search
             context["groups"] = filtered_groups
 
-        # Manage group management.
+        # View group dashboard request.
+        if request.POST.get("group-dash"):
+            group_name = request.POST.get("group-dash")
+            if GroupAccount.objects.get(name=group_name):
+                return redirect('/group/' + group_name)
+
+        # Edit group request.
         if request.POST.get("edit-group"):
             edit_group = request.POST.get("edit-group")
             if GroupAccount.objects.get(name=edit_group):
-                return redirect('/group-management?g=' + edit_group)
+                return redirect('/edit-group?g=' + edit_group)
     return render(request, 'all-groups.html', context)
 
+# New group creation page.
+@login_required
+def create_group(request):
+    user = request.user
+    all_users = User.objects.all().exclude(username=user.username)
+    groups = []
+    for g in user.profile.GroupAccount.all():
+        groups.append(g.name)
+    create_members = []
+    for u in all_users:
+        if (u != user.username):
+            create_members.append(u.username)
+    context ={
+        "user" : user,
+        "filter_members": create_members,
+        "all_groups" :groups,
+    }
+    return render(request, 'create_group.html', context)
+
+# Group dashboard page.
 @login_required
 def group_dash(request, name):
-    print("the name we got:", name)
-    context = {"groupName": name}
+    user = request.user
+    try:
+        group = GroupAccount.objects.get(name=name)
+    except:
+        group = None
+    group_members = []
+    if group:
+        for p in group.members.all():
+            if p.user != user:
+                group_members.append(p.user.username)
+    context = {
+        "user" : user,
+        "group" : group,
+        "group_members": group_members,
+    }
+    if request.method == "POST":
+        add_amount = request.POST.get('add_amount')
+        minus_amount = request.POST.get('minus_amount')
+        try:
+            tx = None
+            if add_amount and float(add_amount) > 0:
+                tx = group.account.deposit(float(add_amount), user.account)
+            elif minus_amount and float(minus_amount) > 0:
+                tx = group.account.withdraw(float(minus_amount), user.account)
+            context['error'] = "Success" if tx else "Insufficient Funds"
+        except Exception as e:
+            context['error'] = e
+        finally:
+            return render(request, 'group_dash.html', context)
     return render(request, 'group_dash.html', context)
 
+# Edit group page.
 @login_required
-def group_management(request):
+def edit_group(request):
     user = request.user
     filter_users = [u.username for u in User.objects.all().exclude(username=user.username)]
 
@@ -461,10 +510,11 @@ def group_management(request):
         "user_groups:": user_groups,
         "group_members": group_members,
     }
-    return render(request, 'group_management.html', context)
+    return render(request, 'edit_group.html', context)
 
 ### HELPER FUNCTIONS ###
 
+# Checks if a particular transfer has query term in its name, description or involved users.
 def transfer_has_query(t, query):
     if not query:
         return True
@@ -485,7 +535,7 @@ def transfer_has_query(t, query):
 
     return False
 
-
+# Collects transfers based on categories and given search query.
 def collect_dash_transfers(user, transfer_objects, query=None):
     incoming = []
     outgoing = []

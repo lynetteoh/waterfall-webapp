@@ -40,7 +40,7 @@ urlpatterns = [
     path('dashboard/view-more-h/', views.viewMoreH, name='viewMoreH'),
     path('create-group', views.create_group, name='create_group'),
     path('all-groups', views.all_groups, name='all_groups'),
-    path('group-management', views.group_management, name='group_management'),
+    path('edit-group', views.edit_group, name='edit_group'),
     re_path(r'^group/(?P<name>[\w|\W]+)/$', views.group_dash, name="group_dash")
 ]
 
