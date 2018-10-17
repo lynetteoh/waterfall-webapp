@@ -59,7 +59,7 @@
         {% for tx in current %}
           <tr>
             <td>{{ tx.deadline }}</td>
-            {% if tx.tx_from.account.user and user.account == tx.tx_from.account %}
+            {% if acc == tx.tx_from.account %}
               <td class="text-center">{{ tx.tx_to.account }}</td>
               <td class="text-center">{{ tx.tx_to.title | truncatechars:30 }}</td>
               <td style="text-align:center; color:rgb(223, 65, 65);">${{ tx.tx_from.value | floatformat:"2" }}</td>
@@ -72,7 +72,7 @@
             <td style="text-align:center;">
               <!-- Approve/Deny Received Requests  -->
               {% if tx.is_request %}
-                {% if tx.tx_from.account.user and user.account == tx.tx_from.account %}
+                {% if acc == tx.tx_from.account %}
                   <form style="float:right;" id="delete-req-form" onsubmit="event.preventDefault(); confirmPopup('delete-req-form');" method="POST">
                     {% csrf_token %}
                       <input type="hidden" name="req" id="delete-req" value="delete-req">
@@ -107,7 +107,7 @@
                 </form>
               {% endif %}
 
-            {% elif not tx.tx_to.account.user or not user.account == tx.tx_to.account %} <!-- Can cancel outgoing payments.-->
+            {% elif not acc == tx.tx_to.account %} <!-- Can cancel outgoing payments.-->
               <form style="float:right;" id="delete-form" onsubmit="event.preventDefault(); confirmPopup('delete-form');" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="req" id="delete-req" value="delete-req">
@@ -138,7 +138,7 @@
         </thead>
         <tbody>
             {% for tx in past %}
-              {% if tx.tx_from.account == user.account %}
+              {% if tx.tx_from.account == acc %}
               <tr>
                   <td>{{ tx.confirmed_at }}</td>
                   <td>{{ tx.tx_to.account }}</td>

@@ -40,7 +40,9 @@ urlpatterns = [
     path('create-group', views.create_group, name='create_group'),
     path('all-groups', views.all_groups, name='all_groups'),
     path('edit-group', views.edit_group, name='edit_group'),
-    re_path(r'^group/(?P<name>[\w|\W]+)/$', views.group_dash, name="group_dash")
+    re_path(r'^group/(?P<name>[\w|\W]+)/$', views.group_dash, name="group_dash"),
+    re_path(r'^group/(?P<name>[\w|\W]+)/view-more-current$', views.view_more_current, name="view_group_current"),
+    re_path(r'^group/(?P<name>[\w|\W]+)/view-more-history$', views.view_more_history, name="view_group_history"),
 ]
 
 if settings.DEBUG:

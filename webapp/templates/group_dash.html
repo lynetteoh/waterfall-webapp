@@ -156,6 +156,14 @@
     {% else %}
       <p>This group currently has no pending transactions.</p>
     {% endif %}
+
+    <div class="col">
+      <p style="float:right;">
+        {% if past %}
+        <a class="view-more-link" href="/group/{{ group.name }}/view-more-current">View More</a>
+        {% endif %}
+      </p>
+    </div>
   </div>
   <br/>
   <div class="row dash_heading">
@@ -200,6 +208,13 @@
     {% else %}
       <p>This group currently has no past transactions.</p>
     {% endif %}
+  </div>
+  <div class="col">
+    <p style="float:right;">
+      {% if past %}
+      <a class="view-more-link" href="/group/{{ group.name }}/view-more-history">View More</a>
+      {% endif %}
+    </p>
   </div>
 {% else %}
 </br>

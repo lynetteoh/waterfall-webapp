@@ -136,7 +136,11 @@
         {% if search %}
           <p>No search results match your query.</p>
         {% else %}
-          <p>You currently have no pending transactions.</p>
+          {% if group %}
+            <p>The group currently has no pending transactions.</p>
+          {% else %}
+            <p>You currently have no pending transactions.</p>
+          {% endif %}
         {% endif %}
       {% endif %}
     </div>
@@ -192,11 +196,15 @@
         {% if search %}
           <p>No search results match your query.</p>
         {% else %}
-          <p>You currently have no past transactions.</p>
+          {% if group %}
+            <p>The group currently has no past transactions.</p>
+          {% else %}
+            <p>You currently have no past transactions.</p>
+          {% endif %}
         {% endif %}
       {% endif %}
     </div>
-    <div  class="col">
+    <div class="col">
       <p style="float:right;">
         {% if past %}
         <a class="view-more-link" href="/dashboard/view-more-h">View More</a>

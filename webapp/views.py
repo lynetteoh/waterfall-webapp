@@ -47,7 +47,7 @@ def register_new(request):
 
 # Incoming Payments View more selection for dashboard.
 @login_required
-def view_more_current(request):
+def view_more_current(request, name=None):
     user = request.user
     current = []
     query = None if not request.GET.get('query') else request.GET.get('query')
@@ -79,14 +79,22 @@ def view_more_current(request):
 
 # Historical Transactions complete selection for dashboard.
 @login_required
-def view_more_history(request):
+def view_more_history(request, name=None):
     user = request.user
+    title = "Transaction History"
+    group = None
     query = None if not request.GET.get('query') else request.GET.get('query')
-    (current, past) = collect_transfers(user.account, Transfer.objects.all(), query)
+    acc = user.account
+    if name and GroupAccount.objects.get(name=name):
+        group = GroupAccount.objects.get(name=name)
+        title += " - " + group.name
+        acc = group.account
+    (current, past) = collect_transfers(acc, Transfer.objects.all(), query)
     context = {
-        "title": "Transaction History",
+        "title": title,
         "past": past,
-        "user": user,
+        "group": group,
+        "acc" : acc,
     }
     if query:
         context["search"] = query
