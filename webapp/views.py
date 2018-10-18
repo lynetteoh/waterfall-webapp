@@ -198,7 +198,6 @@ def balance(request):
                 tx = user.account.deposit(float(add_amount))
             elif minus_amount and float(minus_amount) > 0:
                 tx = user.account.withdraw(float(minus_amount))
-
             if not tx:
                 context['error'] = "Insufficient Funds"
             else:
@@ -208,6 +207,8 @@ def balance(request):
             print(e)
             context['error'] = "Invalid Value"
         finally:
+            transactions = collect_transactions(user.account, Transaction.objects.all())
+            context["transactions"] = transactions
             return render(request, 'balance.html', context)
     return render(request, 'balance.html', context)
 
@@ -402,7 +403,7 @@ def create_group(request):
             gacc = GroupAccount.objects.create(account=acc, name=group_name)
             members = [User.objects.get(username=m).profile for m in members]
             gacc.members.set(members)
-            
+
             acc.save()
             gacc.save()
 
@@ -673,12 +674,12 @@ def collect_dash_transfers(acc, transfer_objects, query=None):
         # Check for search results.
         if not transfer_has_query(t, query):
             continue
-            
+
         # Past transactions.
         if t.confirmed_at:
             past.append(t)
             continue
-            
+
         # Pending or outgoing requests.
         if t.is_request:
             # Pending requests waiting for approval from user to transfer someone else.
