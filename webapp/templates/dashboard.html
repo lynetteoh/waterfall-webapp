@@ -218,7 +218,7 @@
 <br/><br/>
 
 <script type="text/javascript">
-        $(function(){
+      function startTutorial(){
         var intro = introJs();
           intro.setOptions({
             steps: [
@@ -260,15 +260,23 @@
               }
             ]
           });
-          {% comment %} Show steps number in the red circle or not {% endcomment %}
+
           intro.setOption("showStepNumbers", "false");
           intro.setOption("overlayOpacity", "0.5");
           intro.setOption("exitOnOverlayClick", "false");
           intro.setOption("scrollToElement", "true");
           intro.start();
       
-      });
-    </script>
+      };
+</script>
+
+
+{% if tutorial %}
+<script>
+//call after page loaded
+window.onload=startTutorial ; 
+</script>
+{% endif %}
 
 <script>
 checkError("{{ error }}");

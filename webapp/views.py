@@ -118,10 +118,12 @@ def dashboard(request):
     user = request.user
     query = None if not request.GET.get('query') else request.GET.get('query')
     current, past = collect_transfers(user.account, Transfer.objects.all(), query)
+    tutorial = len(Transaction.objects.filter(account=user.account)) <= 0
     context = {
         "current" : current[:10],
         "past": past[:10],
         "user": user,
+        "tutorial": tutorial,
     }
     if query:
         context["search"] = query
