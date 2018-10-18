@@ -518,12 +518,8 @@ def collect_dash_transfers(user, transfer_objects, query=None):
         if not transfer_has_query(t, query):
             continue
 
-        # Remove time from the date.
-        t.deadline = t.deadline.date()
-
         # Past transactions.
         if t.confirmed_at:
-            t.confirmed_at = t.confirmed_at.date()
             past.append(t)
             continue
         # Pending or outgoing requests.
@@ -545,6 +541,16 @@ def collect_dash_transfers(user, transfer_objects, query=None):
     past.sort(key=lambda x: x.confirmed_at, reverse=True)
     requests.sort(key=lambda x: x.deadline)
     user_requests.sort(key=lambda x: x.deadline)
+
+    # remove time from the format 
+    for i in incoming:
+        i.deadline = i.deadline.date()
+
+    for i in outgoing:
+        i.deadline = i.deadline.date()
+
+    for i in past:
+        i.confirmed_at = i.confirmed_at.date()
 
     return (incoming, outgoing, past, requests, user_requests)
 
