@@ -647,10 +647,10 @@ def collect_transfers(acc, transfer_objects, query=None):
 
     # remove time for date-time format
     for i in current:
-        i.deadline = current.deadline.date()
+        i.deadline = i.deadline.date()
 
     for i in past:
-        i.confirmed_at = past.confirmed_at.date()
+        i.confirmed_at = i.confirmed_at.date()
 
     return (current, past)
 
