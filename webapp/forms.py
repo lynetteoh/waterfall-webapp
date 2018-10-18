@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from .models import GroupAccount
 
 
 class SignUpForm(UserCreationForm):
@@ -23,6 +25,14 @@ class SignUpForm(UserCreationForm):
         if User.objects.filter(email__iexact=self.cleaned_data['email']):
             raise forms.ValidationError("This email address is already in use. Please supply a different email address.")
         return self.cleaned_data['email']
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        username_qs1 = User.objects.filter(username__iexact=username)
+        username_qs2 = GroupAccount.objects.filter(name__iexact=username)
+        if username_qs1.exists() or username_qs2.exists():
+            raise ValidationError("Username already exists")
+        return username
 
 class AvatarForm(forms.Form):
     avatar = forms.ImageField()
