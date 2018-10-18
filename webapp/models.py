@@ -279,7 +279,6 @@ class Transaction(models.Model):
         )
 
     # Sends email notification about a transac
-    @transaction.atomic
     def notify(self, subj, template):
         # NOTE: Does not send notifications for groups.
         if not self.account.user:
@@ -377,7 +376,6 @@ class Transfer(models.Model):
         print("Created recurring transfer copy.")
 
     # Sends email notification about transfer.
-    @transaction.atomic
     def notify(self, subj, template):
         # Note: If one of the payments goes to a group, no notification is sent.
         if not self.tx_from.account.user or not self.tx_to.account.user:

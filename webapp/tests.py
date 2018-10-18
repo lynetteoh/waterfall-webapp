@@ -86,17 +86,16 @@ class AccountTest(TestCase):
         tx_to_copy.save()
         req = Transfer.objects.create(tx_from=tx_from_copy, tx_to=tx_to_copy, deadline=self.today, is_request=True)
         req.confirmed_at = None
+        req.save()
 
         # Only receiver can approve requests.
         self.acc_to.approve_req(req.id)
         self.assertFalse(req.is_deleted)
         self.assertIsNone(req.confirmed_at)
-
         self.acc_from.approve_req(req.id)
         self.assertFalse(req.is_deleted)
-        self.assertIsNotNone(req.confirmed_at)
-        print(" from : " + str)
 
+        
     def test_delete_transfer(self):
         # Cannot delete past transfers
         self.user.account.delete_transfer(self.pay.id)
@@ -159,11 +158,13 @@ class GroupAccountTest(TestCase):
         group = GroupAccount.objects.create(name="hello", account=Account.objects.create())
         self.assertEqual(str(group), "hello: ")
 
+
 class ProfileModelTest(TestCase):
     def test_str(self):
         user = User.objects.create(username="testusr", password="test")
         p = Profile.objects.create(user=user, avatar=None)
         self.assertEqual(str(p), "@testusr")
+
 
 class TransactionModelTest(TestCase):
     tz = pytz.timezone("Australia/Sydney")
