@@ -388,8 +388,6 @@ def create_group(request):
             errors.append("This account name has been taken.")
         if not bool(re.match(r'^[\w]+$', group_name)):
             errors.append("Account name must only consist of alphanumeric and underscore characters.")
-            print('TYPE')
-            print('|'+group_name+'|')
 
         members = collect_recipients(request, 'members')
         for m in members:
@@ -405,7 +403,7 @@ def create_group(request):
             acc.save()
             gacc.save()
 
-            print("{} group created.".format(gacc))
+            print("'{}' group created.".format(gacc))
         else:
             context['errors'] = errors
             return render(request, 'create_group.html', context)
@@ -453,23 +451,6 @@ def all_groups(request):
     return render(request, 'all-groups.html', context)
 
 # New group creation page.
-@login_required
-def create_group(request):
-    user = request.user
-    all_users = User.objects.all().exclude(username=user.username)
-    groups = []
-    for g in user.profile.GroupAccount.all():
-        groups.append(g.name)
-    create_members = []
-    for u in all_users:
-        if (u != user.username):
-            create_members.append(u.username)
-    context ={
-        "user" : user,
-        "filter_members": create_members,
-        "all_groups" :groups,
-    }
-    return render(request, 'create_group.html', context)
 
 # Group dashboard page.
 @login_required
