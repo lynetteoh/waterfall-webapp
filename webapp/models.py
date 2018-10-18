@@ -137,6 +137,7 @@ class Account(models.Model):
                 print("Failed to send mail: " + str(e))
         return tx
 
+
     # Creates a payment or request from user to receiver (and reversed).
     # Does not validate.
     def _create_transfer(self, receiver, subj, amount, recurr, date, is_request):
