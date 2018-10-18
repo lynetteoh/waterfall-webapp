@@ -71,14 +71,15 @@ class Account(models.Model):
         # Attempt to send email notifications.
         try:
             t = threading.Thread(target=transfer.notify,\
-                args=("Approved TricklePay Request", 'email/approve-req.html',))
+                args=("Approved TricklePay Request", 'email/approve-req.html',),\
+                daemon=True)
             t.start()
 
             # Reminders for low balance.
             if (transfer.tx_from.account.balance < 10):
                 tR = threading.Thread(target=w.notify,\
                     args=("Warning: Low Waterfall Balance",\
-                            "email/reminder-balance.html",))
+                            "email/reminder-balance.html",), daemon=True)
                 tR.start()
         except Exception as e:
             print("Failed to send mail: " + str(e))
@@ -108,7 +109,8 @@ class Account(models.Model):
 
         # Attempt to send email notification
         try:
-            t = threading.Thread(target=transfer.notify, args=(subj, template,))
+            t = threading.Thread(target=transfer.notify, args=(subj, template,),\
+                                    daemon=True)
             t.start()
         except Exception as e:
             print("Failed to send mail: " + str(e))
@@ -124,13 +126,15 @@ class Account(models.Model):
             title=title,
             value=value,
             transaction_type=type,
+            created_at=tz.localize(datetime.now()),
+            modified_at=tz.localize(datetime.now()),
             confirmed_at=now,
             is_pending=is_pending,
         )
         if (self.balance < 10) and not is_pending:
             try:
                 t = threading.Thread(target=tx.notify,\
-                    args=("Warning: Low Waterfall Balance", "email/reminder-balance.html",))
+                    args=("Warning: Low Waterfall Balance", "email/reminder-balance.html",), daemon=True)
                 t.start()
             except Exception as e:
                 print("Failed to send mail: " + str(e))
@@ -198,8 +202,7 @@ class Account(models.Model):
     @property
     def num_requests(self):
         num_requests = 0
-        requests = Transfer.objects.filter(is_deleted=False, is_request=True,\
-                                    confirmed_at__isnull=False)
+        requests = Transfer.objects.filter(is_deleted=False, is_request=True)
         for r in requests:
             if r.tx_to.account == self:
                 num_requests += 1
@@ -274,14 +277,13 @@ class Transaction(models.Model):
         )
 
     # Sends email notification about a transac
-    @transaction.atomic
     def notify(self, subj, template):
         # NOTE: Does not send notifications for groups.
         if not self.account.user:
             return
 
         print("Notifying...")
-        amount = self.value if self.value > 0 else self.value*(-1)
+        amount = self.value if float(self.value) > 0 else float(self.value)*(-1)
         txt = "deposit" if self.transaction_type == 'd' else "withdraw"
         context = {
             "bal" : self.account.balance,
@@ -372,7 +374,6 @@ class Transfer(models.Model):
         print("Created recurring transfer copy.")
 
     # Sends email notification about transfer.
-    @transaction.atomic
     def notify(self, subj, template):
         # Note: If one of the payments goes to a group, no notification is sent.
         if not self.tx_from.account.user or not self.tx_to.account.user:
