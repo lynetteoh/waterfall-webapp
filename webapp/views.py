@@ -180,8 +180,10 @@ def profile(request):
 @login_required
 def balance(request):
     user = request.user
+    transactions = collect_transactions(user.account, Transaction.objects.all())
     context = {
-        "user": user
+        "user": user,
+        "transactions": transactions,
     }
     if request.method == "POST":
         add_amount = request.POST.get('add_amount')
@@ -545,6 +547,49 @@ def transfer_has_query(t, query):
     if not t.tx_to.account.user and (q in t.tx_to.account.groupaccount.name.lower()):
         return True
     return False
+
+
+# Collects group transfers based on categories.
+def collect_transfers(acc, transfer_objects, query=None):
+    current = []
+    past = []
+    for t in transfer_objects:
+        # Check its a valid existing transfer relevant to current user.
+        if t.is_deleted or not (t.tx_from.account == acc \
+                                or t.tx_to.account == acc):
+            continue
+        # Check for search results.
+        if not transfer_has_query(t, query):
+            continue
+        # Past transactions.
+        if t.confirmed_at:
+            t.confirmed_at = t.confirmed_at.date()
+            past.append(t)
+            continue
+        # Remove time from the date.
+        t.deadline = t.deadline.date()
+        current.append(t)
+    current.sort(key=lambda x: x.deadline)
+    past.sort(key=lambda x: x.confirmed_at, reverse=True)
+    return (current, past)
+
+# Collects group transfers based on categories.
+def collect_transactions(acc, transactions, query=None):
+    tx = []
+    for t in transactions:
+        # Check its a valid existing transfer relevant to current user.
+        if t.is_deleted or not t.confirmed_at or not t.account == acc:
+            continue
+
+        if t.title == "Deposit" or t.title == "Withdrawal"\
+            or t.title == "Deposit into Group"\
+            or t.title == "Withdrawal from Group":
+            tx.append(t)
+
+    tx.sort(key=lambda x: x.confirmed_at, reverse=True)
+    for t in tx:
+        t.confirmed_at = t.confirmed_at.date()
+    return tx[:10]
 
 # Collects group transfers based on categories.
 def collect_transfers(acc, transfer_objects, query=None):
