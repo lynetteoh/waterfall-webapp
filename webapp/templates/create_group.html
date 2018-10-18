@@ -12,7 +12,6 @@
 {% endblock %}
 
 {% block content %}
-{{ errors }}
 <div class="container" style="">
     <h3 class="py-4">Create Group</h3>
     <form role="form" id="group-creation-form" onsubmit="event.preventDefault();popup('members','group-creation-form')"
@@ -20,8 +19,11 @@
         {% csrf_token %}
         <div class="row form-group mb-5">
             <label style="font-size:18px;" for="group_name" class="col-sm-2 col-form-label">Group Name</label>
-            <div class="input-group col-sm-10">
+            <div class="col-sm-10">
                 <input name="group_name" type="text" class="form-control" id="group_name" required>
+                {% for e in errors %}
+                    <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> {{e}}</p>
+                {% endfor %}
             </div>
         </div>
         <h5>Select Members</h5>
@@ -30,7 +32,7 @@
                 <input class="col-sm-10 form-control" placeholder="Search" id="member_search" list="member_list">
                 <datalist id="member_list">
                     {% for m in filter_members %}
-                    <option>@{{ m }}</option>
+                    <option>{{ m }}</option>
                     {% endfor %}
                 </datalist>
                 <input type="button" class="col-sm-2 btn btn-primary" id="add" onclick="add_member('member_search', 'members')"
@@ -50,6 +52,5 @@
     var f_members = "{{filter_members}}";
     var all_groups = "{{all_groups}}";
     add_creator('members', '{{user}}');
-    // checkError("{{error}}");
 </script>
 {% endblock %}

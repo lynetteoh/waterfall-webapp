@@ -370,6 +370,7 @@ def request(request):
     # Regular request view.
     return render(request, 'request.html', context)
 
+# New group creation page.
 @login_required
 def create_group(request):
     user = request.user
@@ -450,7 +451,7 @@ def all_groups(request):
                 return redirect('/edit-group?g=' + edit_group)
     return render(request, 'all-groups.html', context)
 
-# New group creation page.
+
 
 # Group dashboard page.
 @login_required
