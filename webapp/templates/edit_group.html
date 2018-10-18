@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+<title>Waterfall - Edit Group</title>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="{% static 'js/group.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/awesomplete.css' %}" type="text/css">
+<script src="{% static 'js/awesomplete.js' %}" async></script>
+<link rel="stylesheet" href="{% static 'css/group.css' %}" type="text/css">
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top:-20px;">
+    <h3 class="py-4">Edit Group</h3>
+    {% if not group %}
+      <p>No group has been selected for management. Please try again.</p>
+    {% else %}
+      <form role="form" id="group-management-form" onsubmit="event.preventDefault();popup('members','group-management-form')"
+          method="POST">
+          {% csrf_token %}
+          <div class="row form-group mb-5" style="font-size:18px;">
+              <label for="group_name" class="col-sm-3 col-form-label">Group Name</label>
+              <div class="input-group col-sm-5">
+                  <input style="background-color:white; border: 2px solid rgba(0,0,0,0); font-weight:bold; font-size:18px;" name="group_name" type="text" class="form-control" id="group_name" value="{{ group.name }}" disabled>
+              </div>
+          </div>
+          <h5>Members</h5>
+          <div class="row form-group mt-5">
+              <div class="col-sm-12 mb-3 form-inline">
+                  <input class="col-sm-10 form-control" placeholder="Search" id="member_search" list="member_list">
+                  <datalist id="member_list">
+                      {% for m in filter_members %}
+                      <option>@{{ m }}</option>
+                      {% endfor %}
+                  </datalist>
+                  <input type="button" class="col-sm-2 btn btn-primary" id="add" onclick="add_member('member_search', 'members')"
+                      value="Add">
+              </div>
+              <div class="col-sm-12">
+                  <ul class="ul_style ml-4 mx-3" id='members'></ul>
+              </div>
+          </div>
+          </t>
+          <div class="text-center font-inline p-4">
+              <button class="btn btn-lg btn-primary" type="submit" style="font-size:18px;">Save</button>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <input type="button" class="btn btn-lg btn-primary" value="Leave Group" onclick="leave_group('leave_group')" style="font-size:18px;">
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <input type="button" class="btn btn-lg btn-primary" value="Cancel" onclick="cancel_changes('{% url 'all_groups' %}')" style="font-size:18px;">
+          </div>
+      </form>
+      <form role="form" id="leave_group" method="POST">
+          {% csrf_token %}
+          <input id="hidden_field" name="hidden_field" type="hidden" value="User leave group" />
+      </form>
+    {% endif %}
+</div>
+
+<script>
+    var f_members = "{{filter_members}}";
+    var g_members = "{{group_members}}";
+    var group_list = "{% url 'all_groups' %}";
+    add_all_members('members');
+    checkError("{{error}}");
+</script>
+{% endblock %}

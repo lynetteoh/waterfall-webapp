@@ -3,7 +3,7 @@ function checkError(error) {
   if (error == "Success") {
     swal({
       title: "Success!",
-      text:  "The transaction has been sent.",
+      text:  "Your request has been processed.",
       icon:  "success",
     });
   } else if (error) {
@@ -13,6 +13,20 @@ function checkError(error) {
       icon:  "warning",
     });
   }
+}
+
+/* Produces a popup confirmation for request approvals and rejections. */
+function confirmPopup(form_id) {
+  swal({
+    title: "Are you sure?",
+    text:  "Once processed, this action cannot be undone.",
+    icon:  "warning",
+    buttons: true,
+  }).then((confirmed) => {
+    if (confirmed) {
+      document.getElementById(form_id).submit();
+    }
+  });
 }
 
 /* Produces a popup confirmation for withdrawals and deposits. */

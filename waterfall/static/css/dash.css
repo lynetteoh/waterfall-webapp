@@ -18,6 +18,11 @@
 
 .view-more-link {
     color: grey;
+    font-size: 16px;
+}
+
+table {
+    margin-bottom: 0px !important;
 }
 
 .view-more-link:hover {

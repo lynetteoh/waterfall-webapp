@@ -25,10 +25,8 @@ class Account(models.Model):
             if (user_acc.balance < value):
                 print("Insufficient balance.")
                 return None
-            title = "Deposit into Group"
             date = tz.localize(datetime.now())
-            return user_acc._create_transfer(self, title, value, 0, date, False)
-
+            return user_acc._create_transfer(self, "Deposit into Group", value, 0, date, False)
         # Regular user deposits.
         title = "Deposit"
         return self._create_transaction(value, "Deposit", 'd', False)
@@ -150,7 +148,6 @@ class Account(models.Model):
         if is_request:
             sender, receiver = receiver, sender
 
-        tz = pytz.timezone('Australia/Sydney')
         today = tz.localize(datetime.today()).date()
         today = tz.localize(datetime.combine(today, datetime.min.time()), is_dst=True)
         date = tz.localize(datetime.combine(date, datetime.min.time()), is_dst=True)
@@ -177,7 +174,7 @@ class Account(models.Model):
         # Create recurring copy of transfer if it is a payment made today.
         if (not is_request and recurr and recurr > 0):
             link_tx.create_recurring_copy(today)
-        return
+        return link_tx
 
     def __str__(self):
         if self.user:
