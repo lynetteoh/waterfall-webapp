@@ -13,126 +13,113 @@ from .models import Profile, Account, Transaction, Transfer, GroupAccount
 from datetime import datetime
 import pytz
 
+# Home landing page.
 def index(request):
     return render(request, 'index.html')
 
+# Team description page.
 def team(request):
     return render(request, 'team.html')
 
+# Product description page.
 def product(request):
     return render(request, 'product.html')
 
+# New user registration page.
+@ensure_csrf_cookie
+def register_new(request):
+    if request.POST:
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            profile = Profile(user=user, avatar=None)
+            profile.save()
+            account = Account(user=user)
+            account.save()
+            login(request, user)
+            return redirect('/dashboard')
+    else:
+        form = SignUpForm()
+    return render(request, 'index.html', {'form': form})
+
+# Incoming Payments View more selection for dashboard.
 @login_required
-def viewMoreOp(request):
-    title = "Outgoing Payments"
-    user = str(request.user)
-    outgoing = []
+def view_more_current(request, name=None):
+    user = request.user
+    acc = user.account
+    title = "Pending Transactions"
+    current = []
+    group = None
 
-    if request.GET.get('query'):
-        query = request.GET.get('query')
-        context = collect_search_results(request.user, query)
-        context["title"] = title
-        context["user1"] = user
-        context["key"] = "op"
-        return render(request, 'view_more.html', context)
+    if name and GroupAccount.objects.get(name=name):
+        group = GroupAccount.objects.get(name=name)
+        title += " - " + group.name
+        acc = group.account
 
-    transfers = Transfer.objects.all()
-    for t in transfers:
-        # Remove time from the date.
-        # Outgoing or Incoming payments.
-        tx_to = str(t.tx_to.account).strip("@")
-        if tx_to != user and not t.is_request and not t.tx_from.confirmed_at:
-            t.deadline = t.deadline.date()
-            outgoing.append(t)
-
-    context ={
+    query = None if not request.GET.get('query') else request.GET.get('query')
+    (current, past) = collect_transfers(acc, Transfer.objects.all(), query)
+    context = {
         "title": title,
-        "outgoing": outgoing,
-        "user1": user,
-        "key": "op",
+        "current": current,
+        "group": group,
+        "acc" : acc,
     }
+    if query:
+        context["search"] = query
+        return render(request, 'view_more.html', context)
+    # User requests.
+    if request.method == "POST":
+        transfer = request.POST.get('transfer')
+        try:
+            if request.POST.get('req') == "approve-req":
+                context['error'] = acc.approve_req(transfer)
+            if request.POST.get('req') == "delete-req":
+                context['error'] = acc.delete_transfer(transfer)
+        except Exception as e:
+            context['error'] = str(e)
+        finally:
+            current, past = collect_transfers(acc, Transfer.objects.all(), query)
+            context['current'] = current
+            return render(request, 'view_more.html', context)
     return render(request, 'view_more.html', context)
 
+# Historical Transactions complete selection for dashboard.
 @login_required
-def viewMoreIp(request):
-    title = "Incoming Payments"
-    user = str(request.user)
-    incoming = []
-
-    if request.GET.get('query'):
-        query = request.GET.get('query')
-        context = collect_search_results(request.user, query)
-        context["title"] = title
-        context["user1"] = user
-        context["key"] = "ip"
-        return render(request, 'view_more.html', context)
-
-    transfers = Transfer.objects.all()
-    for t in transfers:
-        # Remove time from the date.
-        # Outgoing or Incoming payments.
-        tx_to = str(t.tx_to.account).strip("@")
-        if tx_to == user and not t.is_request and not t.tx_from.confirmed_at:
-            t.deadline = t.deadline.date()
-            incoming.append(t)
-
-    context ={
-        "title": title,
-        "incoming": incoming,
-        "user1": user,
-        "key": "ip",
-    }
-    return render(request, 'view_more.html', context)
-
-@login_required
-def viewMoreH(request):
+def view_more_history(request, name=None):
+    user = request.user
     title = "Transaction History"
-    user = str(request.user)
-    past = []
-
-    if request.GET.get('query'):
-        query = request.GET.get('query')
-        context = collect_search_results(request.user, query)
-        context["title"] = title
-        context["user1"] = user
-        context["key"] = "th"
-        return render(request, 'view_more.html', context)
-
-    transfers = Transfer.objects.all()
-
-    for t in transfers:
-        if t.tx_from.confirmed_at:
-            t.confirmed_at = t.confirmed_at.date()
-            past.append(t)
-
-    context ={
+    group = None
+    acc = user.account
+    if name and GroupAccount.objects.get(name=name):
+        group = GroupAccount.objects.get(name=name)
+        title += " - " + group.name
+        acc = group.account
+    query = None if not request.GET.get('query') else request.GET.get('query')
+    (current, past) = collect_transfers(acc, Transfer.objects.all(), query)
+    context = {
         "title": title,
         "past": past,
-        "user1": user,
-        "key": "th",
+        "group": group,
+        "acc" : acc,
     }
+    if query:
+        context["search"] = query
+        return render(request, 'view_more.html', context)
     return render(request, 'view_more.html', context)
 
-@login_required
-def group_dash(request, name):
-    print("the name we got:", name)
-    context = {"groupName": name}
-    return render(request, 'group_dash.html', context)
-
+# User dashboard & landing page after login.
 @login_required
 def dashboard(request):
-    user_str = str(request.user)
+    user = request.user
     query = None if not request.GET.get('query') else request.GET.get('query')
-
-    incoming, outgoing, past, requests, user_requests =\
-        collect_dash_transfers(request.user, Transfer.objects.all(), query)
+    current, past = collect_transfers(user.account, Transfer.objects.all(), query)
     context = {
-        "past": past,
-        "incoming" : incoming,
-        "outgoing": outgoing,
-        "user1": user_str,
-        "requests": requests,
-        "user_requests": user_requests,
+        "current" : current[:10],
+        "past": past[:10],
+        "user": user,
     }
     if query:
         context["search"] = query
@@ -142,26 +129,19 @@ def dashboard(request):
         transfer = request.POST.get('transfer')
         try:
             if request.POST.get('req') == "approve-req":
-                context['error'] = request.user.account.approve_req(transfer)
+                context['error'] = user.account.approve_req(transfer)
             if request.POST.get('req') == "delete-req":
-                context['error'] = request.user.account.delete_transfer(transfer)
+                context['error'] = user.account.delete_transfer(transfer)
         except Exception as e:
             context['error'] = str(e)
         finally:
-            incoming, outgoing, past, requests, user_requests =\
-                                            collect_dash_transfers(request.user, Transfer.objects.all())
-            context['incoming'] = incoming
-            context['outgoing'] = outgoing
-            context['past'] = past
-            context['requests'] = requests
-            context['user_requests'] = user_requests
-
-            if len(outgoing) == 0:
-                context['outgoing'] = None
-
+            current, past = collect_transfers(user.account, Transfer.objects.all(), query)
+            context['current'] = current[:10]
+            context['past'] = past[:10]
             return render(request, 'dashboard.html', context)
     return render(request, 'dashboard.html', context)
 
+# Profile settings page.
 @login_required
 def profile(request):
     if request.method == "POST":
@@ -196,6 +176,7 @@ def profile(request):
         form = AvatarForm()
     return render(request, 'profile.html')
 
+# Balance management page.
 @login_required
 def balance(request):
     user = request.user
@@ -224,25 +205,7 @@ def balance(request):
             return render(request, 'balance.html', context)
     return render(request, 'balance.html', context)
 
-@ensure_csrf_cookie
-def register_new(request):
-    if request.POST:
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            profile = Profile(user=user, avatar=None)
-            profile.save()
-            account = Account(user=user)
-            account.save()
-            login(request, user)
-            return redirect('/dashboard')
-    else:
-        form = SignUpForm()
-    return render(request, 'index.html', {'form': form})
-
+# Payment page.
 @login_required
 def pay(request):
     user = request.user
@@ -320,10 +283,10 @@ def pay(request):
     # Regular pay view.
     return render(request, 'pay.html', context)
 
+# Request page.
 @login_required
 def request(request):
     user = request.user
-    # all_users = User.objects.all().exclude(username=request.user.username)
     all_users = User.objects.all()
     from_users = []
     from_users.append(user.username)
@@ -403,24 +366,7 @@ def request(request):
     # Regular request view.
     return render(request, 'request.html', context)
 
-@login_required
-def create_group(request):
-    user = request.user
-    all_users = User.objects.all().exclude(username=user.username)
-    groups = []
-    for g in user.profile.GroupAccount.all():
-        groups.append(g.name)
-    create_members = []
-    for u in all_users:
-        if (u != user.username):
-            create_members.append(u.username)
-    context ={
-        "user" : user,
-        "filter_members": create_members,
-        "all_groups" :groups,
-    }
-    return render(request, 'create_group.html', context)
-
+# Groups page.
 @login_required
 def all_groups(request):
     user = request.user
@@ -444,15 +390,103 @@ def all_groups(request):
             context["search"] = search
             context["groups"] = filtered_groups
 
-        # Manage group management.
+        # View group dashboard request.
+        if request.POST.get("group-dash"):
+            group_name = request.POST.get("group-dash")
+            if GroupAccount.objects.get(name=group_name):
+                return redirect('/group/' + group_name)
+
+        # Edit group request.
         if request.POST.get("edit-group"):
             edit_group = request.POST.get("edit-group")
             if GroupAccount.objects.get(name=edit_group):
-                return redirect('/group-management?g=' + edit_group)
+                return redirect('/edit-group?g=' + edit_group)
     return render(request, 'all-groups.html', context)
 
+# New group creation page.
 @login_required
-def group_management(request):
+def create_group(request):
+    user = request.user
+    all_users = User.objects.all().exclude(username=user.username)
+    groups = []
+    for g in user.profile.GroupAccount.all():
+        groups.append(g.name)
+    create_members = []
+    for u in all_users:
+        if (u != user.username):
+            create_members.append(u.username)
+    context ={
+        "user" : user,
+        "filter_members": create_members,
+        "all_groups" :groups,
+    }
+    return render(request, 'create_group.html', context)
+
+# Group dashboard page.
+@login_required
+def group_dash(request, name):
+    user = request.user
+    try:
+        group = GroupAccount.objects.get(name=name)
+    except:
+        group = None
+    group_members = []
+    context = {
+        "user" : user,
+        "group" : group,
+        "group_members": group_members,
+    }
+    if group:
+        for p in group.members.all():
+            if p.user != user:
+                group_members.append(p.user.username)
+        current, past = collect_transfers(group.account, Transfer.objects.all())
+        context["current"] = current[:10]
+        context["past"] = past[:10]
+        context["group_members"] = group_members
+
+    if request.method == "POST":
+        # Edit group request.
+        if request.POST.get("edit-group"):
+            edit_group = request.POST.get("edit-group")
+            if GroupAccount.objects.get(name=edit_group):
+                return redirect('/edit-group?g=' + edit_group)
+
+        # Edit transfers request.
+        if request.POST.get('transfer') and group:
+            transfer = request.POST.get('transfer')
+            try:
+                if request.POST.get('req') == "approve-req":
+                    context['error'] = group.account.approve_req(transfer)
+                if request.POST.get('req') == "delete-req":
+                    context['error'] = group.account.delete_transfer(transfer)
+            except Exception as e:
+                context['error'] = str(e)
+            finally:
+                current, past = collect_transfers(group.account, Transfer.objects.all())
+                context['current'] = current[:10]
+                context['past'] = past[:10]
+                return render(request, 'group_dash.html', context)
+
+        # Balance management request.
+        add_amount = request.POST.get('add_amount')
+        minus_amount = request.POST.get('minus_amount')
+        try:
+            tx = None
+            if add_amount and float(add_amount) > 0:
+                tx = group.account.deposit(float(add_amount), user.account)
+            elif minus_amount and float(minus_amount) > 0:
+                tx = group.account.withdraw(float(minus_amount), user.account)
+            context['error'] = "Success" if tx else "Insufficient Funds"
+        except Exception as e:
+            context['error'] = e
+        finally:
+            return render(request, 'group_dash.html', context)
+    return render(request, 'group_dash.html', context)
+
+# Edit group page.
+@login_required
+def edit_group(request):
     user = request.user
     filter_users = [u.username for u in User.objects.all().exclude(username=user.username)]
 
@@ -477,76 +511,9 @@ def group_management(request):
         "user_groups:": user_groups,
         "group_members": group_members,
     }
-    return render(request, 'group_management.html', context)
+    return render(request, 'edit_group.html', context)
 
 ### HELPER FUNCTIONS ###
-
-def transfer_has_query(t, query):
-    if not query:
-        return True
-    q = query.lower()
-
-    # Check user names for query.
-    if (q in t.tx_from.title.lower()) or (q in t.tx_to.title.lower()):
-        return True
-    if t.tx_from.account.user and (q in t.tx_from.account.user.username.lower()):
-        return True
-    if t.tx_to.account.user and (q in t.tx_to.account.user.username.lower()):
-        return True
-    # Check group names for query.
-    if not t.tx_from.account.user and (q in t.tx_from.account.groupaccount.name.lower()):
-        return True
-    if not t.tx_to.account.user and (q in t.tx_to.account.groupaccount.name.lower()):
-        return True
-
-    return False
-
-
-def collect_dash_transfers(user, transfer_objects, query=None):
-    incoming = []
-    outgoing = []
-    past = []
-    requests = []
-    user_requests = []
-
-    for t in transfer_objects:
-        # Check its a valid existing transfer relevant to current user.
-        if t.is_deleted or not (t.tx_from.account == user.account or t.tx_to.account == user.account):
-            continue
-
-        # Check for search results.
-        if not transfer_has_query(t, query):
-            continue
-
-        # Remove time from the date.
-        t.deadline = t.deadline.date()
-
-        # Past transactions.
-        if t.confirmed_at:
-            t.confirmed_at = t.confirmed_at.date()
-            past.append(t)
-            continue
-        # Pending or outgoing requests.
-        if t.is_request:
-            # Pending requests waiting for approval from user to transfer someone else.
-            if t.tx_from.account == user.account:
-                requests.append(t)
-            else:
-                user_requests.append(t)
-            continue
-        # Outgoing or Incoming payments.
-        if t.tx_to.account == user.account:
-            incoming.append(t)
-        else:
-            outgoing.append(t)
-
-    incoming.sort(key=lambda x: x.deadline)
-    outgoing.sort(key=lambda x: x.deadline)
-    past.sort(key=lambda x: x.confirmed_at, reverse=True)
-    requests.sort(key=lambda x: x.deadline)
-    user_requests.sort(key=lambda x: x.deadline)
-
-    return (incoming, outgoing, past, requests, user_requests)
 
 # Collects payees for multi pay and multi requests.
 def collect_recipients(request, user_type):
@@ -559,3 +526,90 @@ def collect_recipients(request, user_type):
         i += 1
         r = request.POST.get(user_type + str(i))
     return payees
+
+# Checks if a particular transfer has query term in its name, description or involved users.
+def transfer_has_query(t, query):
+    if not query:
+        return True
+    q = query.lower()
+    # Check user names for query.
+    if (q in t.tx_from.title.lower()) or (q in t.tx_to.title.lower()):
+        return True
+    if t.tx_from.account.user and (q in t.tx_from.account.user.username.lower()):
+        return True
+    if t.tx_to.account.user and (q in t.tx_to.account.user.username.lower()):
+        return True
+    # Check group names for query.
+    if not t.tx_from.account.user and (q in t.tx_from.account.groupaccount.name.lower()):
+        return True
+    if not t.tx_to.account.user and (q in t.tx_to.account.groupaccount.name.lower()):
+        return True
+    return False
+
+# Collects group transfers based on categories.
+def collect_transfers(acc, transfer_objects, query=None):
+    current = []
+    past = []
+    for t in transfer_objects:
+        # Check its a valid existing transfer relevant to current user.
+        if t.is_deleted or not (t.tx_from.account == acc \
+                                or t.tx_to.account == acc):
+            continue
+        # Check for search results.
+        if not transfer_has_query(t, query):
+            continue
+        # Past transactions.
+        if t.confirmed_at:
+            t.confirmed_at = t.confirmed_at.date()
+            past.append(t)
+            continue
+        # Remove time from the date.
+        t.deadline = t.deadline.date()
+        current.append(t)
+    current.sort(key=lambda x: x.deadline)
+    past.sort(key=lambda x: x.confirmed_at, reverse=True)
+    return (current, past)
+
+### DEPRECATED ###
+# Collects transfers based on categories and given search query.
+def collect_dash_transfers(acc, transfer_objects, query=None):
+    incoming = []
+    outgoing = []
+    past = []
+    requests = []
+    user_requests = []
+
+    for t in transfer_objects:
+        # Check its a valid existing transfer relevant to current user.
+        if t.is_deleted or not (t.tx_from.account == acc or t.tx_to.account == acc):
+            continue
+        # Check for search results.
+        if not transfer_has_query(t, query):
+            continue
+        # Remove time from the date.
+        t.deadline = t.deadline.date()
+        # Past transactions.
+        if t.confirmed_at:
+            t.confirmed_at = t.confirmed_at.date()
+            past.append(t)
+            continue
+        # Pending or outgoing requests.
+        if t.is_request:
+            # Pending requests waiting for approval from user to transfer someone else.
+            if t.tx_from.account == acc:
+                requests.append(t)
+            else:
+                user_requests.append(t)
+            continue
+        # Outgoing or Incoming payments.
+        if t.tx_to.account == acc:
+            incoming.append(t)
+        else:
+            outgoing.append(t)
+
+    incoming.sort(key=lambda x: x.deadline)
+    outgoing.sort(key=lambda x: x.deadline)
+    past.sort(key=lambda x: x.confirmed_at, reverse=True)
+    requests.sort(key=lambda x: x.deadline)
+    user_requests.sort(key=lambda x: x.deadline)
+    return (incoming, outgoing, past, requests, user_requests)
