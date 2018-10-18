@@ -591,14 +591,19 @@ def collect_transfers(acc, transfer_objects, query=None):
             continue
         # Past transactions.
         if t.confirmed_at:
-            t.confirmed_at = t.confirmed_at.date()
             past.append(t)
             continue
-        # Remove time from the date.
-        t.deadline = t.deadline.date()
         current.append(t)
     current.sort(key=lambda x: x.deadline)
     past.sort(key=lambda x: x.confirmed_at, reverse=True)
+
+    # remove time for date-time format
+    for i in current:
+        i.deadline = i.deadline.date()
+
+    for i in past:
+        i.confirmed_at = i.confirmed.at.date()
+
     return (current, past)
 
 # Collects group transfers based on categories.
@@ -615,6 +620,7 @@ def collect_transactions(acc, transactions, query=None):
             tx.append(t)
 
     tx.sort(key=lambda x: x.confirmed_at, reverse=True)
+    # remove time for date-time format
     for t in tx:
         t.confirmed_at = t.confirmed_at.date()
     return tx[:10]
@@ -633,14 +639,19 @@ def collect_transfers(acc, transfer_objects, query=None):
             continue
         # Past transactions.
         if t.confirmed_at:
-            t.confirmed_at = t.confirmed_at.date()
             past.append(t)
             continue
-        # Remove time from the date.
-        t.deadline = t.deadline.date()
         current.append(t)
     current.sort(key=lambda x: x.deadline)
     past.sort(key=lambda x: x.confirmed_at, reverse=True)
+
+    # remove time for date-time format
+    for i in current:
+        i.deadline = current.deadline.date()
+
+    for i in past:
+        i.confirmed_at = past.confirmed_at.date()
+
     return (current, past)
 
 ### DEPRECATED ###
@@ -685,7 +696,7 @@ def collect_dash_transfers(acc, transfer_objects, query=None):
     requests.sort(key=lambda x: x.deadline)
     user_requests.sort(key=lambda x: x.deadline)
 
-    # remove time from the format 
+    # remove time for date-time format
     for i in incoming:
         i.deadline = i.deadline.date()
 
