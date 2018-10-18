@@ -2,7 +2,7 @@ function checkError(error) {
   if (error == "Success") {
     swal({
       title: "Success!",
-      text:  "The changes have been saved.",
+      text:  "Your request has been processed.",
       icon:  "success",
     });
   } else if (error) {
@@ -23,8 +23,7 @@ function confirmPopup(form_id) {
     buttons: true,
   }).then((confirmed) => {
     if (confirmed) {
-      console.log("hello")
-      // document.getElementById(form_id).submit();
+      document.getElementById(form_id).submit();
     }
   });
 }
