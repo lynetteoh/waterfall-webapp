@@ -1,10 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth import authenticate
 from django.core import mail
+import pytz
 from .models import User, Profile, Account, Transfer, Transaction, GroupAccount
 from datetime import datetime, timedelta, tzinfo
-import pytz
-
 
 class AccountTest(TestCase):
     tz = pytz.timezone("Australia/Sydney")
