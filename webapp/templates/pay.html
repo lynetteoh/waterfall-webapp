@@ -9,6 +9,8 @@
 <link rel="stylesheet" href="{% static 'css/awesomplete.css' %}" type="text/css">
 <script src="{% static 'js/awesomplete.js' %}" async></script>
 <link rel="stylesheet" href="{% static 'css/tricklepay.css' %}" type="text/css">
+<link href="{% static "css/introjs-modern.css" %}" rel="stylesheet">
+<script type="text/javascript" src="{% static 'js/intro.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -95,12 +97,61 @@
     </div>
 </div>
 
+<script type="text/javascript">
+      function startTutorial(){
+        var intro = introJs();
+          intro.setOptions({
+            steps: [
+              {
+                intro: "Are you excited to make your first payment? Let me quickly show you how easy it is"
+              },
+              {
+                element: '#pay_from',
+                intro: "By default, the money will be withdrawn from your account. However, you can also use a group account to pay.",
+                position: 'auto'
+              },
+              {
+                element: '#pay_search',
+                intro: "You can top up and withdraw amounts from here.",
+                position: 'auto'
+              },
+              {
+                element: '#pay_amount',
+                intro: 'Amount that each user will receive.',
+                position: 'auto'
+              },
+              {
+                element: '#pay_date',
+                intro: "Lucky you can plan out your future payments so you never miss the deadline",
+                position: 'auto'
+              },
+              {
+                element: '#pay_freq',
+                intro: "You can also set up a recurring payment for things like rent",
+                position: 'auto'
+              },
+              {
+                intro: "Easy right? Now let's make your fist payment!"
+              }
+            ]
+          });
+
+          intro.setOption("showStepNumbers", "false");
+          intro.setOption("overlayOpacity", "0.5");
+          intro.setOption("exitOnOverlayClick", "false");
+          intro.setOption("scrollToElement", "false");
+          intro.start();
+      };
+</script>
+
+<script>
+//call after page loaded
+window.onload=startTutorial ; 
+</script>
 
 <script>
     var f_users = "{{filter_users}}";
     checkError("{{error}}");
     document.getElementById('pay_date').valueAsDate = new Date();
-
 </script>
-
 {% endblock %}
