@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from webapp import views
@@ -35,12 +35,14 @@ urlpatterns = [
     path('register-new', views.register_new, name='register_new'),
     path('logout', auth_views.LogoutView, name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('dashboard/view-more-op/', views.viewMoreOp, name='viewMoreOp'),
-    path('dashboard/view-more-ip/', views.viewMoreIp, name='viewMoreIp'),
-    path('dashboard/view-more-h/', views.viewMoreH, name='viewMoreH'),
+    path('dashboard/view-more-c/', views.view_more_current, name='view_more_current'),
+    path('dashboard/view-more-h/', views.view_more_history, name='view_more_history'),
     path('create-group', views.create_group, name='create_group'),
     path('all-groups', views.all_groups, name='all_groups'),
-    path('group-management', views.group_management, name='group_management'),
+    path('edit-group', views.edit_group, name='edit_group'),
+    re_path(r'^group/(?P<name>[\w|\W]+)/$', views.group_dash, name="group_dash"),
+    re_path(r'^group/(?P<name>[\w|\W]+)/view-more-current$', views.view_more_current, name="view_group_current"),
+    re_path(r'^group/(?P<name>[\w|\W]+)/view-more-history$', views.view_more_history, name="view_group_history"),
 ]
 
 if settings.DEBUG:

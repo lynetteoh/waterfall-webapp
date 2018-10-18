@@ -2,7 +2,7 @@ function checkError(error) {
   if (error == "Success") {
     swal({
       title: "Success!",
-      text:  "The changes have been saved.",
+      text:  "Your request has been processed.",
       icon:  "success",
     });
   } else if (error) {

@@ -13,83 +13,92 @@
 
 
 {% block content %}
-<div class="dash_back">
-    <div class="dash_form">
-        <form class="form" method="POST">
-            {% csrf_token %}
-            <div class="form-row">
-                <div style="padding: 0px !important;" class="col-md-10 form-group">
-                    <input type="text" style="width: 100%;" class="form-control" placeholder="Search" name="search-txt" id="search-txt">
-                </div>
-                <div class="col">
-                    <button type="submit" class="btn search_btn btn-outline-success">Search</button>
-                </div>
-            </div>
-        </form>
+<div class="container dash_back">
+    <div class="row dash_heading">
+      <div class="col ">
+        {% if search %}
+          <h3 style="color:black;">Search Results for "{{ search }}"</h3>
+        {% else %}
+          <h3 style="color:black;">Your Groups</h3>
+        {% endif %}
+      </div>
     </div>
     <br/>
-
-    <div class="row dash_heading">
-        <div class="col ">
-            {% if search %}
-              <h3>Search Results for "{{ search }}"</h3>
-            {% else %}
-              <h3>Your Groups</h3>
-            {% endif %}
-        </div>
-        <div class="col">
-            <div class="float-right">
-                <a class="btn search_btn btn-outline-success" style="width: 100%;" href="{% url 'create_group' %}">Create Group</a>
+    <div class="dash_form">
+        <form class="form" method="POST">
+          {% csrf_token %}
+          <div class="form-row">
+            <div style="padding: 0px !important;" class="col-md-10 form-group">
+                <input type="text" style="width: 100%;" class="form-control" placeholder="Search" name="search-txt" id="search-txt">
             </div>
-        </div>       
+            <div class="col">
+                <button type="submit" class="btn search_btn btn-outline-success">Search</button>
+            </div>
+          </div>
+        </form>
     </div>
     <br/>
     {% if groups %}
         <div class="income_table">
-            <table class="table">
-                    <thead>
-                        <tr class="income_header_row">
-                            <th style="width:25%; text-align:center;" scope="col">Group Name</th>
-                            <th style="width:40%;" scope="col">Members</th>
-                            <th style="width:25%; text-align:center;" scope="col">Balance</th>
-                            <th style="width:10%; text-align:center;" scope="col"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for g in groups %}
-                        <tr>
-                            <td style="text-align:center;">{{ g.name }}</td>
-                            <td>
-                              {% for m in g.members.all %}
-                                {{ m }}&nbsp;&nbsp;
-                              {% endfor %}
-                            </td>
-                            <td style="text-align:center;">
-                              ${{ g.account.balance | floatformat:"2" }}
-                            </td>
-                            <td style="text-align:center;">
-                              <form style="float:right;" id="delete-req-form" method="POST">
-                                {% csrf_token %}
-                                  <input type="hidden" name="edit-group" id="edit-group" value="{{ g.name }}">
-                                  <div class="request_btn">
-                                      <button type="submit" value="delete-req" class="btn  btn-outline" style="outline:none;">
-                                        <i class="fas fa-edit"></i>
-                                      </button>
-                                  </div>
-                              </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                  </table>
+          <table class="table">
+            <thead>
+              <tr class="income_header_row">
+                <th style="width:25%; text-align:center;" scope="col">Group Name</th>
+                <th style="width:40%; text-align:center;" scope="col">Members</th>
+                <th style="width:15%; text-align:center;" scope="col">Balance</th>
+                <th style="width:20%; text-align:center;" scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for g in groups %}
+                <tr>
+                  <td style="text-align:center; color:black;">
+                    <a style="color:black; text-decoration:none;" href="/group/{{ g.name }}">{{ g.name }}</a>
+                  </td>
+                  <td style="text-align:center;">
+                    {% for m in g.members.all %}
+                      {{ m }}&nbsp;&nbsp;
+                    {% endfor %}
+                  </td>
+                  <td style="text-align:center;">
+                    ${{ g.account.balance | floatformat:"2" }}
+                  </td>
+                  <td style="text-align:center;">
+                    <form style="float:right;" id="edit-form" method="POST">
+                      {% csrf_token %}
+                      <input type="hidden" name="edit-group" id="edit-group" value="{{ g.name }}">
+                      <div class="request_btn">
+                        <button type="submit" class="btn btn-outline" style="outline:none;">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                      </div>
+                    </form>
+                    <form style="float:right;" id="edit-form" method="POST">
+                      {% csrf_token %}
+                      <input type="hidden" name="group-dash" id="group-dash" value="{{ g.name }}">
+                      <div class="request_btn">
+                        <button type="submit" class="btn btn-outline" style="outline:none;">
+                          <i class="fas fa-chart-line"></i>
+                        </button>
+                      </div>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+          </table>
         </div>
     {% else %}
       {% if search %}
-      <p>Your search found no matching groups.</p>
+        <p>Your search found no matching groups.</p>
       {% else %}
         <p>You are currently not listed in any groups. </p>
       {% endif %}
     {% endif %}
+    </br>
+    <div class="text-center">
+      <a class="btn search_btn" style="width: 20%; height: 43px; font-size: 18px; text-align:center;background-color: rgb(136, 206, 188); color:white !important" href="{% url 'create_group' %}">Create Group</a>
+    </div>
     <br/><br/>
 </div>
 <br/><br/>

@@ -10,6 +10,8 @@ from django.utils.html import strip_tags
 from datetime import datetime, timedelta
 import os, pytz, threading
 
+tz = pytz.timezone("Australia/Sydney")
+
 def user_directory_path(instance, filename):
     # File will be uploaded to MEDIA_ROOT/avatars/user_<id>/<filename>
     return 'avatars/{0}/{1}'.format(instance.user.id, filename)
@@ -23,10 +25,8 @@ class Account(models.Model):
             if (user_acc.balance < value):
                 print("Insufficient balance.")
                 return None
-            title = "Deposit into Group"
             date = tz.localize(datetime.now())
-            return user_acc._create_transfer(self, title, value, 0, date, False)
-
+            return user_acc._create_transfer(self, "Deposit into Group", value, 0, date, False)
         # Regular user deposits.
         title = "Deposit"
         return self._create_transaction(value, "Deposit", 'd', False)
@@ -47,7 +47,6 @@ class Account(models.Model):
             print('Account funds are insufficient.')
             return None
         return self._create_transaction(0-value, title, 'w', False)
-
 
     def approve_req(self, id):
         print ("Approving request....")
@@ -145,7 +144,6 @@ class Account(models.Model):
         if is_request:
             sender, receiver = receiver, sender
 
-        tz = pytz.timezone('Australia/Sydney')
         today = tz.localize(datetime.today()).date()
         today = tz.localize(datetime.combine(today, datetime.min.time()), is_dst=True)
         date = tz.localize(datetime.combine(date, datetime.min.time()), is_dst=True)
@@ -172,7 +170,7 @@ class Account(models.Model):
         # Create recurring copy of transfer if it is a payment made today.
         if (not is_request and recurr and recurr > 0):
             link_tx.create_recurring_copy(today)
-        return
+        return link_tx
 
     def __str__(self):
         if self.user:
@@ -376,7 +374,7 @@ class Transfer(models.Model):
     @transaction.atomic
     def notify(self, subj, template):
         # Note: If one of the payments goes to a group, no notification is sent.
-        if not tx_from.account.user or not tx_to.account.user:
+        if not self.tx_from.account.user or not self.tx_to.account.user:
             return
 
         print("Notifying...")
