@@ -19,7 +19,22 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Everytime you add a python dependancy to the project, run:
+### Instructions for running the website locally:
+
+Run the server and open localhost on a web browser:
+```
+python manage.py runserver
+```
+Run custom unit tests:
+```
+python manage.py test webapp
+```
+Run scheduled script that updates transactions:
+```
+python manage.py update
+```
+
+## Every time you add a python dependancy to the project, run:
 ```
 pip freeze > requirements.txt
 ```
