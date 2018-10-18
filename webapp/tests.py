@@ -23,6 +23,7 @@ class AccountTest(TestCase):
         self.acc = Account.objects.create(user=self.user)
         self.acc_from = Account.objects.create(user=self.usr_from)
         self.acc_to = Account.objects.create(user=self.usr_to)
+        self.acc_from.deposit(500)
 
         self.tx_from = Transaction.objects.create(transaction_type='w', title="transaction1", account=self.acc_from, value="-10.50", created_at=self.today, modified_at=self.today, confirmed_at=self.today)
         self.tx_to = Transaction.objects.create(transaction_type='d', title="transaction1", account=self.acc_to, value="10.50", created_at=self.today, modified_at=self.today, confirmed_at=self.today)
@@ -38,6 +39,10 @@ class AccountTest(TestCase):
         tx_from_copy.save()
         tx_to_copy.save()
         self.req = Transfer.objects.create(tx_from=tx_from_copy, tx_to=tx_to_copy, deadline=self.today, is_request=True)
+
+    def test_str(self):
+        self.assertEqual(str(self.user.account), "@testuser")
+        self.assertEqual(str(self.group.account), "group (Group)")
 
     def test_balance(self):
         self.assertEqual(self.acc.balance, 0)
@@ -66,27 +71,87 @@ class AccountTest(TestCase):
         self.user.account.deposit(10.70)
         self.user.account.withdraw(10.00)
         self.assertEqual('{0:.2f}'.format(self.user.account.balance), "0.70")
-#
-#     def test_approve_req(self):
-#         # TODO
-#         return True
-#
-#     def test_delete_transfer(self):
-#         # TODO
-#         return True
-#
-#     def test_create_transaction(self):
-#         # TODO
-#         return True
-#
-#     def test_create_transfer(self):
-#         # TODO
-#         return True
-#
-#     def test_str(self):
-#         # TODO
-#         return True
 
+    def test_approve_req(self):
+        # Cannot approve payments.
+        str = self.user.account.approve_req(self.pay.id)
+        self.assertEqual(str, "Invalid Transfer")
+
+        # Create transfer request.
+        tx_from_copy = self.tx_from._copy()
+        tx_to_copy   = self.tx_to._copy()
+        tx_from_copy.confirmed_at = None
+        tx_to_copy.confirmed_at = None
+        tx_from_copy.save()
+        tx_to_copy.save()
+        req = Transfer.objects.create(tx_from=tx_from_copy, tx_to=tx_to_copy, deadline=self.today, is_request=True)
+        req.confirmed_at = None
+
+        # Only receiver can approve requests.
+        self.acc_to.approve_req(req.id)
+        self.assertFalse(req.is_deleted)
+        self.assertIsNone(req.confirmed_at)
+
+        self.acc_from.approve_req(req.id)
+        self.assertFalse(req.is_deleted)
+        self.assertIsNotNone(req.confirmed_at)
+        print(" from : " + str)
+
+    def test_delete_transfer(self):
+        # Cannot delete past transfers
+        self.user.account.delete_transfer(self.pay.id)
+        self.assertFalse(self.pay.is_deleted)
+        self.assertFalse(self.pay.tx_from.is_deleted)
+        self.assertFalse(self.pay.tx_to.is_deleted)
+        # Delete transfer request.
+        self.user.account.delete_transfer(self.req.id)
+        self.assertFalse(self.req.is_deleted)
+        self.assertFalse(self.req.tx_from.is_deleted)
+        self.assertFalse(self.req.tx_to.is_deleted)
+
+    def test__create_transaction(self):
+        num_transactions = len(Transaction.objects.all())
+        self.user.account._create_transaction(0.50, "test transaction", 'd', False)
+        self.assertEqual(len(Transaction.objects.all()), num_transactions+1)
+        tx = Transaction.objects.get(id=num_transactions+1)
+        self.assertEqual(tx.title, "test transaction")
+        self.assertEqual(tx.value, 0.50)
+        self.assertEqual(tx.account, self.user.account)
+        self.assertEqual(tx.transaction_type, 'd')
+        self.assertIsNotNone(tx.confirmed_at)
+        self.assertIsNotNone(tx.created_at)
+        self.assertIsNotNone(tx.modified_at)
+        self.assertFalse(tx.is_pending)
+
+    def test__create_transfer(self):
+        # Pay group.
+        num_transfers = len(Transfer.objects.all())
+        self.user.account._create_transfer(self.group.account, "To Group", 12.50, 0, self.today, False)
+        self.assertIsNotNone(Transfer.objects.get(id=num_transfers+1))
+        tx = Transfer.objects.get(id=num_transfers+1)
+        self.assertFalse(tx.is_request)
+        self.assertEqual(tx.recurrence_days, 0)
+        self.assertIsNotNone(tx.confirmed_at)
+        self.assertEqual(tx.tx_from.value, -12.50)
+        self.assertEqual(tx.tx_from.account, self.user.account)
+        self.assertEqual(tx.tx_from.title, "To Group")
+        self.assertEqual(tx.tx_to.value, 12.50)
+        self.assertEqual(tx.tx_to.account, self.group.account)
+        self.assertEqual(tx.tx_to.title, "To Group")
+
+        # Group requests user.
+        self.group.account._create_transfer(self.user.account, "Request from Group", 17.50, 5, self.today, True)
+        self.assertIsNotNone(Transfer.objects.get(id=num_transfers+2))
+        tx = Transfer.objects.get(id=num_transfers+2)
+        self.assertTrue(tx.is_request)
+        self.assertEqual(tx.recurrence_days, 5)
+        self.assertIsNone(tx.confirmed_at)
+        self.assertEqual(tx.tx_from.value, -17.50)
+        self.assertEqual(tx.tx_from.account, self.user.account)
+        self.assertEqual(tx.tx_from.title, "Request from Group")
+        self.assertEqual(tx.tx_to.value, 17.50)
+        self.assertEqual(tx.tx_to.account, self.group.account)
+        self.assertEqual(tx.tx_to.title, "Request from Group")
 
 
 class GroupAccountTest(TestCase):

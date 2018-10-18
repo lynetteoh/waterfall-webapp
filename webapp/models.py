@@ -50,7 +50,6 @@ class Account(models.Model):
             return None
         return self._create_transaction(0-value, title, 'w', False)
 
-
     def approve_req(self, id):
         print ("Approving request....")
         transfer = Transfer.objects.get(id=id)
@@ -74,14 +73,15 @@ class Account(models.Model):
         # Attempt to send email notifications.
         try:
             t = threading.Thread(target=transfer.notify,\
-                args=("Approved TricklePay Request", 'email/approve-req.html',))
+                args=("Approved TricklePay Request", 'email/approve-req.html',),\
+                daemon=True)
             t.start()
 
             # Reminders for low balance.
             if (transfer.tx_from.account.balance < 10):
                 tR = threading.Thread(target=w.notify,\
                     args=("Warning: Low Waterfall Balance",\
-                            "email/reminder-balance.html",))
+                            "email/reminder-balance.html",), daemon=True)
                 tR.start()
         except Exception as e:
             print("Failed to send mail: " + str(e))
@@ -111,7 +111,8 @@ class Account(models.Model):
 
         # Attempt to send email notification
         try:
-            t = threading.Thread(target=transfer.notify, args=(subj, template,))
+            t = threading.Thread(target=transfer.notify, args=(subj, template,),\
+                                    daemon=True)
             t.start()
         except Exception as e:
             print("Failed to send mail: " + str(e))
@@ -127,13 +128,15 @@ class Account(models.Model):
             title=title,
             value=value,
             transaction_type=type,
+            created_at=tz.localize(datetime.now()),
+            modified_at=tz.localize(datetime.now()),
             confirmed_at=now,
             is_pending=is_pending,
         )
         if (self.balance < 10) and not is_pending:
             try:
                 t = threading.Thread(target=tx.notify,\
-                    args=("Warning: Low Waterfall Balance", "email/reminder-balance.html",))
+                    args=("Warning: Low Waterfall Balance", "email/reminder-balance.html",), daemon=True)
                 t.start()
             except Exception as e:
                 print("Failed to send mail: " + str(e))
