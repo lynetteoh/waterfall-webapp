@@ -49,30 +49,39 @@ def register_new(request):
 @login_required
 def view_more_current(request, name=None):
     user = request.user
+    acc = user.account
+    title = "Pending Transactions"
     current = []
+    group = None
+
+    if name and GroupAccount.objects.get(name=name):
+        group = GroupAccount.objects.get(name=name)
+        title += " - " + group.name
+        acc = group.account
+
     query = None if not request.GET.get('query') else request.GET.get('query')
-    (current, past) = collect_transfers(user.account, Transfer.objects.all(), query)
+    (current, past) = collect_transfers(acc, Transfer.objects.all(), query)
     context = {
-        "title": "Pending Transactions",
+        "title": title,
         "current": current,
-        "user": user,
+        "group": group,
+        "acc" : acc,
     }
-    # Search requests.
     if query:
         context["search"] = query
-        return render(request, 'dashboard.html', context)
-    # User request on outgoing transactions or incoming requests.
+        return render(request, 'view_more.html', context)
+    # User requests.
     if request.method == "POST":
         transfer = request.POST.get('transfer')
         try:
             if request.POST.get('req') == "approve-req":
-                context['error'] = user.account.approve_req(transfer)
+                context['error'] = acc.approve_req(transfer)
             if request.POST.get('req') == "delete-req":
-                context['error'] = user.account.delete_transfer(transfer)
+                context['error'] = acc.delete_transfer(transfer)
         except Exception as e:
             context['error'] = str(e)
         finally:
-            current, past = collect_transfers(user.account, Transfer.objects.all(), query)
+            current, past = collect_transfers(acc, Transfer.objects.all(), query)
             context['current'] = current
             return render(request, 'view_more.html', context)
     return render(request, 'view_more.html', context)
@@ -83,12 +92,12 @@ def view_more_history(request, name=None):
     user = request.user
     title = "Transaction History"
     group = None
-    query = None if not request.GET.get('query') else request.GET.get('query')
     acc = user.account
     if name and GroupAccount.objects.get(name=name):
         group = GroupAccount.objects.get(name=name)
         title += " - " + group.name
         acc = group.account
+    query = None if not request.GET.get('query') else request.GET.get('query')
     (current, past) = collect_transfers(acc, Transfer.objects.all(), query)
     context = {
         "title": title,
@@ -278,7 +287,6 @@ def pay(request):
 @login_required
 def request(request):
     user = request.user
-    # all_users = User.objects.all().exclude(username=request.user.username)
     all_users = User.objects.all()
     from_users = []
     from_users.append(user.username)
