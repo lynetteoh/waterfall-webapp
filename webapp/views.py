@@ -13,6 +13,8 @@ from .models import Profile, Account, Transaction, Transfer, GroupAccount
 from datetime import datetime
 import pytz
 
+import re
+
 # Home landing page.
 def index(request):
     return render(request, 'index.html')
@@ -367,6 +369,51 @@ def request(request):
             return render(request, 'request.html', context)
     # Regular request view.
     return render(request, 'request.html', context)
+
+@login_required
+def create_group(request):
+    user = request.user
+    create_members = [u.username for u in User.objects.all().exclude(username=user.username)]
+    context ={
+        "user" : user,
+        "filter_members": create_members,
+    }
+    if request.method == "POST":
+        print(request.POST)
+        errors = []
+        group_name = request.POST.get('group_name')
+        if group_name and (len(group_name) == 0 or len(group_name)) > 30:
+            errors.append("The group name must be between 1-30 characters.")
+        if GroupAccount.objects.filter(name__iexact=group_name):
+            errors.append("This account name has been taken.")
+        if not bool(re.match(r'^[\w]+$', group_name)):
+            errors.append("Account name must only consist of alphanumeric and underscore characters.")
+            print('TYPE')
+            print('|'+group_name+'|')
+
+        members = collect_recipients(request, 'members')
+        for m in members:
+            if not User.objects.filter(username=m).exists():
+                errors.append("A selected user does not exist.")
+
+        if len(errors) == 0:
+            acc = Account.objects.create()
+            gacc = GroupAccount.objects.create(account=acc, name=group_name)
+            members = [User.objects.get(username=m).profile for m in members]
+            gacc.members.set(members)
+            
+            acc.save()
+            gacc.save()
+
+            print("{} group created.".format(gacc))
+        else:
+            context['errors'] = errors
+            return render(request, 'create_group.html', context)
+
+        return HttpResponse('success')
+
+    else:
+        return render(request, 'create_group.html', context)
 
 # Groups page.
 @login_required
