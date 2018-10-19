@@ -370,6 +370,7 @@ def request(request):
     # Regular request view.
     return render(request, 'request.html', context)
 
+# New group creation page.
 @login_required
 def create_group(request):
     user = request.user
@@ -389,6 +390,7 @@ def create_group(request):
         if not bool(re.match(r'^[\w]+$', group_name)):
             errors.append("Account name must only consist of alphanumeric and underscore characters.")
 
+        # TODO: Avoid instance of duplicate users.
         members = collect_recipients(request, 'members')
         for m in members:
             if not User.objects.filter(username=m).exists():
@@ -449,8 +451,6 @@ def all_groups(request):
             if GroupAccount.objects.get(name=edit_group):
                 return redirect('/edit-group?g=' + edit_group)
     return render(request, 'all-groups.html', context)
-
-# New group creation page.
 
 # Group dashboard page.
 @login_required
@@ -525,7 +525,7 @@ def edit_group(request):
         user_groups.append(g.name)
 
     group = None
-    if request.method == "GET" and request.GET.get("g"):
+    if (request.method == "GET" and request.GET.get("g")) or (request.method == "POST" and request.GET.get("g")):
         edit_group = request.GET.get("g")
         group = GroupAccount.objects.get(name=edit_group)
 
@@ -541,6 +541,21 @@ def edit_group(request):
         "user_groups:": user_groups,
         "group_members": group_members,
     }
+
+    if request.method == "POST":
+        leaveGroup = request.POST.get('leave_group')
+        members = collect_recipients(request, 'members')
+
+        if leaveGroup:
+            group.members.remove(user.profile)
+            group.save()
+
+            return redirect('/all-groups')
+
+        #for m in members:
+        #    if not User.objects.filter(username=m).exists():
+        #        errors.append("A selected user does not exist.")
+
     return render(request, 'edit_group.html', context)
 
 ### HELPER FUNCTIONS ###
