@@ -1,20 +1,3 @@
-function checkError(error) {
-    console.log("Checking error : " + error)
-    if (error == "Success") {
-        swal({
-            title: "Success!",
-            text: "The transaction has been saved.",
-            icon: "success",
-        });
-    } else if (error) {
-        swal({
-            title: error,
-            text: "Please try again.",
-            icon: "warning",
-        });
-    }
-}
-
 //add member to group
 function add_member(search, users) {
 	// Get text from search bar

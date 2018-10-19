@@ -56,38 +56,38 @@
             <div class="row stop_margin">
                 <!-- Sidebar -->
                 <div class="col-md-3 position-fixed" id="sidebar" role="navigation">
-                    <div class="affix">
+                    <div class="affix" style="padding-left:12px;">
                     <ul class="nav" id="nav-list">
                         <li>
                           <a href="{% url 'dashboard'%}" id="about_nav" class="active nav_text nav-link" role="button">Dashboard
                           </a>
                         </li>
-                        <li class="subnav-list">
-                          <a id="about_nav" class="nav_text nav-link subnav" href={% url 'profile'%}>Profile Settings
+                        <li>
+                          <a id="profile-mgmt" class="nav_text nav-link" href={% url 'profile'%}>Profile Settings
                           </a>
                         </li>
-                        <li class="subnav-list">
-                          <a id="about_nav" class="nav_text nav-link subnav" role="button" href={% url 'balance'%}>Balance Management
+                        <li>
+                          <a id="balance-mgmt" class="nav_text nav-link" role="button" href={% url 'balance'%}>Balance Management
                           </a>
                         </li>
-                        <li class="subnav-list">
-                            <a id="about_nav" class="nav_text nav-link subnav" role="button" href="{% url 'all_groups' %}">Group Management
+                        <li>
+                            <a id="groups" class="nav_text nav-link" role="button" href="{% url 'all_groups' %}">Group Management
                             </a>
                         </li>
                         <li>
-                          <a id="about_nav" class="nav_text nav-link" role="button" href="{% url 'pay' %}">TricklePay
+                          <a id="trickle-pay" class="nav_text nav-link" role="button" href="{% url 'pay' %}">TricklePay
                           </a>
                         </li>
                         <li class="subnav-list">
-                          <a id="about_nav" class="nav_text nav-link subnav" role="button" href="{% url 'pay' %}">Pay
+                          <a class="nav_text nav-link subnav" role="button" href="{% url 'pay' %}">Pay
                           </a>
                         </li>
                         <li class="subnav-list">
-                          <a id="about_nav" class="nav_text nav-link subnav" role="button" href="{% url 'request' %}">Request
+                          <a class="nav_text nav-link subnav" role="button" href="{% url 'request' %}">Request
                           </a>
                         </li>
                         <li>
-                          <a id="about_nav" class="nav_text nav-link"  role="button" href="{% url 'logout'%}">Logout
+                          <a class="nav_text nav-link"  role="button" href="{% url 'logout'%}">Logout
                           </a>
                         </li>
                     </ul>

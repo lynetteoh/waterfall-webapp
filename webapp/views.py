@@ -9,6 +9,7 @@ from django.core.files.storage import FileSystemStorage
 from .forms import SignUpForm, AvatarForm
 from django.contrib.auth.models import User
 from .models import Profile, Account, Transaction, Transfer, GroupAccount
+from django.contrib.auth.password_validation import validate_password
 
 from datetime import datetime
 import pytz
@@ -118,10 +119,12 @@ def dashboard(request):
     user = request.user
     query = None if not request.GET.get('query') else request.GET.get('query')
     current, past = collect_transfers(user.account, Transfer.objects.all(), query)
+    tutorial = len(Transaction.objects.filter(account=user.account)) <= 0
     context = {
         "current" : current[:10],
         "past": past[:10],
         "user": user,
+        "tutorial": tutorial,
     }
     if query:
         context["search"] = query
@@ -196,7 +199,6 @@ def balance(request):
                 tx = user.account.deposit(float(add_amount))
             elif minus_amount and float(minus_amount) > 0:
                 tx = user.account.withdraw(float(minus_amount))
-
             if not tx:
                 context['error'] = "Insufficient Funds"
             else:
@@ -206,6 +208,8 @@ def balance(request):
             print(e)
             context['error'] = "Invalid Value"
         finally:
+            transactions = collect_transactions(user.account, Transaction.objects.all())
+            context["transactions"] = transactions
             return render(request, 'balance.html', context)
     return render(request, 'balance.html', context)
 
@@ -410,7 +414,7 @@ def create_group(request):
             gacc = GroupAccount.objects.create(account=acc, name=group_name)
             members = [User.objects.get(username=m).profile for m in members]
             gacc.members.set(members)
-            
+
             acc.save()
             gacc.save()
 
@@ -460,6 +464,7 @@ def all_groups(request):
             if GroupAccount.objects.get(name=edit_group):
                 return redirect('/edit-group?g=' + edit_group)
     return render(request, 'all-groups.html', context)
+
 
 # Group dashboard page.
 @login_required
@@ -691,10 +696,10 @@ def collect_transfers(acc, transfer_objects, query=None):
 
     # remove time for date-time format
     for i in current:
-        i.deadline = current.deadline.date()
+        i.deadline = i.deadline.date()
 
     for i in past:
-        i.confirmed_at = past.confirmed_at.date()
+        i.confirmed_at = i.confirmed_at.date()
 
     return (current, past)
 
@@ -714,12 +719,12 @@ def collect_dash_transfers(acc, transfer_objects, query=None):
         # Check for search results.
         if not transfer_has_query(t, query):
             continue
-            
+
         # Past transactions.
         if t.confirmed_at:
             past.append(t)
             continue
-            
+
         # Pending or outgoing requests.
         if t.is_request:
             # Pending requests waiting for approval from user to transfer someone else.

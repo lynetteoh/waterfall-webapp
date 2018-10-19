@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from webapp.models import Profile, Account, Transaction, Transfer
 
 from datetime import datetime, timedelta
-import pytz
+import pytz, threading
 
 # Updates various transactions in the database.
 # Will be called by the Scheduler running in the background periodically.
@@ -32,7 +32,8 @@ class Command(BaseCommand):
 
                 # Attempt to send email notification
                 try:
-                    t = threading.Thread(target=t.notify, args=(subj, template,))
+                    t = threading.Thread(target=t.notify, args=(subj, template,),\
+                    daemon=True)
                     t.start()
                 except Exception as e:
                     print("Failed to send mail: " + str(e))

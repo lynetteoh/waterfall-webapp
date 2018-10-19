@@ -32,7 +32,7 @@
                   <input class="col-sm-10 form-control" placeholder="Search" id="member_search" list="member_list">
                   <datalist id="member_list">
                       {% for m in filter_members %}
-                      <option>@{{ m }}</option>
+                      <option>{{ m }}</option>
                       {% endfor %}
                   </datalist>
                   <input type="button" class="col-sm-2 btn btn-primary" id="add" onclick="add_member('member_search', 'members')"
