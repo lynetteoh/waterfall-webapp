@@ -9,6 +9,7 @@ from django.core.files.storage import FileSystemStorage
 from .forms import SignUpForm, AvatarForm
 from django.contrib.auth.models import User
 from .models import Profile, Account, Transaction, Transfer, GroupAccount
+from django.contrib.auth.password_validation import validate_password
 
 from datetime import datetime
 import pytz

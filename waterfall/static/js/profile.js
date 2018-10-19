@@ -33,7 +33,9 @@ function validateForm() {
   if (pw != pw2) {
     return "Please ensure you verify the right password."
   }
-  // TODO if pw field is empty, send back old pw
+  if (pw.length >= 1 && pw.length < 8) {
+    return "This password is too short. It must contain at least 8 characters."
+  }
   return "";
 }
 
