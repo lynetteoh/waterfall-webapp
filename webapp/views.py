@@ -580,7 +580,7 @@ def edit_group(request):
 
             # There must be no duplicates.
             if len(set(other_members)) != len(other_members):
-                errors.append("A user is selected twice."+str(other_members))
+                errors.append("A user is selected twice.")
 
             if not len(errors):
                 members = [user.username] + other_members
