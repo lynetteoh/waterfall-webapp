@@ -161,7 +161,7 @@ function add_all_members(members, acc_owner) {
 			input.setAttribute("type", "hidden");
 			input.setAttribute("name", members + ul_len);
 			input.setAttribute("id", members + ul_len);
-			input.setAttribute("value", users);
+			input.setAttribute("value", users[i]);
 			list.appendChild(input);
 			list.appendChild(textnode);
 			list.setAttribute('class', 'pr-5');
