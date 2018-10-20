@@ -384,20 +384,30 @@ def create_group(request):
         "filter_members": create_members,
     }
     if request.method == "POST":
-        print(request.POST)
         errors = []
+
         group_name = request.POST.get('group_name')
+        # Group name must be between 1-30 characters.
         if group_name and (len(group_name) == 0 or len(group_name)) > 30:
             errors.append("The group name must be between 1-30 characters.")
-        if GroupAccount.objects.filter(name__iexact=group_name):
+
+        # Group name mustn't already exist as a group name or username
+        if GroupAccount.objects.filter(name__iexact=group_name) or User.objects.filter(username__iexact=group_name):
             errors.append("This account name has been taken.")
+
+        # Group name must only consist of alphanumeric + underscore chars
         if not bool(re.match(r'^[\w]+$', group_name)):
             errors.append("Account name must only consist of alphanumeric and underscore characters.")
 
         members = collect_recipients(request, 'members')
+        # members must all exist.
         for m in members:
             if not User.objects.filter(username=m).exists():
                 errors.append("A selected user does not exist.")
+
+        # There must be no duplicates.
+        if list(set(other_members)) != other_members:
+            errors.append("A user is selected twice.")
 
         if len(errors) == 0:
             acc = Account.objects.create()
@@ -454,7 +464,6 @@ def all_groups(request):
             if GroupAccount.objects.get(name=edit_group):
                 return redirect('/edit-group?g=' + edit_group)
     return render(request, 'all-groups.html', context)
-
 
 
 # Group dashboard page.
@@ -530,7 +539,7 @@ def edit_group(request):
         user_groups.append(g.name)
 
     group = None
-    if request.method == "GET" and request.GET.get("g"):
+    if (request.method == "GET" and request.GET.get("g")) or (request.method == "POST" and request.GET.get("g")):
         edit_group = request.GET.get("g")
         group = GroupAccount.objects.get(name=edit_group)
 
@@ -546,6 +555,41 @@ def edit_group(request):
         "user_groups:": user_groups,
         "group_members": group_members,
     }
+
+    if request.method == "POST":
+        errors = []
+        leaveGroup = request.POST.get('leave_group')
+        other_members = collect_recipients(request, 'members')
+
+        if leaveGroup:
+            group.members.remove(user.profile)
+            group.save()
+            return redirect('/all-groups')
+
+        else:
+            # List of members must not include self.
+            if user.username in other_members:
+                errors.append("List of members must not include self.")
+
+            # Members must all exist.
+            for m in other_members:
+                if not User.objects.filter(username=m).exists():
+                    errors.append("A selected user does not exist.")
+
+            # There must be no duplicates.
+            if list(set(other_members)) != other_members:
+                errors.append("A user is selected twice.")
+
+            if not len(errors):
+                members = [user.username] + other_members
+                members = [User.objects.get(username=m).profile for m in members]
+                group.members.set(members)
+                group.save()
+                return redirect('/all-groups')
+            
+            context['errors'] = errors
+
+
     return render(request, 'edit_group.html', context)
 
 ### HELPER FUNCTIONS ###
