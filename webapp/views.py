@@ -550,10 +550,11 @@ def edit_group(request):
         edit_group = request.GET.get("g")
         group = GroupAccount.objects.get(name=edit_group)
 
-    group_members = []
+    group_members = [user.username]
     if group:
         for p in group.members.all():
-            group_members.append(p.user.username)
+            if p.user.username != user.username:
+                group_members.append(p.user.username)
 
     context = {
         "user" : user,
