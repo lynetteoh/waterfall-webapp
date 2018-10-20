@@ -406,7 +406,7 @@ def create_group(request):
                 errors.append("A selected user does not exist.")
 
         # There must be no duplicates.
-        if list(set(other_members)) != other_members:
+        if len(set(members)) != len(members):
             errors.append("A user is selected twice.")
 
         if len(errors) == 0:
@@ -419,6 +419,8 @@ def create_group(request):
             gacc.save()
 
             print("'{}' group created.".format(gacc))
+            return redirect('/all-groups')
+
         else:
             context['errors'] = errors
             return render(request, 'create_group.html', context)
@@ -525,6 +527,9 @@ def group_dash(request, name):
         except Exception as e:
             context['error'] = e
         finally:
+            current, past = collect_transfers(group.account, Transfer.objects.all())
+            context['current'] = current[:10]
+            context['past'] = past[:10]
             return render(request, 'group_dash.html', context)
     return render(request, 'group_dash.html', context)
 
@@ -577,7 +582,7 @@ def edit_group(request):
                     errors.append("A selected user does not exist.")
 
             # There must be no duplicates.
-            if list(set(other_members)) != other_members:
+            if len(set(other_members)) != len(other_members):
                 errors.append("A user is selected twice.")
 
             if not len(errors):
@@ -586,7 +591,7 @@ def edit_group(request):
                 group.members.set(members)
                 group.save()
                 return redirect('/all-groups')
-            
+
             context['errors'] = errors
 
 
