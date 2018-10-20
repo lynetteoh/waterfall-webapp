@@ -7,12 +7,15 @@
 <link href="{% static "css/balance.css" %}" rel="stylesheet" type="text/css">
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="{% static "js/balance.js" %}" type="text/javascript"></script>
+{% comment %} <link href="{% static "css/introjs-modern.css" %}" rel="stylesheet"> {% endcomment %}
+<script type="text/javascript" src="{% static 'js/intro.js' %}"></script>
 {% endblock %}
 
 {% block content %}
 <div class="container bootstrap snippet" onload="checkError("{{ error }}")">
   <div class="">
       <div class="">
+      <a class="btn btn-large btn-success" href="javascript:void(0);" onclick="startIntro();">Show me how</a>
         <h3>Balance Management</h3>
         <br/>
         <h3 class="subheader" style="padding-top:15px; text-align: center;">Current Balance </h3>
@@ -94,6 +97,26 @@
 
 
 </div> <!-- end of container -->
+
+<script type="text/javascript" src="{% static 'js/intro.js' %}"></script>
+<script type="text/javascript">
+      function startIntro(){
+        var intro = introJs();
+          intro.setOptions({
+            steps: [
+              { 
+                intro: "Hello world!"
+              },
+              { 
+                intro: "You <b>don't need</b> to define element to focus, this is a floating tooltip."
+              }
+            ]
+          });
+
+          intro.start();
+      }
+    </script>
+
 <script>
 checkError("{{error}}");
 </script>
