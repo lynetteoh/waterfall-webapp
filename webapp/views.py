@@ -406,7 +406,7 @@ def create_group(request):
                 errors.append("A selected user does not exist.")
 
         # There must be no duplicates.
-        if list(set(members)) != members:
+        if len(set(members)) != len(members):
             errors.append("A user is selected twice.")
 
         if len(errors) == 0:
@@ -579,8 +579,8 @@ def edit_group(request):
                     errors.append("A selected user does not exist.")
 
             # There must be no duplicates.
-            if list(set(other_members)) != other_members:
-                errors.append("A user is selected twice.")
+            if len(set(other_members)) != len(other_members):
+                errors.append("A user is selected twice."+str(other_members))
 
             if not len(errors):
                 members = [user.username] + other_members
