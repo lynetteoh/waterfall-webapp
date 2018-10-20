@@ -406,7 +406,7 @@ def create_group(request):
                 errors.append("A selected user does not exist.")
 
         # There must be no duplicates.
-        if list(set(other_members)) != other_members:
+        if list(set(members)) != members:
             errors.append("A user is selected twice.")
 
         if len(errors) == 0:
@@ -419,6 +419,8 @@ def create_group(request):
             gacc.save()
 
             print("'{}' group created.".format(gacc))
+            return redirect('/all-groups')
+
         else:
             context['errors'] = errors
             return render(request, 'create_group.html', context)
