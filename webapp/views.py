@@ -527,6 +527,9 @@ def group_dash(request, name):
         except Exception as e:
             context['error'] = e
         finally:
+            current, past = collect_transfers(group.account, Transfer.objects.all())
+            context['current'] = current[:10]
+            context['past'] = past[:10]
             return render(request, 'group_dash.html', context)
     return render(request, 'group_dash.html', context)
 
@@ -588,7 +591,7 @@ def edit_group(request):
                 group.members.set(members)
                 group.save()
                 return redirect('/all-groups')
-            
+
             context['errors'] = errors
 
 
