@@ -75,64 +75,46 @@ function check_member(user) {
 }
 
 //alert
-function popup(members, form) {
-	var error = validateForm(members);
-	if (!error) {
-		if (form == 'group-creation-form') {
-			swal({
-				title: "Creating New Group",
-				text: "Are you sure?",
-				icon: "warning",
-				buttons: true,
-				dangerMode: true,
-			}).then((confirmed) => {
-				if (confirmed) {
-					document.getElementById(form).submit();
-					window.location.replace(group_list);
-				} else {
-					swal({
-						title: "Cancelled",
-						text: "Group creation cancelled",
-						icon: "warning",
-					});
-				}
-			});
-		} else {
-			swal({
-				title: "Are you sure?",
-				text: "Once changes have been saved, they cannot be undone.",
-				icon: "warning",
-				buttons: true,
-				dangerMode: true,
-			}).then((confirmed) => {
-				if (confirmed) {
-					document.getElementById(form).submit();
-				} else {
-					swal({
-						title: "Cancelled",
-						text: "Your changes have not been saved.",
-						icon: "warning",
-					});
-				}
-			});
-		}
-
+function popup (form) {
+	if (form == 'group-creation-form') {
+		swal({
+			title: "Creating New Group",
+			text: "Are you sure?",
+			icon: "warning",
+			buttons: true,
+			dangerMode: true,
+		}).then((confirmed) => {
+			if (confirmed) {
+				document.getElementById(form).submit();
+				window.location.replace(group_list);
+			} else {
+				swal({
+					title: "Cancelled",
+					text: "Group creation cancelled",
+					icon: "warning",
+				});
+			}
+		});
 	} else {
 		swal({
-			title: "Process Failed",
-			text: error,
+			title: "Are you sure?",
+			text: "Once changes have been saved, they cannot be undone.",
 			icon: "warning",
+			buttons: true,
+			dangerMode: true,
+		}).then((confirmed) => {
+			if (confirmed) {
+				document.getElementById(form).submit();
+			} else {
+				swal({
+					title: "Cancelled",
+					text: "Your changes have not been saved.",
+					icon: "warning",
+				});
+			}
 		});
 	}
-}
 
-function validateForm(members) {
-	// Ensure at least one payee is selected.
-	if (document.getElementById(members).getElementsByTagName('li').length >= 1) {
-		return "";
-	} else {
-		return "Please choose at least one member.";
-	}
 }
 
 //add group creator
@@ -155,8 +137,8 @@ function add_creator(members, user) {
 	document.getElementById(members).appendChild(list);
 }
 
-function add_all_members(members) {
-	users = g_members.split("&#39;");
+function add_all_members(members, acc_owner) {
+	var users = g_members.split("&#39;");
 	// Removes the [] parantheses.
 	users.splice(0, 1);
 	users.pop();
@@ -167,7 +149,26 @@ function add_all_members(members) {
 	}
 
 	for (var i = 0; i < users.length; i++) {
-		add(users[i], members)
+		console.log(users[i]);
+		console.log(acc_owner);
+		if(users[i] == acc_owner) {
+			var list = document.createElement("li");
+			var textnode = document.createTextNode(users[i]);
+			var ul_len = document.getElementById(members).childNodes.length;
+		
+			// create input element
+			var input = document.createElement("input");
+			input.setAttribute("type", "hidden");
+			input.setAttribute("name", members + ul_len);
+			input.setAttribute("id", members + ul_len);
+			input.setAttribute("value", users);
+			list.appendChild(input);
+			list.appendChild(textnode);
+			list.setAttribute('class', 'pr-5');
+			document.getElementById(members).appendChild(list);
+		} else {
+			add(users[i], members)
+		}	
 	}
 
 }

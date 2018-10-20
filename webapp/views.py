@@ -551,14 +551,15 @@ def edit_group(request):
     group_members = []
     if group:
         for p in group.members.all():
-            if p.user != user:
-                group_members.append(p.user.username)
+            group_members.append(p.user.username)
+
     context = {
         "user" : user,
         "group" : group,
         "filter_members": filter_users,
         "user_groups:": user_groups,
         "group_members": group_members,
+        "acc_owner": user.username
     }
 
     if request.method == "POST":

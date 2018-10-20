@@ -17,7 +17,7 @@
     {% if not group %}
       <p>No group has been selected for management. Please try again.</p>
     {% else %}
-      <form role="form" id="group-management-form" onsubmit="event.preventDefault();popup('members','group-management-form')"
+      <form role="form" id="group-management-form" onsubmit="event.preventDefault();popup('group-management-form')"
           method="POST">
           {% csrf_token %}
           <div class="row form-group mb-5" style="font-size:18px;">
@@ -65,7 +65,6 @@
     var f_members = "{{filter_members}}";
     var g_members = "{{group_members}}";
     var group_list = "{% url 'all_groups' %}";
-    add_all_members('members');
-    checkError("{{error}}");
+    add_all_members('members',"{{acc_owner}}");
 </script>
 {% endblock %}
