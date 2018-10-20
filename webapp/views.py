@@ -568,35 +568,39 @@ def edit_group(request):
     if request.method == "POST":
         errors = []
         leaveGroup = request.POST.get('leave_group')
-        other_members = collect_recipients(request, 'members')
+        members = collect_recipients(request, 'members')
 
         if leaveGroup:
             group.members.remove(user.profile)
             group.save()
             return redirect('/all-groups')
 
-        else:
+        elif len(members):
+            # Remove self
+            members.remove(user.username)
+            
             # List of members must not include self.
-            if user.username in other_members:
+            if user.username in members:
                 errors.append("List of members must not include self.")
 
             # Members must all exist.
-            for m in other_members:
+            for m in members:
                 if not User.objects.filter(username=m).exists():
                     errors.append("A selected user does not exist.")
 
             # There must be no duplicates.
-            if len(set(other_members)) != len(other_members):
+            if len(set(members)) != len(members):
                 errors.append("A user is selected twice.")
 
             if not len(errors):
-                members = [user.username] + other_members
+                members = [user.username] + members
                 members = [User.objects.get(username=m).profile for m in members]
                 group.members.set(members)
                 group.save()
                 return redirect('/all-groups')
 
-            context['errors'] = errors
+        context['errors'] = errors
+        
 
 
     return render(request, 'edit_group.html', context)
@@ -605,6 +609,11 @@ def edit_group(request):
 
 # Collects payees for multi pay and multi requests.
 def collect_recipients(request, user_type):
+    member_inputs = [m for m in list(request.POST) if bool(re.match(r'^{}[0-9]+$'.format(user_type), m))]
+    recipients = [request.POST.get(m) for m in member_inputs]
+    return recipients
+
+    '''
     # Collect all payees.
     payees = []
     i = 0
@@ -614,6 +623,7 @@ def collect_recipients(request, user_type):
         i += 1
         r = request.POST.get(user_type + str(i))
     return payees
+    '''
 
 # Checks if a particular transfer has query term in its name, description or involved users.
 def transfer_has_query(t, query):
