@@ -34,14 +34,15 @@
                         <div class="row form-group ">
                             <label class="col-sm-2 col-form-label" for="pay_search">To</label>
                             <div class="col-sm-10 mb-3 form-inline">
-                                <input class="col-sm-10 form-control" placeholder="Search" onfocus="this.value=''" id="pay_search" list="pay_userList">
+                                <input class="col-sm-10 form-control" placeholder="Search" onfocus="this.value=''" id="pay_search"
+                                    list="pay_userList">
                                 <datalist id="pay_userList">
                                     {% for f in filter_users %}
                                     <option>{{ f }}</option>
                                     {% endfor %}
                                 </datalist>
-                                <input type="button" class="col-sm-2 btn btn-primary" id="pay_add"
-                                    onclick="add('pay_search', 'pay_users', 'pay_amount')" value="Add">
+                                <input type="button" class="col-sm-2 btn btn-primary" id="pay_add" onclick="add('pay_search', 'pay_users', 'pay_amount')"
+                                    value="Add">
                             </div>
                         </div>
                         <div class="col-sm-12  ml-5 pl-5 mb-3">
@@ -99,7 +100,21 @@
 <script>
     var f_users = "{{filter_users}}";
     checkError("{{error}}");
-    document.getElementById('pay_date').valueAsDate = new Date();
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1; //January is 0!
+    var yyyy = today.getFullYear();
+
+    if (dd < 10) {
+        dd = '0' + dd
+    }
+
+    if (mm < 10) {
+        mm = '0' + mm
+    }
+
+    today = yyyy + '-' + mm + '-' + dd;
+    document.getElementById('pay_date').value = today;
 
 </script>
 
