@@ -86,7 +86,6 @@ function popup (form) {
 		}).then((confirmed) => {
 			if (confirmed) {
 				document.getElementById(form).submit();
-				window.location.replace(group_list);
 			} else {
 				swal({
 					title: "Cancelled",
@@ -137,6 +136,7 @@ function add_creator(members, user) {
 	document.getElementById(members).appendChild(list);
 }
 
+//add all members in a group
 function add_all_members(members, acc_owner) {
 	var users = g_members.split("&#39;");
 	// Removes the [] parantheses.
@@ -193,7 +193,6 @@ function add(user, members) {
 	list.appendChild(remove);
 	document.getElementById(members).appendChild(list);
 	remove.onclick = function () {
-		console.log(list);
 		document.getElementById(members).removeChild(list);
 	}
 }
