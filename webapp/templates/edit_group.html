@@ -44,7 +44,7 @@
           </div>
           </t>
           <div class="text-center font-inline p-4">
-              <button class="btn btn-lg btn-primary" type="submit" style="font-size:18px;">Save</button>
+              <button class="btn btn-lg btn-primary" name="update_members" type="submit" style="font-size:18px;">Save</button>
               &nbsp;&nbsp;&nbsp;&nbsp;
               <input type="button" class="btn btn-lg btn-primary" value="Leave Group" onclick="leave_group('leave_group')" style="font-size:18px;">
               &nbsp;&nbsp;&nbsp;&nbsp;
@@ -53,7 +53,7 @@
       </form>
       <form role="form" id="leave_group" method="POST">
           {% csrf_token %}
-          <input id="hidden_field" name="hidden_field" type="hidden" value="User leave group" />
+          <input id="hidden_field" name="leave_group" type="hidden" value="User leave group" />
       </form>
     {% endif %}
 </div>

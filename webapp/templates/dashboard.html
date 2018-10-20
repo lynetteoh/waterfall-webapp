@@ -9,10 +9,13 @@
 <link href="{% static "css/dash.css" %}" rel="stylesheet" type="text/css">
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="{% static "js/dash.js" %}" type="text/javascript"></script>
+<link href="{% static "css/introjs.css" %}" rel="stylesheet">
+<link href="{% static "css/introjs-modern.css" %}" rel="stylesheet">
+<script type="text/javascript" src="{% static 'js/intro.js' %}"></script>
 {% endblock %}
 
 {% block content %}
-<div class="dash_back" style="padding:14px; margin-top:-12px;">
+<div id="dashboard" class="dash_back" style="padding:14px; margin-top:-12px;">
     {% if search %}
     <div class="row dash_heading">
       <div class="col">
@@ -213,6 +216,66 @@
     </div>
 </div>
 <br/><br/>
+
+<script type="text/javascript">
+      function startTutorial(){
+        var intro = introJs();
+          intro.setOptions({
+            steps: [
+              {
+                intro: "Welcome! Lost? Join us for a quick tutorial!<br><br>Use arrow keys for navigation or hit ESC to exit the tour."
+              },
+              {
+                element: '#balance-text',
+                intro: "Here’s your current balance.",
+                position: 'left'
+              },
+              {
+                element: '#balance-mgmt',
+                intro: "You can top up and withdraw amounts from here.",
+                position: 'right'
+              },
+              {
+                element: '#profile-mgmt',
+                intro: 'You can also change to a more exciting profile picture!',
+                position: 'right'
+              },
+              {
+                element: '#trickle-pay',
+                intro: "Pay and get paid from as many other users as you want, whenever you choose.",
+                position: 'right'
+              },
+              {
+                element: '#dashboard',
+                intro: "All your transactions will be listed here.",
+                position: 'auto'
+              },
+              {
+                element: '#groups',
+                intro: "Lastly, create groups with friends to share a common fund for expenses!",
+                position: 'right'
+              },
+              {
+                intro: "We hope you enjoyed this guide! See you soon."
+              }
+            ]
+          });
+
+          intro.setOption("showStepNumbers", "false");
+          intro.setOption("overlayOpacity", "0.5");
+          intro.setOption("exitOnOverlayClick", "false");
+          intro.setOption("scrollToElement", "true");
+          intro.start();
+      };
+</script>
+
+
+{% if tutorial %}
+<script>
+//call after page loaded
+window.onload=startTutorial ; 
+</script>
+{% endif %}
 
 <script>
 checkError("{{ error }}");

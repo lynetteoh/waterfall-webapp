@@ -16,7 +16,8 @@ class OneSessionPerUserMiddleware:
             # different from the current session, delete the stored_session_key
             # session_key with from the Session table
             if stored_session_key and stored_session_key != request.session.session_key:
-                Session.objects.get(session_key=stored_session_key).delete()
+                if Session.objects.filter(session_key=stored_session_key):
+                    Session.objects.get(session_key=stored_session_key).delete()
 
             request.user.logged_in_user.session_key = request.session.session_key
             request.user.logged_in_user.save()
