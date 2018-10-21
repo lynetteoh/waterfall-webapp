@@ -45,8 +45,8 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -85,11 +85,8 @@ WSGI_APPLICATION = 'waterfall.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL')
-    )
-}
+prod_db  =  dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(prod_db)
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -116,16 +113,8 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
-STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
-
-STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = '/dashboard'
 
@@ -136,10 +125,6 @@ MEDIA_URL = '/media/' #this line is added and it creates a directory named media
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media') #this line is added and it serves as the root address of
 #uploaded file
 MEDIA_ROOT = 'waterfall/static/'
-MEDIA_ROOT = 'waterfall/static/'
-
-# Added by Steph for Heroku Integration
-django_heroku.settings(locals())
 
 # Email Notification Settings
 EMAIL_HOST ='smtp.gmail.com'
@@ -147,3 +132,15 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'waterfallpay@gmail.com'
 EMAIL_HOST_PASSWORD = config('WEBAPP_EMAIL_PASSWORD')
 EMAIL_USE_TLS = True
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/2.1/howto/static-files/
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+# Added by Steph for Heroku Integration
+django_heroku.settings(locals())
