@@ -9,6 +9,7 @@ from django.core.files.storage import FileSystemStorage
 from .forms import SignUpForm, AvatarForm
 from django.contrib.auth.models import User
 from .models import Profile, Account, Transaction, Transfer, GroupAccount
+from django.contrib.auth.password_validation import validate_password
 
 from datetime import datetime
 import pytz
@@ -395,20 +396,30 @@ def create_group(request):
         "filter_members": create_members,
     }
     if request.method == "POST":
-        print(request.POST)
         errors = []
+
         group_name = request.POST.get('group_name')
+        # Group name must be between 1-30 characters.
         if group_name and (len(group_name) == 0 or len(group_name)) > 30:
             errors.append("The group name must be between 1-30 characters.")
-        if GroupAccount.objects.filter(name__iexact=group_name):
+
+        # Group name mustn't already exist as a group name or username
+        if GroupAccount.objects.filter(name__iexact=group_name) or User.objects.filter(username__iexact=group_name):
             errors.append("This account name has been taken.")
+
+        # Group name must only consist of alphanumeric + underscore chars
         if not bool(re.match(r'^[\w]+$', group_name)):
             errors.append("Account name must only consist of alphanumeric and underscore characters.")
 
         members = collect_recipients(request, 'members')
+        # members must all exist.
         for m in members:
             if not User.objects.filter(username=m).exists():
                 errors.append("A selected user does not exist.")
+
+        # There must be no duplicates.
+        if len(set(members)) != len(members):
+            errors.append("A user is selected twice.")
 
         if len(errors) == 0:
             acc = Account.objects.create()
@@ -420,6 +431,8 @@ def create_group(request):
             gacc.save()
 
             print("'{}' group created.".format(gacc))
+            return redirect('/all-groups')
+
         else:
             context['errors'] = errors
             return render(request, 'create_group.html', context)
@@ -465,7 +478,6 @@ def all_groups(request):
             if GroupAccount.objects.get(name=edit_group):
                 return redirect('/edit-group?g=' + edit_group)
     return render(request, 'all-groups.html', context)
-
 
 
 # Group dashboard page.
@@ -527,6 +539,9 @@ def group_dash(request, name):
         except Exception as e:
             context['error'] = e
         finally:
+            current, past = collect_transfers(group.account, Transfer.objects.all())
+            context['current'] = current[:10]
+            context['past'] = past[:10]
             return render(request, 'group_dash.html', context)
     return render(request, 'group_dash.html', context)
 
@@ -541,28 +556,74 @@ def edit_group(request):
         user_groups.append(g.name)
 
     group = None
-    if request.method == "GET" and request.GET.get("g"):
+    if (request.method == "GET" and request.GET.get("g")) or (request.method == "POST" and request.GET.get("g")):
         edit_group = request.GET.get("g")
         group = GroupAccount.objects.get(name=edit_group)
 
-    group_members = []
+    group_members = [user.username]
     if group:
         for p in group.members.all():
-            if p.user != user:
+            if p.user.username != user.username:
                 group_members.append(p.user.username)
+
     context = {
         "user" : user,
         "group" : group,
         "filter_members": filter_users,
         "user_groups:": user_groups,
         "group_members": group_members,
+        "acc_owner": user.username
     }
+
+    if request.method == "POST":
+        errors = []
+        leaveGroup = request.POST.get('leave_group')
+        members = collect_recipients(request, 'members')
+
+        if leaveGroup:
+            group.members.remove(user.profile)
+            group.save()
+            return redirect('/all-groups')
+
+        elif len(members):
+            # Remove self
+            members.remove(user.username)
+            
+            # List of members must not include self.
+            if user.username in members:
+                errors.append("List of members must not include self.")
+
+            # Members must all exist.
+            for m in members:
+                if not User.objects.filter(username=m).exists():
+                    errors.append("A selected user does not exist.")
+
+            # There must be no duplicates.
+            if len(set(members)) != len(members):
+                errors.append("A user is selected twice.")
+
+            if not len(errors):
+                members = [user.username] + members
+                members = [User.objects.get(username=m).profile for m in members]
+                group.members.set(members)
+                group.save()
+                return redirect('/all-groups')
+
+        context['errors'] = errors
+        
+
+
     return render(request, 'edit_group.html', context)
 
 ### HELPER FUNCTIONS ###
 
 # Collects payees for multi pay and multi requests.
 def collect_recipients(request, user_type):
+    member_inputs = [m for m in list(request.POST) if bool(re.match(r'^{}[0-9]+$'.format(user_type), m))]
+    recipients = [request.POST.get(m) for m in member_inputs]
+    return recipients
+
+    '''
     # Collect all payees.
     payees = []
     i = 0
@@ -572,6 +633,7 @@ def collect_recipients(request, user_type):
         i += 1
         r = request.POST.get(user_type + str(i))
     return payees
+    '''
 
 # Checks if a particular transfer has query term in its name, description or involved users.
 def transfer_has_query(t, query):
