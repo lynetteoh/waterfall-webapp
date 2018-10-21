@@ -9,6 +9,9 @@
 <link rel="stylesheet" href="{% static 'css/awesomplete.css' %}" type="text/css">
 <script src="{% static 'js/awesomplete.js' %}" async></script>
 <link rel="stylesheet" href="{% static 'css/tricklepay.css' %}" type="text/css">
+<link href="{% static "css/introjs.css" %}" rel="stylesheet">
+<link href="{% static "css/introjs-modern.css" %}" rel="stylesheet">
+<script type="text/javascript" src="{% static 'js/intro.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -65,7 +68,7 @@
                                     onload="today()" required>
                                 <div class="text-center col-sm-5">
                                     <div class="btn-group  pl-5" id="pay_freq">
-                                        <input type="radio" name="pay_freq" id="pay_once" value="0" required><label for="pay_once"
+                                        <input type="radio" name="pay_freq" checked="checked" id="pay_once" value="0" required><label for="pay_once"
                                             class="btn">Once</label>
                                         <input type="radio" name="pay_freq" id="pay_weekly" value="7"><label for="pay_weekly"
                                             class="btn">Weekly</label>
@@ -96,6 +99,54 @@
     </div>
 </div>
 
+<script type="text/javascript">
+      function startTutorial(){
+        var intro = introJs();
+          intro.setOptions({
+            steps: [
+              {
+                intro: "Excited to make your first payment? Let me quickly show you how easy it is."
+              },
+              {
+                element: '#pay_from',
+                intro: "By default, the money will be withdrawn from your account. However, you can also use a group account to pay."
+              },
+              {
+                element: '#pay_search',
+                intro: "You can also pay multiple people.<br>What a time saver, right?"
+              },
+              {
+                element: '#pay_amount',
+                intro: 'Amount that each user will receive.'
+              },
+              {
+                element: '#pay_date',
+                intro: "Lucky you can plan out your future payments so you never miss the deadline."
+              },
+              {
+                element: '#pay_freq',
+                intro: "You can also set up a recurring payment for things like rent, phone bill or membership."
+              },
+              {
+                intro: "Easy right? Now let's make your fist payment!"
+              }
+            ]
+          });
+
+          intro.setOption("showStepNumbers", "false");
+          intro.setOption("overlayOpacity", "0.5");
+          intro.setOption("exitOnOverlayClick", "false");
+          intro.setOption("scrollToElement", "true");
+          intro.start();
+      };
+</script>
+
+{% if tutorial %}
+<script>
+//call after page loaded
+window.onload=startTutorial ; 
+</script>
+{% endif %} 
 
 <script>
     var f_users = "{{filter_users}}";

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+
 {% load static %}
 
 {% block title %}
@@ -8,6 +9,9 @@
 <link rel="stylesheet" href="{% static 'css/awesomplete.css' %}" type="text/css">
 <script src="{% static 'js/awesomplete.js' %}" async></script>
 <link rel="stylesheet" href="{% static 'css/tricklepay.css' %}" type="text/css">
+<link href="{% static "css/introjs.css" %}" rel="stylesheet">
+<link href="{% static "css/introjs-modern.css" %}" rel="stylesheet">
+<script type="text/javascript" src="{% static 'js/intro.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -65,7 +69,7 @@
                                     required>
                                 <div class="text-center col-sm-5">
                                     <div class="btn-group  pl-5" id="req_freq">
-                                        <input type="radio" name="req_freq" id="req_once" value="0" required><label for="req_once"
+                                        <input type="radio" name="req_freq" checked="checked" id="req_once" value="0" required><label for="req_once"
                                             class="btn">Once</label>
                                         <input type="radio" name="req_freq" id="req_weekly" value="7"><label for="req_weekly"
                                             class="btn">Weekly</label>
@@ -116,6 +120,55 @@
     </div>
 </div>
 
+<script type="text/javascript">
+      function startTutorial(){
+        var intro = introJs();
+          intro.setOptions({
+            steps: [
+              {
+                intro: "Excited to make your first request?<br>Let me quickly show you how easy it is."
+              },
+              {
+                element: '#req_from',
+                intro: "By default, the money will be transfered to your account.<br>However, you can also select one of your group accounts."
+              },
+              {
+                element: '#req_search',
+                intro: "You can also send a request to multiple people.<br>What a time saver, right?"
+              },
+              {
+                element: '#req_amount',
+                intro: "Total amount that you request.<br>By default, the amount is split evenly.<br>Feel free to change it to fit your requirements later."
+              },
+              {
+                element: '#req_date',
+                intro: "Select a deadline to be sure you always receive your money on time."
+              },
+              {
+                element: '#req_freq',
+                intro: "You can also set up a recurring payment.<br>For example, when you pay for rent on behalf of your housemates."
+              },
+              {
+                intro: "Easy right? Now let's make your fist request!"
+              }
+            ]
+          });
+
+          intro.setOption("showStepNumbers", "false");
+          intro.setOption("overlayOpacity", "0.5");
+          intro.setOption("exitOnOverlayClick", "false");
+          intro.setOption("scrollToElement", "true");
+          intro.start();
+      };
+</script>
+
+{% if tutorial %}
+<script>
+//call after page loaded
+window.onload=startTutorial ; 
+</script>
+{% endif %} 
+
 <script>
     var f_users = "{{filter_users}}";
     checkError("{{error}}");
@@ -135,4 +188,5 @@
     today = yyyy + '-' + mm + '-' + dd;
     document.getElementById('req_date').value = today;
 </script>
+
 {% endblock %}
