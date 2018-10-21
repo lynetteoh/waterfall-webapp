@@ -26,6 +26,7 @@ Run the server and open localhost on a web browser:
 python manage.py runserver
 ```
 Run custom unit tests:
+NOTE: May take a few tries to get no warnings, given the Django bug in relevant project document.
 ```
 python manage.py test webapp
 ```
