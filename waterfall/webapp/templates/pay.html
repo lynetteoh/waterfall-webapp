@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+<title>Waterfall - TricklePay</title>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="{% static 'js/pay.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/awesomplete.css' %}" type="text/css">
+<script src="{% static 'js/awesomplete.js' %}" async></script>
+<link rel="stylesheet" href="{% static 'css/tricklepay.css' %}" type="text/css">
+<link href="{% static "css/introjs.css" %}" rel="stylesheet">
+<link href="{% static "css/introjs-modern.css" %}" rel="stylesheet">
+<script type="text/javascript" src="{% static 'js/intro.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top:-20px; margin-left:15px; margin-right:15px;">
+    <div class="row">
+        {% include 'navtabs.html' %}
+        <div class="panel-body">
+            <div class="tab-content">
+                <div class="tab-pane container active" id="pay">
+                    <form role="form" id="pay-form" onsubmit="event.preventDefault();popup('pay_users','pay-form','pay_amount', 'pay_date')"
+                        method="POST">
+                        {% csrf_token %}
+                        <div class="row form-group mt-5 mb-5">
+                            <label class="col-sm-2 col-form-label" for="pay_from">From</label>
+                            <div class=" col-sm-10">
+                                <select class="form-control" name="pay_from" id="pay_from">
+                                    {% for f in from_users %}
+                                    <option value="{{f}}">{{ f }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group ">
+                            <label class="col-sm-2 col-form-label" for="pay_search">To</label>
+                            <div class="col-sm-10 mb-3 form-inline">
+                                <input class="col-sm-10 form-control" placeholder="Search" onfocus="this.value=''" id="pay_search"
+                                    list="pay_userList">
+                                <datalist id="pay_userList">
+                                    {% for f in filter_users %}
+                                    <option>{{ f }}</option>
+                                    {% endfor %}
+                                </datalist>
+                                <input type="button" class="col-sm-2 btn btn-primary" id="pay_add" onclick="add('pay_search', 'pay_users', 'pay_amount')"
+                                    value="Add">
+                            </div>
+                        </div>
+                        <div class="col-sm-12  ml-5 pl-5 mb-3">
+                            <ul class="ml-5 form-inline" id='pay_users'></ul>
+                        </div>
+                        <div class="row form-group mb-5">
+                            <label for="pay_amount" class="col-sm-2 col-form-label">Amount</label>
+                            <div class="input-group col-sm-10">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">$</span>
+                                </div>
+                                <input name="pay_amount" type="number" class="form-control" id="pay_amount" name="pay_amount"
+                                    min="0" step=".01" required>
+                            </div>
+                        </div>
+                        <div class="row form-group mb-5">
+                            <label class="col-sm-2 col-form-label" for="pay_date">Date</label>
+                            <div class="form-inline col-sm-10">
+                                <input type=date class="form-control col-sm-4" role="input" id="pay_date" name="pay_date"
+                                    onload="today()" required>
+                                <div class="text-center col-sm-5">
+                                    <div class="btn-group  pl-5" id="pay_freq">
+                                        <input type="radio" name="pay_freq" checked="checked" id="pay_once" value="0" required><label for="pay_once"
+                                            class="btn">Once</label>
+                                        <input type="radio" name="pay_freq" id="pay_weekly" value="7"><label for="pay_weekly"
+                                            class="btn">Weekly</label>
+                                        <input type="radio" name="pay_freq" id="pay_monthly" value="30"><label for="pay_monthly"
+                                            class="btn ">Monthly</label>
+                                        <input type="radio" name="pay_freq" id="pay_yearly" value="365"><label for="pay_yearly"
+                                            class="btn ">Yearly</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group mb-5">
+                            <label class="col-sm-2 col-form-label" for="pay_description">Description</label>
+                            <div class="col-sm-10 mb-3">
+                                <textarea class="no-resize form-control" name="pay_description" row="3" id="description"
+                                    placeholder="Type Something..." required></textarea>
+                            </div>
+                        </div>
+                        <div class="text-center p-4">
+                            <button class="btn btn-lg btn-primary" type="submit">TricklePay
+                                <i class="fa fa-credit-card px-2"></i></button>
+                        </div>
+                        <br />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+      function startTutorial(){
+        var intro = introJs();
+          intro.setOptions({
+            steps: [
+              {
+                intro: "Excited to make your first payment? Let me quickly show you how easy it is."
+              },
+              {
+                element: '#pay_from',
+                intro: "By default, the money will be withdrawn from your account. However, you can also use a group account to pay."
+              },
+              {
+                element: '#pay_search',
+                intro: "You can also pay multiple people.<br>What a time saver, right?"
+              },
+              {
+                element: '#pay_amount',
+                intro: 'Amount that each user will receive.'
+              },
+              {
+                element: '#pay_date',
+                intro: "Lucky you can plan out your future payments so you never miss the deadline."
+              },
+              {
+                element: '#pay_freq',
+                intro: "You can also set up a recurring payment for things like rent, phone bill or membership."
+              },
+              {
+                intro: "Easy right? Now let's make your fist payment!"
+              }
+            ]
+          });
+
+          intro.setOption("showStepNumbers", "false");
+          intro.setOption("overlayOpacity", "0.5");
+          intro.setOption("exitOnOverlayClick", "false");
+          intro.setOption("scrollToElement", "true");
+          intro.start();
+      };
+</script>
+
+{% if tutorial %}
+<script>
+//call after page loaded
+window.onload=startTutorial ; 
+</script>
+{% endif %} 
+
+<script>
+    var f_users = "{{filter_users}}";
+    checkError("{{error}}");
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1; //January is 0!
+    var yyyy = today.getFullYear();
+
+    if (dd < 10) {
+        dd = '0' + dd
+    }
+
+    if (mm < 10) {
+        mm = '0' + mm
+    }
+
+    today = yyyy + '-' + mm + '-' + dd;
+    document.getElementById('pay_date').value = today;
+
+</script>
+
+{% endblock %}

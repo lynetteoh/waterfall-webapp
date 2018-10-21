@@ -1,0 +1,73 @@
+{% extends 'home-base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Waterfall</title>
+{% endblock %}
+
+{% block css %}
+<link href="{% static "css/team.css" %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+<br/><br/>
+<div class="team_back">
+    <div class="container main_landing">
+        <div class="team_header padding_top"><h1 class="display-4">Our Team</h1></div>
+            <br/><br/><br/>
+            <center class="profiles">
+            <div class="row">
+                <div class="profile_card col">
+                    <div class="card" style="width:150px">
+                    <img class="member_image card-img-top"  src="{% static "images/jo.jpg" %}"  alt="Card image" style="width:100%">
+                    <div class="card-body">
+                      <h4 class="card-title">Joseph</h4>
+                      <p class="card-text">Back-end </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="profile_card col">
+                    <div class="card" style="width:150px">
+                    <img class="member_image card-img-top"  src="{% static "images/lynn.jpg" %}"  alt="Card image" style="width:100%">
+                    <div class="card-body">
+                      <h4 class="card-title">Lynn</h4>
+                      <p class="card-text">Front-end </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="profile_card col">
+                    <div class="card" style="width:150px">
+                    <img class="member_image card-img-top"  src="{% static "images/martin.jpg" %}"  alt="Card image" style="width:100%">
+                    <div class="card-body">
+                      <h4 class="card-title">Martin</h4>
+                      <p class="card-text">Back-end </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="profile_card col">
+                    <div class="card" style="width:150px">
+                    <img class="member_image card-img-top"  src="{% static "images/nash.jpg" %}"  alt="Card image" style="width:100%">
+                    <div class="card-body">
+                      <h4 class="card-title">Panashe</h4>
+                      <p class="card-text">Product Owner</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="profile_card col">
+                    <div class="card" style="width:150px">
+                    <img class="member_image card-img-top"  src="{% static "images/steph.jpg" %}"  alt="Card image" style="width:100%">
+                    <div class="card-body">
+                      <h4 class="card-title">Steph</h4>
+                      <p class="card-text">Scrum Master</p>
+                    </div>
+                  </div>
+                </div>
+
+            </div>
+        </center>
+        <br/><br/>
+        <br/><br/>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Waterfall - Balance Management</title>
+<link href="{% static "css/dash.css" %}" rel="stylesheet" type="text/css">
+<link href="{% static "css/balance.css" %}" rel="stylesheet" type="text/css">
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="{% static "js/balance.js" %}" type="text/javascript"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container bootstrap snippet" onload="checkError("{{ error }}")">
+  <div class="">
+      <div class="">
+        <h3>Balance Management</h3>
+        <br/>
+        <h3 class="subheader" style="padding-top:15px; text-align: center;">Current Balance </h3>
+        <p id="balance-value">${{ user.account.balance | floatformat:"2" }}</p>
+      </div>
+        <!-- Balance Edit Buttons -->
+      <div class="col" id="balance-buttons">
+        <div class="row">
+          <div class="col button-row">
+            <form class="form-inline" role="form" id="deposit" onsubmit="event.preventDefault(); balancePopup(false)" method="POST">
+              {% csrf_token %}
+              <div class="deposit_inner">
+
+              <input type="text" style="display: inline-block;" class="text-center form-control" name="add_amount" placeholder="0.00" value="0.00" id="add-amount">
+                <button style="display: inline-block !important;" class="btn btn-lg btn-success text-center" type="submit" value="Add" id="plus-button">
+                  Deposit
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="col button-row">
+          <center>
+          <form class="form-inline" role="form" id="withdraw" onsubmit="event.preventDefault(); balancePopup(true)" method="POST">
+            {% csrf_token %}
+            <div class="deposit_inner">
+
+              <input type="text" style="display: inline-block;" class="text-center form-control" name="minus_amount" id="minus-amount" value="0.00" placeholder="0.00">
+                <button style="display: inline-block !important;" class="btn btn-lg btn-danger" type="submit" value="Withdraw" id="minus-button">
+                  Withdraw
+                </button>
+              </div>
+          </form></center>
+        </div>
+        </div>
+      </div><!-- end of buttons -->
+    </div>
+    <br> <br>
+
+    <div class="row dash_heading">
+        <div class="col">
+            <h4 style="color:grey;">Past Transactions</h4>
+        </div>
+    </div>
+    <br/>
+    <div class="income_table">
+      {% if transactions %}
+      <div class="income_table">
+        <table class="table">
+          <thead>
+            <tr class="income_header_row">
+              <th style="width:25%; text-align:center;" scope="col">Date</th>
+              <th style="width:45%; text-align:center;" scope="col">Description</th>
+              <th style="width:30%; text-align:center;" scope="col">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+              {% for tx in transactions %}
+                {% if tx.value < 0 %}
+                <tr>
+                    <td>{{ tx.confirmed_at }}</td>
+                    <td style="text-align:center;">{{ tx.title | truncatechars:30 }}</td>
+                    <td style="text-align:center; color:rgb(223, 65, 65);">${{ tx.value | floatformat:"2" }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td>{{ tx.confirmed_at }}</td>
+                    <td style="text-align:center;">{{ tx.title | truncatechars:30 }}</td>
+                    <td style="text-align:center; color:rgb(37, 165, 37);">${{ tx.value | floatformat:"2" }}</td>
+                </tr>
+                {% endif %}
+              {% endfor %}
+          </tbody>
+        </table>
+      <br/>
+      </div>
+      {% else %}
+        <p>You currently have no past transactions.</p>
+      {% endif %}
+    
+</div>
+</div>
+
+<script>
+checkError("{{error}}");
+</script>
+
+{% endblock %}
