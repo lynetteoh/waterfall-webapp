@@ -389,12 +389,19 @@ def request(request):
 # New group creation page.
 @login_required
 def create_group(request):
+    # get account owner
     user = request.user
+
+    # get all user in the database except account owner
     create_members = [u.username for u in User.objects.all().exclude(username=user.username)]
+
+    # context for frontend display
     context ={
         "user" : user,
         "filter_members": create_members,
     }
+
+    # POST request
     if request.method == "POST":
         errors = []
 
@@ -421,7 +428,9 @@ def create_group(request):
         if len(set(members)) != len(members):
             errors.append("A user is selected twice.")
 
+        # if no error 
         if len(errors) == 0:
+            # create group account with members and add it to database
             acc = Account.objects.create()
             gacc = GroupAccount.objects.create(account=acc, name=group_name)
             members = [User.objects.get(username=m).profile for m in members]
@@ -434,6 +443,7 @@ def create_group(request):
             return redirect('/all-groups')
 
         else:
+            # return error to front end for display
             context['errors'] = errors
             return render(request, 'create_group.html', context)
 
@@ -445,12 +455,18 @@ def create_group(request):
 # Groups page.
 @login_required
 def all_groups(request):
+    # get account owner
     user = request.user
+
+    # get all groups the account owner belongs
     groups = [g for g in user.profile.GroupAccount.all()]
+
+    # context for frontend 
     context = {
         "user": user,
         "groups": groups,
     }
+
     if request.method == "POST":
         # Search requests.
         if request.POST.get("search-txt"):
@@ -483,17 +499,25 @@ def all_groups(request):
 # Group dashboard page.
 @login_required
 def group_dash(request, name):
+    # get account owner
     user = request.user
+
+    # get groups
     try:
         group = GroupAccount.objects.get(name=name)
     except:
         group = None
+
     group_members = []
+
+    # context for frontend
     context = {
         "user" : user,
         "group" : group,
         "group_members": group_members,
     }
+
+    # get group members and pass it to frontend
     if group:
         for p in group.members.all():
             if p.user != user:
@@ -548,24 +572,31 @@ def group_dash(request, name):
 # Edit group page.
 @login_required
 def edit_group(request):
+    # get account owner
     user = request.user
+
+    # get all user in the database except acc owner
     filter_users = [u.username for u in User.objects.all().exclude(username=user.username)]
 
+    # get all groups name
     user_groups = []
     for g in user.profile.GroupAccount.all():
         user_groups.append(g.name)
 
+    # get group info
     group = None
     if (request.method == "GET" and request.GET.get("g")) or (request.method == "POST" and request.GET.get("g")):
         edit_group = request.GET.get("g")
         group = GroupAccount.objects.get(name=edit_group)
 
+    # add all members in a group 
     group_members = [user.username]
     if group:
         for p in group.members.all():
             if p.user.username != user.username:
                 group_members.append(p.user.username)
 
+    # context for frontend
     context = {
         "user" : user,
         "group" : group,
@@ -575,14 +606,18 @@ def edit_group(request):
         "acc_owner": user.username
     }
 
+    # POST request
     if request.method == "POST":
         errors = []
         leaveGroup = request.POST.get('leave_group')
         members = collect_recipients(request, 'members')
 
+        # if user chose to leave group 
         if leaveGroup:
+            # remove user from group members 
             group.members.remove(user.profile)
             group.save()
+            # redirect to group list 
             return redirect('/all-groups')
 
         elif len(members):
@@ -602,6 +637,7 @@ def edit_group(request):
             if len(set(members)) != len(members):
                 errors.append("A user is selected twice.")
 
+            # if no error, save changes for group
             if not len(errors):
                 members = [user.username] + members
                 members = [User.objects.get(username=m).profile for m in members]
@@ -609,6 +645,7 @@ def edit_group(request):
                 group.save()
                 return redirect('/all-groups')
 
+        # return error to frontend
         context['errors'] = errors
         
 

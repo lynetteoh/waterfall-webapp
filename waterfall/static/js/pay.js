@@ -1,3 +1,4 @@
+// pop up to show error message for form submission
 function checkError(error) {
     console.log("Checking error : " + error)
     if (error == "Success") {
@@ -15,6 +16,7 @@ function checkError(error) {
     }
 }
 
+// pop up to ask for user confirmation for form submission
 function popup(ul, form, amount, date) {
     var text = document.getElementById(amount).value;
     var error = validateForm(ul, amount, date, form);
@@ -46,6 +48,7 @@ function popup(ul, form, amount, date) {
 }
 
 
+// add payee to list
 function add(search, user, amnt) {
 
     var text = document.getElementById(search).value;
@@ -108,6 +111,7 @@ function removeBtn() {
     return btn;
 }
 
+// validate form before form submission to make sure fields are correct
 function validateForm(ul, amnt, d, form) {
 
     // Ensure at least one payee is selected.
@@ -273,6 +277,7 @@ function check_split(amount, users_list) {
     return (sum != amount) ? 1 : 0;
 }
 
+// check if the selected user is chosen already
 function exist(user, text) {
     result = 0
     // make sure same payee is not chosen
