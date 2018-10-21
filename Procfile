@@ -1,2 +1,2 @@
-web: gunicorn waterfall.wsgi 
+web: gunicorn waterfall.wsgi --log-file -
 
