@@ -38,13 +38,13 @@
                 </a>
                 <li>
                   <div id="profile">
-                  <a href="{% url 'profile' %}">
+                    <center><a href="{% url 'profile' %}">
                     {% if user.profile.avatar %}
                       <img id="user-icon" src="{{ user.profile.avatar.url }}"/>
                     {% else %}
                       <img src="{% static "images/anon-user.svg" %}" id="user-icon"/>
                     {% endif %}
-                  </a>
+                  </a></center>
                   <p id="username">@{{ user.username }}</p>
                   </div>
                 </li>
@@ -107,9 +107,9 @@
                                 <p id="footer" class="bottomText"> Project Waterfall &copy; 2018</p>
                             </div>
                             <div class="social_icons">
-                                <i class="fab fa-facebook-square icon"></i>
-                                <i class="fab fa-linkedin icon"></i>
-                                <i class="fab fa-instagram icon"></i>
+                                <a style="color: #666666;" target="_blank" href="mailto:waterfallpay@gmail.com"><i class="fas fa-envelope icon"></i></a>
+
+                                <a style="color: #666666;" target="_blank" href="https://www.instagram.com/waterfall.app/"><i class="fab fa-instagram icon"></i></a>
                             </div>
                         </div>
                         </div>
