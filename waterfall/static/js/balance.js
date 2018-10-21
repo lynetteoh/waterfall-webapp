@@ -47,7 +47,7 @@ function validAmount(txt) {
     if (isNaN(txt) || !result || txt <= 0) {
     swal({
       title: "Invalid Amount",
-      text:  "Please only input positive numeric amounts.",
+      text:  "Please only input positive numeric amounts with at most 2 decimal places.",
       icon:  "warning",
     });
     return false;
