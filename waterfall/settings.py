@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 import django_heroku
+from decouple import config
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,12 +22,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ogx48w&ab+!s8uz8yt-_3t%f4%=j)(e8^k@1ih^uj01(ie(ko!'
+SECRET_KEY =  config(‘SECRET_KEY’)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config(‘DEBUG’, default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [‘*’]
 
 
 # Application definition
@@ -83,11 +85,9 @@ WSGI_APPLICATION = 'waterfall.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+    ‘default’: dj_database_url.config(
+    default=config(‘DATABASE_URL’)
+)}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -114,9 +114,9 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "waterfall/static/"),
-]
+STATICFILES_DIRS = (os.path.join(BASE_DIR, ‘static’),)
+
+STATIC_ROOT = os.path.join(BASE_DIR, ‘staticfiles’)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
@@ -141,5 +141,5 @@ django_heroku.settings(locals())
 EMAIL_HOST ='smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'waterfallpay@gmail.com'
-EMAIL_HOST_PASSWORD = os.environ.get('WEBAPP_EMAIL_PASSWORD', '')
+EMAIL_HOST_PASSWORD = config(‘'WEBAPP_EMAIL_PASSWORD'’)
 EMAIL_USE_TLS = True
