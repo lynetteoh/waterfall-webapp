@@ -19,6 +19,13 @@
     
 }
 
+.team_back {
+    position: relative;
+    padding-bottom: 150px;
+}
+
+.footer_new {}
+
 .padding_top {
     padding-top: 150px !important;
 }
