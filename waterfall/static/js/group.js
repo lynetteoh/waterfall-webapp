@@ -22,6 +22,7 @@ function add_member(search, users) {
 	}
 }
 
+// check if member already added
 function exist(search, user, text) {
 	result = 0
 	// make sure same payee is not chosen
@@ -54,6 +55,7 @@ function removeBtn() {
 	return btn;
 }
 
+//check for valid member
 function check_member(user) {
 	users = f_members.split("&#39;");
 	// Removes the [] parantheses.
@@ -173,6 +175,7 @@ function add_all_members(members, acc_owner) {
 
 }
 
+//add member to list
 function add(user, members) {
 	var list = document.createElement("li");
 	var textnode = document.createTextNode(user);
@@ -197,6 +200,7 @@ function add(user, members) {
 	}
 }
 
+// Show pop up for user confirmation to leave group. submit form to leave group. 
 function leave_group(form) {
 	swal({
 		title: "Leaving Group",
@@ -207,7 +211,6 @@ function leave_group(form) {
 	}).then((confirmed) => {
 		if (confirmed) {
 			document.getElementById(form).submit();
-			// window.location.replace(group_list);
 		} else {
 			swal({
 				title: "Cancelled",
@@ -218,6 +221,7 @@ function leave_group(form) {
 	});
 }
 
+// pop up to get user confirmation to cancel all changes made
 function cancel_changes(link) {
 	swal({
 		title: "Cancel Changes?",
