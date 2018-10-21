@@ -41,10 +41,10 @@ function balancePopup(isWithdraw) {
 /* Ensures withdraw/deposit amounts are positive values. */
 function validAmount(txt) {
 
-    var patt = /\d*\.?\d{3,}/;
+    var patt = /^\d+(\.\d{1,2})?$/;
     var result = patt.test(txt);
     
-    if (isNaN(txt) || result) {
+    if (isNaN(txt) || !result || txt <= 0) {
     swal({
       title: "Invalid Amount",
       text:  "Please only input positive numeric amounts.",
