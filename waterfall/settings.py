@@ -25,9 +25,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY =  config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config(‘DEBUG’, default=False, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = [‘*’]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -85,9 +85,10 @@ WSGI_APPLICATION = 'waterfall.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
-    ‘default’: dj_database_url.config(
-    default=config(‘DATABASE_URL’)
-)}
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL')
+    )
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -114,11 +115,11 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, ‘static’),)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 
-STATIC_ROOT = os.path.join(BASE_DIR, ‘staticfiles’)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
@@ -143,5 +144,5 @@ django_heroku.settings(locals())
 EMAIL_HOST ='smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'waterfallpay@gmail.com'
-EMAIL_HOST_PASSWORD = config(‘'WEBAPP_EMAIL_PASSWORD'’)
+EMAIL_HOST_PASSWORD = config('WEBAPP_EMAIL_PASSWORD')
 EMAIL_USE_TLS = True
