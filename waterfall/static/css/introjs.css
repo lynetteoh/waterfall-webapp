@@ -188,7 +188,7 @@ tr.introjs-showElement > th {
   font-size: 20px;
   font-weight: 600;
   min-width: 500px;
-  max-width: 600px;
+  max-width: 800px;
   border-radius: 3px;
   box-shadow: 0 1px 10px rgba(0,0,0,.4);
   -webkit-transition: opacity 0.1s ease-out;

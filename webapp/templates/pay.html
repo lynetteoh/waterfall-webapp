@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="{% static 'css/awesomplete.css' %}" type="text/css">
 <script src="{% static 'js/awesomplete.js' %}" async></script>
 <link rel="stylesheet" href="{% static 'css/tricklepay.css' %}" type="text/css">
+<link href="{% static "css/introjs.css" %}" rel="stylesheet">
 <link href="{% static "css/introjs-modern.css" %}" rel="stylesheet">
 <script type="text/javascript" src="{% static 'js/intro.js' %}"></script>
 {% endblock %}
@@ -103,7 +104,7 @@
           intro.setOptions({
             steps: [
               {
-                intro: "Are you excited to make your first payment? Let me quickly show you how easy it is."
+                intro: "Excited to make your first payment? Let me quickly show you how easy it is."
               },
               {
                 element: '#pay_from',
@@ -111,7 +112,7 @@
               },
               {
                 element: '#pay_search',
-                intro: "You can top up and withdraw amounts from here."
+                intro: "You can also pay multiple people.<br>What a time saver, right?"
               },
               {
                 element: '#pay_amount',
@@ -119,11 +120,11 @@
               },
               {
                 element: '#pay_date',
-                intro: "Lucky you can plan out your future payments so you never miss the deadline"
+                intro: "Lucky you can plan out your future payments so you never miss the deadline."
               },
               {
                 element: '#pay_freq',
-                intro: "You can also set up a recurring payment for things like rent"
+                intro: "You can also set up a recurring payment for things like rent, phone bill or membership."
               },
               {
                 intro: "Easy right? Now let's make your fist payment!"
@@ -131,22 +132,25 @@
             ]
           });
 
-          {% comment %} intro.setOption("showStepNumbers", "false");
+          intro.setOption("showStepNumbers", "false");
           intro.setOption("overlayOpacity", "0.5");
           intro.setOption("exitOnOverlayClick", "false");
-          intro.setOption("scrollToElement", "false"); {% endcomment %}
+          intro.setOption("scrollToElement", "true");
           intro.start();
       };
 </script>
 
+{% if tutorial %}
 <script>
 //call after page loaded
 window.onload=startTutorial ; 
 </script>
+{% endif %} 
 
 <script>
     var f_users = "{{filter_users}}";
     checkError("{{error}}");
     document.getElementById('pay_date').valueAsDate = new Date();
 </script> 
+
 {% endblock %}

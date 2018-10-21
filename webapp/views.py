@@ -229,12 +229,16 @@ def pay(request):
     for u in all_users:
         if (u != user.username):
             pay_users.append(u.username)
+
+    tutorial = len(Transfer.objects.all().filter(tx_from__account__user = user)) <= 0
+
     context = {
         "pay_page": "active",
         "user" : user,
         "user_groups": user_groups,
         "filter_users": pay_users,
         "from_users": from_users,
+        "tutorial": tutorial,
     }
     if request.method == "POST":
         try:
@@ -288,6 +292,7 @@ def pay(request):
             print (e)
             context['error'] = str(e)
         finally:
+            context['tutorial'] = False
             return render(request, 'pay.html', context)
     # Regular pay view.
     return render(request, 'pay.html', context)
@@ -311,12 +316,16 @@ def request(request):
     for u in all_users:
         if (u != user.username):
             req_users.append(u.username)
+
+    tutorial = len(Transfer.objects.all().filter(tx_to__account__user = user, is_request = True)) <= 0
+
     context = {
         "request_page": "active",
         "user" : user,
         "user_groups": user_groups,
         "filter_users": req_users,
         "from_users": from_users,
+        "tutorial": tutorial,
     }
     if request.method == "POST":
         try:
@@ -371,6 +380,7 @@ def request(request):
             print (e)
             context['error'] = str(e)
         finally:
+            context['tutorial'] = False
             return render(request, 'request.html', context)
     # Regular request view.
     return render(request, 'request.html', context)
