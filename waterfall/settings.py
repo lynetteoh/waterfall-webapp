@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'SOME+RANDOM+KEY(z9+3vnm(jb0u@&w68t#5_e8s9-lbfhv-')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'ogx48w&ab+!s8uz8yt-_3t%f4%=j)(e8^k@1ih^uj01(ie(ko!')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -84,19 +84,32 @@ WSGI_APPLICATION = 'waterfall.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'waterfallDB',
-        'USER': 'name',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '',
+try:
+    from .local_settings import *
+    print("FOUND LOCAL")
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
 
-db_from_env = dj_database_url.config(conn_max_age=500)
-DATABASES['default'].update(db_from_env)
+except ImportError:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'waterfallDB',
+            'USER': 'name',
+            'PASSWORD': '',
+            'HOST': 'localhost',
+            'PORT': '',
+        }
+    }
+
+    db_from_env = dj_database_url.config(conn_max_age=500)
+    DATABASES['default'].update(db_from_env)
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -140,7 +153,6 @@ MEDIA_URL = '/media/' #this line is added and it creates a directory named media
 #where the uploaded images will be stored
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media') #this line is added and it serves as the root address of
 #uploaded file
-MEDIA_ROOT = 'waterfall/static/'
 MEDIA_ROOT = 'waterfall/static/'
 
 # Added by Steph for Heroku Integration
