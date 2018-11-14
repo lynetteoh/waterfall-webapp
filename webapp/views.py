@@ -12,9 +12,7 @@ from .models import Profile, Account, Transaction, Transfer, GroupAccount
 from django.contrib.auth.password_validation import validate_password
 
 from datetime import datetime
-import pytz
-
-import re
+import pytz, re
 
 # Home landing page.
 def index(request):
@@ -35,6 +33,7 @@ def product(request):
 def register_new(request):
     if request.POST:
         form = SignUpForm(request.POST)
+        # Check validity of the registration form.
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
@@ -50,7 +49,7 @@ def register_new(request):
         form = SignUpForm()
     return render(request, 'index.html', {'form': form})
 
-# Incoming Payments View more selection for dashboard.
+# Pending Transactions View more selection for main & group dashboard.
 @login_required
 def view_more_current(request, name=None):
     user = request.user
@@ -59,11 +58,13 @@ def view_more_current(request, name=None):
     current = []
     group = None
 
+    # View more for group accounts.
     if name and GroupAccount.objects.get(name=name):
         group = GroupAccount.objects.get(name=name)
         title += " - " + group.name
         acc = group.account
 
+    # Get search queries and relevant transfers.
     query = None if not request.GET.get('query') else request.GET.get('query')
     (current, past) = collect_transfers(acc, Transfer.objects.all(), query)
     context = {
@@ -72,6 +73,7 @@ def view_more_current(request, name=None):
         "group": group,
         "acc" : acc,
     }
+    # Search requests.
     if query:
         context["search"] = query
         return render(request, 'view_more.html', context)
@@ -91,17 +93,19 @@ def view_more_current(request, name=None):
             return render(request, 'view_more.html', context)
     return render(request, 'view_more.html', context)
 
-# Historical Transactions complete selection for dashboard.
+# Past Transactions complete selection for main/group dashboard.
 @login_required
 def view_more_history(request, name=None):
     user = request.user
     title = "Transaction History"
     group = None
     acc = user.account
+    # View more for group accounts.
     if name and GroupAccount.objects.get(name=name):
         group = GroupAccount.objects.get(name=name)
         title += " - " + group.name
         acc = group.account
+    # Gets search query and filter relevant transfers.
     query = None if not request.GET.get('query') else request.GET.get('query')
     (current, past) = collect_transfers(acc, Transfer.objects.all(), query)
     context = {
@@ -110,15 +114,18 @@ def view_more_history(request, name=None):
         "group": group,
         "acc" : acc,
     }
+    # For search requests.
     if query:
         context["search"] = query
         return render(request, 'view_more.html', context)
+    # Else display transfers.
     return render(request, 'view_more.html', context)
 
 # User dashboard & landing page after login.
 @login_required
 def dashboard(request):
     user = request.user
+    # Get search query and filter relevant transfers.
     query = None if not request.GET.get('query') else request.GET.get('query')
     current, past = collect_transfers(user.account, Transfer.objects.all(), query)
     tutorial = len(Transaction.objects.filter(account=user.account)) <= 0
@@ -128,10 +135,11 @@ def dashboard(request):
         "user": user,
         "tutorial": tutorial,
     }
+    # For search requests.
     if query:
         context["search"] = query
         return render(request, 'dashboard.html', context)
-
+    # For user approval and cancellation of transfers.
     if request.method == "POST":
         transfer = request.POST.get('transfer')
         try:
@@ -142,6 +150,7 @@ def dashboard(request):
         except Exception as e:
             context['error'] = str(e)
         finally:
+            # Refresh on selected transfers.
             current, past = collect_transfers(user.account, Transfer.objects.all(), query)
             context['current'] = current[:10]
             context['past'] = past[:10]
@@ -196,6 +205,7 @@ def balance(request):
         add_amount = request.POST.get('add_amount')
         minus_amount = request.POST.get('minus_amount')
         try:
+            # Execute relevant user request and identify any errors.
             tx = None
             if add_amount and float(add_amount) > 0:
                 tx = user.account.deposit(float(add_amount))
@@ -210,6 +220,7 @@ def balance(request):
             print(e)
             context['error'] = "Invalid Value"
         finally:
+            # Refresh on transactions relevant to users.
             transactions = collect_transactions(user.account, Transaction.objects.all())
             context["transactions"] = transactions
             return render(request, 'balance.html', context)
@@ -623,7 +634,7 @@ def edit_group(request):
         elif len(members):
             # Remove self
             members.remove(user.username)
-            
+
             # List of members must not include self.
             if user.username in members:
                 errors.append("List of members must not include self.")
@@ -647,9 +658,6 @@ def edit_group(request):
 
         # return error to frontend
         context['errors'] = errors
-        
-
-
     return render(request, 'edit_group.html', context)
 
 ### HELPER FUNCTIONS ###
@@ -659,18 +667,6 @@ def collect_recipients(request, user_type):
     member_inputs = [m for m in list(request.POST) if bool(re.match(r'^{}[0-9]+$'.format(user_type), m))]
     recipients = [request.POST.get(m) for m in member_inputs]
     return recipients
-
-    '''
-    # Collect all payees.
-    payees = []
-    i = 0
-    r = request.POST.get(user_type + '0')
-    while r:
-        payees.append(r)
-        i += 1
-        r = request.POST.get(user_type + str(i))
-    return payees
-    '''
 
 # Checks if a particular transfer has query term in its name, description or involved users.
 def transfer_has_query(t, query):
@@ -715,10 +711,8 @@ def collect_transfers(acc, transfer_objects, query=None):
     # remove time for date-time format
     for i in current:
         i.deadline = i.deadline.date()
-
     for i in past:
         i.confirmed_at = i.confirmed.at.date()
-
     return (current, past)
 
 # Collects group transfers based on categories.
@@ -728,7 +722,6 @@ def collect_transactions(acc, transactions, query=None):
         # Check its a valid existing transfer relevant to current user.
         if t.is_deleted or not t.confirmed_at or not t.account == acc:
             continue
-
         if t.title == "Deposit" or t.title == "Withdrawal"\
             or t.title == "Deposit into Group"\
             or t.title == "Withdrawal from Group":

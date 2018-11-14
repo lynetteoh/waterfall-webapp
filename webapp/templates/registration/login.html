@@ -11,11 +11,11 @@
 
 {% block content %}
 
-<div class="login_back">
+<div class="login_back" style="padding-top:110px;">
     <div class="padding_top1 container main_landing">
         <center>
             <div class="col-md-5 login_back1">
-                <form method="post" action="{% url 'login' %}" class="register_form">        
+                <form method="post" action="{% url 'login' %}" class="register_form">
                     {% csrf_token %}
                     <div class="form-group row">
                         <div class="col-sm-12">
@@ -33,7 +33,7 @@
                         }, 3000);
                         </script>
                     {% endif %}
-                    
+
                     <hr style="colour:white; background-color:white;"/>
 
                     <div class="form-group row">
@@ -44,7 +44,7 @@
 
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input type="password" class="form-control" placeholder="Password" name="password" required="" id="password">    
+                            <input type="password" class="form-control" placeholder="Password" name="password" required="" id="password">
                         </div>
                     </div>
                     <div class="form-group row">
